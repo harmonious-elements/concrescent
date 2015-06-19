@@ -1,0 +1,57 @@
+.tag-map {
+	position: relative;
+	width: 100%;
+	height: 0;
+	background: url('../../admin/booth_table_map.php') no-repeat center;
+	background-size: 100% 100%;
+}
+.tag {
+	position: absolute;
+	width: 40px;
+	margin: -6px 0 0 -20px;
+	font-size: 10px;
+	line-height: 12px;
+	font-weight: bold;
+	text-align: center;
+}
+.tag:before {
+	content: attr(data-content);
+	display: block;
+	position: absolute;
+	top: 12px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	font-size: 10px;
+	line-height: 12px;
+	font-weight: bold;
+	text-align: center;
+	color: rgba(255, 255, 255, 0.8);
+	-webkit-text-stroke: 4px rgba(255, 255, 255, 0.8);
+	text-stroke: 4px rgba(255, 255, 255, 0.8);
+	pointer-events: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+	z-index: 5000;
+}
+.tag input {
+	display: block;
+	position: relative;
+	width: 12px;
+	height: 12px;
+	margin: 0 auto;
+	z-index: 15000;
+}
+.tag span {
+	display: block;
+	position: relative;
+	z-index: 10000;
+}
+.tag-assigned {
+	color: blue;
+}

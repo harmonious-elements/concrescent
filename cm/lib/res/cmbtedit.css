@@ -1,0 +1,113 @@
+.tag-map {
+	position: relative;
+	width: 100%;
+	height: 0;
+	background: url('../../admin/booth_table_map.php') no-repeat center;
+	background-size: 100% 100%;
+}
+.tag-form, .untag-form {
+	position: absolute;
+	width: 100px;
+	margin: -30px 0 0 -50px;
+	text-align: center;
+	z-index: 10000;
+}
+.tag-form input[type=text] {
+	width: 40px;
+	text-align: center;
+}
+.tag-form:after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 26px;
+	left: 46px;
+	width: 8px;
+	height: 8px;
+	border-radius: 4px;
+	background: black;
+	pointer-events: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+.untag-form button {
+	margin: 0;
+}
+.tag {
+	position: absolute;
+	width: 40px;
+	height: 20px;
+	margin: -10px 0 0 -20px;
+	line-height: 20px;
+	font-weight: bold;
+	text-align: center;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+	z-index: 5000;
+}
+.tag:before {
+	content: attr(data-content);
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	line-height: 20px;
+	font-weight: bold;
+	text-align: center;
+	color: rgba(255, 255, 255, 0.8);
+	-webkit-text-stroke: 4px rgba(255, 255, 255, 0.8);
+	text-stroke: 4px rgba(255, 255, 255, 0.8);
+	pointer-events: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+	z-index: -1;
+}
+.tag-assigned {
+	color: blue;
+}
+.assignments {
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+	width: 100%;
+	table-layout: fixed;
+}
+.assignments > tbody > tr > td {
+	margin: 0;
+	padding: 0;
+	width: 50%;
+	vertical-align: top;
+}
+.assignments table {
+	width: 100%;
+}
+.assignments table th {
+	white-space: nowrap;
+	width: 1px;
+	font-weight: bold;
+	text-align: right;
+}
+.assignments table th, .assignments table td {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}

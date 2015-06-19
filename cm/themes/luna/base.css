@@ -1,0 +1,232 @@
+/* CSS Reset */
+
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 12px;
+	overflow: hidden;
+}
+.hidden {
+	display: none !important;
+}
+form {
+	display: inline;
+}
+h1 {
+	font-size: 24px;
+}
+h2 {
+	font-size: 18px;
+}
+h3 {
+	font-size: 14px;
+}
+
+/* Tables */
+
+th, td {
+	text-align: left;
+	padding: 4px 1em 4px 8px;
+}
+table.form > tbody > tr > th {
+	text-align: right;
+}
+.td-numeric {
+	text-align: right;
+}
+.td-actions {
+	white-space: nowrap;
+	width: 1px;
+	padding-right: 8px;
+}
+
+/* Cards */
+
+.card {
+	margin: 16px;
+	background: white;
+	border: gray;
+	border-radius: 4px;
+	box-shadow: 0 2px 2px gray;
+}
+.card-title {
+	padding: 8px 16px;
+	font-size: 18px;
+	border-bottom: solid 1px #cccccc;
+}
+.card-content {
+	padding: 16px;
+	line-height: 16px;
+}
+.card-content-only {
+	padding: 8px;
+	line-height: 16px;
+}
+.card-buttons {
+	padding: 8px;
+	border-top: solid 1px #cccccc;
+	text-align: center;
+}
+.card-buttons.left {
+	text-align: left;
+}
+.card-buttons.right {
+	text-align: right;
+}
+.card-buttons-left {
+	float: left;
+}
+.card-buttons-right {
+	float: right;
+}
+
+/* Card Content */
+
+.spaced > h1 {
+	margin: 12px 0;
+}
+.spaced > h2,
+.spaced > h3 {
+	margin: 12px 0 8px 0;
+}
+.spaced > p {
+	margin: 8px 0;
+}
+.spaced > hr {
+	margin: 12px 0;
+}
+.spaced > *:first-child {
+	margin-top: 0;
+}
+.spaced > *:last-child {
+	margin-bottom: 0;
+}
+
+/* Form Elements */
+
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=url] {
+	padding: 3px;
+	width: 200px;
+}
+input[type=date],
+input[type=time] {
+	padding: 1px;
+	width: 120px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+input[type=datetime],
+input[type=datetime-local] {
+	padding: 1px;
+	width: 180px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+input[type=number] {
+	padding: 3px;
+	width: 116px;
+}
+input[type=checkbox],
+input[type=radio] {
+	margin: 4px;
+}
+input[type=color] {
+	padding: 1px 2px;
+}
+textarea {
+	padding: 3px;
+	width: 300px;
+	height: 60px;
+}
+label {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+button,
+a.a-button,
+input[type=submit],
+input[type=reset] {
+	background: #eeeeee;
+	padding: 4px 8px;
+	border: solid 1px #cccccc;
+	border-radius: 3px;
+	margin-right: 4px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-size: 11px;
+	line-height: normal;
+}
+button:active,
+a.a-button:active,
+input[type=submit]:active,
+input[type=reset]:active {
+	background: #cccccc;
+	border: solid 1px #aaaaaa;
+}
+a.a-button,
+a.a-button:link,
+a.a-button:hover,
+a.a-button:active,
+a.a-button:visited {
+	display: inline-block;
+	color: black;
+	text-decoration: none;
+	cursor: default;
+}
+select {
+	background: #f8f8f8;
+	padding: 4px 8px;
+	border: solid 1px #cccccc;
+	border-radius: 3px;
+	height: 24px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-size: 11px;
+	line-height: 16px;
+}
+
+/* Miscellaneous */
+
+.payment-status-cancelled {
+	color: gray;
+	font-weight: bold;
+}
+.payment-status-completed {
+	color: green;
+	font-weight: bold;
+}
+.payment-status-refunded {
+	color: orange;
+	font-weight: bold;
+}
+.payment-status-pulled {
+	color: red;
+	font-weight: bold;
+}
+
+.application-status-accepted {
+	color: green;
+	font-weight: bold;
+}
+.application-status-maybe {
+	color: orange;
+	font-weight: bold;
+}
+.application-status-rejected {
+	color: red;
+	font-weight: bold;
+}
+.application-status-cancelled {
+	color: gray;
+	font-weight: bold;
+}
+.application-status-pulled {
+	color: red;
+	font-weight: bold;
+}

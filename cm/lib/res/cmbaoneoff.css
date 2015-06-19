@@ -1,0 +1,44 @@
+.artwork-select .artwork {
+	width: 100px;
+	height: 100px;
+	margin: 4px;
+	padding: 2px;
+	background: rgba(0,0,0,0.1);
+	text-align: center;
+	vertical-align: bottom;
+	/* Center vertically! */
+	display: -webkit-inline-flex;
+	display: inline-flex;
+	-webkit-align-content: center;
+	align-content: center;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+.artwork-select .artwork.active {
+	background: rgba(51,153,255,0.5);
+}
+.artwork-select .artwork img {
+	width: 100px;
+	height: auto;
+}
+.artwork-select .artwork img.vertical {
+	width: auto;
+	height: 100px;
+}
+.artwork-select .no-artwork {
+	padding: 36px 0;
+	font-weight: bold;
+	color: gray;
+	text-align: center;
+	line-height: 24px;
+}
+.artwork-select .loading-artwork {
+	padding: 36px 0;
+	background: url(loading.gif) no-repeat center;
+	background-size: 21px 21px;
+	line-height: 24px;
+	text-indent: -99999px;
+	overflow: hidden;
+}
