@@ -1,0 +1,290 @@
+/* Basic */
+
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 12px;
+}
+h1 {
+	font-size: 24px;
+}
+h2 {
+	font-size: 18px;
+}
+h3 {
+	font-size: 14px;
+}
+.hidden {
+	display: none !important;
+}
+
+/* Header */
+
+header {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 40px;
+	overflow: hidden;
+	background: #656cb9;
+	font-family: Georgia;
+	line-height: 40px;
+	color: white;
+}
+.cm-admin header {
+	background-image: url(logo.png);
+	background-repeat: no-repeat;
+	background-position: right top;
+}
+header a:link,
+header a:visited {
+	color: #fff;
+	text-decoration: none;
+}
+.cm-admin header a:link,
+.cm-admin header a:visited {
+	color: #ccf;
+	text-decoration: none;
+}
+header a:focus,
+header a:hover,
+.cm-admin header a:focus,
+.cm-admin header a:hover {
+	color: #ffc;
+	text-decoration: none;
+}
+header a:active,
+.cm-admin header a:active {
+	color: #ff3;
+	text-decoration: none;
+}
+header .appname {
+	position: absolute;
+	top: 0;
+	left: 20px;
+	bottom: 0;
+	font-style: italic;
+	font-size: 24px;
+	line-height: 40px;
+}
+header .pagename {
+	position: absolute;
+	top: 0;
+	left: 20px;
+	bottom: 0;
+	font-size: 18px;
+	line-height: 40px;
+}
+header .appname + .pagename {
+	left: 236px;
+}
+header .header-items {
+	position: absolute;
+	top: 0;
+	right: 20px;
+	bottom: 0;
+	font-size: 18px;
+	line-height: 40px;
+}
+.cm-admin header .header-items {
+	right: 40px;
+}
+header .header-item {
+	display: inline;
+}
+header .header-item:not(:first-child):before {
+	content: "\00A0\00A0\00B7\00A0\00A0";
+}
+
+/* Navigation */
+
+nav {
+	position: absolute;
+	top: 40px;
+	left: 0;
+	bottom: 0;
+	width: 220px;
+	overflow: auto;
+	background: #7ca7fa;
+	color: white;
+}
+nav > hr {
+	height: 1px;
+	border: none;
+	background: #656cb9;
+	color: #656cb9;
+}
+
+/* Content */
+
+article {
+	position: absolute;
+	top: 40px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: auto;
+	background: #eef;
+}
+nav + article {
+	left: 220px;
+}
+
+/* Cards */
+
+.card {
+	display: block;
+	margin: 16px;
+	overflow: hidden;
+	background: white;
+	border: gray;
+	border-radius: 4px;
+	box-shadow: 0 2px 2px gray;
+}
+.card .card-title {
+	padding: 8px 16px;
+	font-size: 18px;
+	border-bottom: solid 1px #ccc;
+}
+.card .card-content {
+	/* break margin collapse */
+	overflow: auto;
+}
+.card .card-content > p,
+.card .card-content > table {
+	margin: 16px;
+	line-height: 16px;
+}
+.card .card-content > hr {
+	height: 1px;
+	border: none;
+	background: #ccc;
+	color: #ccc;
+}
+.card .card-buttons {
+	padding: 8px;
+	text-align: center;
+	border-top: solid 1px #ccc;
+}
+
+/* Notification Boxes */
+
+.cm-error-box {
+	border: solid 1px #c00;
+	background: #fcc;
+	padding: 12px;
+}
+
+/* Tables */
+
+th, td {
+	padding: 4px 1em 4px 4px;
+	text-align: left;
+}
+
+/* Form Elements */
+
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=url] {
+	padding: 3px;
+	width: 200px;
+}
+input[type=date],
+input[type=time] {
+	padding: 1px;
+	width: 120px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+input[type=datetime],
+input[type=datetime-local] {
+	padding: 1px;
+	width: 180px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+input[type=number] {
+	padding: 3px;
+	width: 116px;
+}
+input[type=checkbox],
+input[type=radio] {
+	margin: 4px;
+}
+input[type=color] {
+	padding: 1px 2px;
+}
+textarea {
+	padding: 3px;
+	width: 300px;
+	height: 60px;
+}
+button,
+a.button,
+input[type=submit],
+input[type=reset] {
+	background: #eee;
+	padding: 4px 8px;
+	border: solid 1px #ccc;
+	border-radius: 3px;
+	margin-right: 4px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-size: 11px;
+	line-height: normal;
+}
+button:active,
+a.button:active,
+input[type=submit]:active,
+input[type=reset]:active {
+	background: #ccc;
+	border: solid 1px #aaa;
+}
+a.button,
+a.button:link,
+a.button:focus,
+a.button:hover,
+a.button:active,
+a.button:visited {
+	display: inline-block;
+	color: black;
+	text-decoration: none;
+	cursor: default;
+}
+label {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+select {
+	background: #f8f8f8;
+	padding: 4px 8px;
+	border: solid 1px #ccc;
+	border-radius: 3px;
+	height: 24px;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-size: 11px;
+	line-height: 16px;
+}
+
+/* Login Page */
+
+.card.cm-login,
+.card.cm-logout {
+	text-align: center;
+}
+.card.cm-login table {
+	margin-left: auto;
+	margin-right: auto;
+}
+.card.cm-login .cm-error-box {
+	width: 300px;
+	margin-left: auto;
+	margin-right: auto;
+}
