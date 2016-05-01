@@ -7,6 +7,8 @@ require_once dirname(__FILE__).'/../lib/database/database.php';
 require_once dirname(__FILE__).'/../lib/database/admin.php';
 require_once dirname(__FILE__).'/../lib/util/util.php';
 require_once dirname(__FILE__).'/../lib/util/res.php';
+require_once dirname(__FILE__).'/admin-nav.php';
+require_once dirname(__FILE__).'/admin-perms.php';
 
 $db = new cm_db();
 $adb = new cm_admin_db($db);
@@ -46,7 +48,58 @@ function cm_admin_body($title) {
 	echo '</header>';
 }
 
+function cm_admin_nav($page_id) {
+	global $cm_admin_nav, $adb, $admin_user;
+	echo '<nav>';
+		foreach ($cm_admin_nav as $group) {
+			$first_link = true;
+			foreach ($group as $link) {
+				if (
+					!isset($link['permission']) || !$link['permission'] ||
+					$adb->user_has_permission($admin_user, $link['permission'])
+				) {
+					if ($first_link) echo '<ul>';
+					if ($link['id'] == $page_id) {
+						echo '<li class="current">';
+					} else {
+						echo '<li>';
+					}
+					$url = get_site_url(false) . $link['href'];
+					echo '<a href="' . htmlspecialchars($url) . '"';
+					if (isset($link['description']) && $link['description']) {
+						echo ' title="' . htmlspecialchars($link['description']) . '"';
+					}
+					echo '>';
+					echo htmlspecialchars($link['name']);
+					echo '</a>';
+					echo '</li>';
+					$first_link = false;
+				}
+			}
+			if (!$first_link) echo '</ul><hr>';
+		}
+	echo '</nav>';
+}
+
 function cm_admin_tail() {
 	echo '</body>';
 	echo '</html>';
+}
+
+function cm_admin_check_permission($page_id, $permission) {
+	global $adb, $admin_user;
+	if (!$adb->user_has_permission($admin_user, $permission)) {
+		cm_admin_head('Unauthorized');
+		cm_admin_body('Unauthorized');
+		cm_admin_nav($page_id);
+		echo '<article>';
+			echo '<div class="card cm-unauthorized">';
+				echo '<div class="card-content">';
+					echo '<p>You do not have permission to view this page.</p>';
+				echo '</div>';
+			echo '</div>';
+		echo '</article>';
+		cm_admin_tail();
+		exit(0);
+	}
 }
