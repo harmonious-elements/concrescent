@@ -40,4 +40,5 @@ echo '<article>';
 	echo '</div>';
 echo '</article>';
 
+cm_admin_dialogs();
 cm_admin_tail();

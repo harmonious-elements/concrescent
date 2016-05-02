@@ -8,7 +8,6 @@ require_once dirname(__FILE__).'/../lib/database/admin.php';
 require_once dirname(__FILE__).'/../lib/util/util.php';
 require_once dirname(__FILE__).'/../lib/util/res.php';
 require_once dirname(__FILE__).'/admin-nav.php';
-require_once dirname(__FILE__).'/admin-perms.php';
 
 $db = new cm_db();
 $adb = new cm_admin_db($db);
@@ -28,6 +27,8 @@ function cm_admin_head($title) {
 	echo '<title>CONcrescent - ' . htmlspecialchars($title) . '</title>';
 	echo '<link rel="shortcut icon" href="' . htmlspecialchars(theme_file_url('favicon.ico', false)) . '">';
 	echo '<link rel="stylesheet" href="' . htmlspecialchars(theme_file_url('theme.css', false)) . '">';
+	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('jquery.js', false)) . '"></script>';
+	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('cmui.js', false)) . '"></script>';
 }
 
 function cm_admin_body($title) {
@@ -81,7 +82,12 @@ function cm_admin_nav($page_id) {
 	echo '</nav>';
 }
 
+function cm_admin_dialogs() {
+	echo '<div class="dialog-cover hidden"></div>';
+}
+
 function cm_admin_tail() {
+	echo '<div class="butterbar hidden"></div>';
 	echo '</body>';
 	echo '</html>';
 }
@@ -99,6 +105,7 @@ function cm_admin_check_permission($page_id, $permission) {
 				echo '</div>';
 			echo '</div>';
 		echo '</article>';
+		cm_admin_dialogs();
 		cm_admin_tail();
 		exit(0);
 	}
