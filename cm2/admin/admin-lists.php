@@ -4,7 +4,22 @@ require_once dirname(__FILE__).'/../lib/util/res.php';
 require_once dirname(__FILE__).'/../lib/util/util.php';
 
 function cm_admin_list_page_head(&$list_def) {
-	echo '<script type="text/javascript">cm_list_def = (' . json_encode($list_def) . ');</script>';
+	echo '<script type="text/javascript">';
+		$function_names = array(
+			'edit-clear-function', 'edit-load-function', 'edit-save-function'
+		);
+		$function_bodies = array();
+		foreach ($function_names as $k) {
+			if (isset($list_def[$k])) {
+				$function_bodies[$k] = $list_def[$k];
+				unset($list_def[$k]);
+			}
+		}
+		echo 'cm_list_def = (' . json_encode($list_def) . ');';
+		foreach ($function_bodies as $k => $v) {
+			echo " cm_list_def['" . $k . "'] = (" . $v . ');';
+		}
+	echo '</script>';
 	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('cmlists.js', false)) . '"></script>';
 }
 

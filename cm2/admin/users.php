@@ -9,7 +9,8 @@ cm_admin_check_permission('admin-users', 'admin-users');
 
 $list_def = array(
 	'ajax-url' => get_site_url(false) . '/admin/users.php',
-	'search-criteria' => 'name',
+	'entity-type' => 'users',
+	'search-criteria' => 'name or username',
 	'columns' => array(
 		array(
 			'name' => 'Name',
@@ -23,8 +24,12 @@ $list_def = array(
 		),
 	),
 	'row-key' => 'username',
+	'name-key' => 'name',
 	'row-actions' => array('edit', 'delete'),
-	'table-actions' => array('add')
+	'table-actions' => array('add'),
+	'edit-clear-function' => 'function(o) { console.log(o); }',
+	'edit-load-function' => 'function(o) { console.log(o); }',
+	'edit-save-function' => 'function(o) { console.log(o); }',
 );
 
 if (isset($_POST['cm-list-action'])) {
@@ -67,7 +72,6 @@ if (isset($_POST['cm-list-action'])) {
 
 cm_admin_head('Admin Users');
 cm_admin_list_page_head($list_def);
-
 cm_admin_body('Admin Users');
 cm_admin_nav('admin-users');
 
