@@ -6,6 +6,9 @@ error_reporting(0);
 /* Time zone PHP should use for date calculations (e.g. when badges are available). */
 date_default_timezone_set('America/Los_Angeles');
 
+/* If magic quotes is on, undo the evil things PHP has done. */
+require_once dirname(__FILE__).'/../lib/util/dontbeevil.php';
+
 /* This is the default configuration for CONcrescent. Replace all values in this file. */
 $cm_config = array(
 
