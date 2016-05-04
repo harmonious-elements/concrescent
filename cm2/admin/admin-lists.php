@@ -6,7 +6,10 @@ require_once dirname(__FILE__).'/../lib/util/util.php';
 function cm_admin_list_page_head(&$list_def) {
 	echo '<script type="text/javascript">';
 		$function_names = array(
-			'edit-clear-function', 'edit-load-function', 'edit-save-function'
+			'select-function',
+			'edit-clear-function',
+			'edit-load-function',
+			'edit-save-function'
 		);
 		$function_bodies = array();
 		foreach ($function_names as $k) {
@@ -152,4 +155,43 @@ function cm_admin_list_row(&$list_def, &$entity) {
 	}
 	$out .= '</tr>';
 	return $out;
+}
+
+function cm_admin_edit_dialog_start() {
+	echo '<div class="dialog edit-dialog hidden">';
+		echo '<div class="dialog-title">Edit</div>';
+		echo '<div class="dialog-content">';
+}
+
+function cm_admin_edit_dialog_end() {
+		echo '</div>';
+		echo '<div class="dialog-buttons">';
+			echo '<button class="cancel-edit-button">Cancel</button>';
+			echo '<button class="confirm-edit-button">Save</button>';
+		echo '</div>';
+	echo '</div>';
+}
+
+function cm_admin_delete_dialog(&$list_def) {
+	$type = (isset($list_def['entity-type']) && $list_def['entity-type']) ? $list_def['entity-type'] : 'item';
+	$switchable = (isset($list_def['row-actions']) && $list_def['row-actions'] && in_array('switch', $list_def['row-actions']));
+	echo '<div class="dialog delete-dialog hidden">';
+		echo '<div class="dialog-title">Delete</div>';
+		echo '<div class="dialog-content">';
+			echo '<p>';
+				echo 'Are you sure you want to delete the ';
+				echo htmlspecialchars($type);
+				echo ' <b class="delete-name"></b>?';
+			echo '</p>';
+			echo '<p>';
+				echo 'This action cannot be undone.';
+				if ($switchable) echo ' If you are unsure, it is better to mark it inactive.';
+			echo '</p>';
+		echo '</div>';
+		echo '<div class="dialog-buttons">';
+			echo '<button class="cancel-delete-button">Cancel</button>';
+			if ($switchable) echo '<button class="soft-delete-button">Mark Inactive</button>';
+			echo '<button class="confirm-delete-button">Delete</button>';
+		echo '</div>';
+	echo '</div>';
 }

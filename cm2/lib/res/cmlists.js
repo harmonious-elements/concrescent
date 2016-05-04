@@ -64,6 +64,7 @@
 		}
 		return false;
 	};
+
 	$(document).ready(function() {
 		var rows = [];
 		var matches = [];
@@ -72,6 +73,10 @@
 		var offset = 0;
 		var visible = [];
 		var html = '';
+		var htmlInit;
+		var entityIdUnderEdit;
+		var entityIdUnderDelete;
+
 		var doFilter = function() {
 			/* Filter */
 			var filterText = ($('.cm-search-input input').val() || '').trim().toLowerCase();
@@ -132,10 +137,11 @@
 				html += visible[i]['html'];
 			}
 			$('.cm-list-table tbody').html(html);
+			if (htmlInit) htmlInit();
 		};
 		var nextId = ('start-id' in listdef) ? listdef['start-id'] : 1;
 		var doLoad = function() {
-			var entityType = listdef['entity-type'];
+			var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
 			cmui.showButterbar(entityType ? ('Loading ' + entityType + '...') : 'Loading...');
 			var ajaxUrl = (listdef['ajax-url'] || '');
 			$.post(ajaxUrl, {'cm-list-action': 'list', 'cm-list-start-id': nextId}, function(data) {
@@ -158,6 +164,15 @@
 					}
 				}
 			}, 'json');
+		};
+		var indexOfEntity = function(entityKey) {
+			var rowKey = listdef['row-key'] || 'id';
+			for (var i = 0, n = rows.length; i < n; ++i) {
+				if (rows[i]['entity'][rowKey] == entityKey) {
+					return i;
+				}
+			}
+			return -1;
 		};
 
 		/* Search Text Field */
@@ -218,11 +233,13 @@
 		/* Keyboard Navigation */
 		$('body').bind('keydown', function(event) {
 			if (event.which == 27) {
-				searchField.val('');
-				searchFieldChanged();
-				searchField.focus();
-				event.stopPropagation();
-				event.preventDefault();
+				if ($('.dialog-cover').hasClass('hidden')) {
+					searchField.val('');
+					searchFieldChanged();
+					searchField.focus();
+					event.stopPropagation();
+					event.preventDefault();
+				}
 			}
 			if (event.which == 33) {
 				prevPageButton.click();
@@ -287,6 +304,83 @@
 				}
 			}
 		}
+		/* Row Action Buttons */
+		htmlInit = function() {
+			if (!listdef['row-actions']) return;
+			var selectable  = (listdef['row-actions'].indexOf('select' ) >= 0);
+			var switchable  = (listdef['row-actions'].indexOf('switch' ) >= 0);
+			var editable    = (listdef['row-actions'].indexOf('edit'   ) >= 0);
+			var reorderable = (listdef['row-actions'].indexOf('reorder') >= 0);
+			var deleteable  = (listdef['row-actions'].indexOf('delete' ) >= 0);
+			var reviewable  = (listdef['row-actions'].indexOf('review' ) >= 0);
+			$('.cm-list-table tbody tr').each(function() {
+				var tr = $(this);
+				var id = tr.attr('id').substring(6);
+				var index = indexOfEntity(id);
+				var entity = (index >= 0) ? rows[index]['entity'] : null;
+				var name = entity ? (entity[listdef['name-key'] || 'name'] || id) : id;
+				if (selectable) {
+					tr.find('.select-button').bind('click', function() {
+						if (listdef['select-function']) {
+							listdef['select-function'](id, entity);
+						}
+					});
+				}
+				if (switchable) {
+					/* TODO */
+				}
+				if (editable) {
+					tr.find('.edit-button').bind('click', function() {
+						if (listdef['edit-url']) {
+							window.location.href = listdef['edit-url'] + id;
+						} else {
+							entityIdUnderEdit = id;
+							$('.edit-dialog .dialog-title').text(listdef['edit-title'] || 'Edit');
+							if (listdef['edit-load-function']) {
+								listdef['edit-load-function'](id, entity);
+							}
+							cmui.showDialog('edit');
+						}
+					});
+				}
+				if (reorderable) {
+					/* TODO */
+				}
+				if (deleteable) {
+					tr.find('.delete-button').bind('click', function() {
+						entityIdUnderDelete = id;
+						$('.delete-dialog .dialog-title').text(listdef['delete-title'] || 'Delete');
+						$('.delete-dialog .delete-name').text(name);
+						cmui.showDialog('delete');
+					});
+				}
+				if (reviewable) {
+					tr.find('.review-button').bind('click', function() {
+						if (listdef['review-url']) {
+							window.location.href = listdef['review-url'] + id;
+						}
+					});
+				}
+			});
+		};
+		/* Table Action Buttons */
+		if (listdef['table-actions']) {
+			if (listdef['table-actions'].indexOf('add') >= 0) {
+				$('.cm-list-table .add-button').bind('click', function() {
+					if (listdef['add-url']) {
+						window.location.href = listdef['add-url'];
+					} else {
+						$('.edit-dialog .dialog-title').text(listdef['add-title'] || 'Add');
+						if (listdef['edit-clear-function']) {
+							listdef['edit-clear-function']();
+						}
+						cmui.showDialog('edit');
+					}
+				});
+			}
+		}
+
+		/* TODO */
 
 		doLoad();
 	});

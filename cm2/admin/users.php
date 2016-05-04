@@ -9,7 +9,8 @@ cm_admin_check_permission('admin-users', 'admin-users');
 
 $list_def = array(
 	'ajax-url' => get_site_url(false) . '/admin/users.php',
-	'entity-type' => 'users',
+	'entity-type' => 'user',
+	'entity-type-pl' => 'users',
 	'search-criteria' => 'name or username',
 	'columns' => array(
 		array(
@@ -27,9 +28,12 @@ $list_def = array(
 	'name-key' => 'name',
 	'row-actions' => array('edit', 'delete'),
 	'table-actions' => array('add'),
-	'edit-clear-function' => 'function(o) { console.log(o); }',
-	'edit-load-function' => 'function(o) { console.log(o); }',
-	'edit-save-function' => 'function(o) { console.log(o); }',
+	'add-title' => 'Add User',
+	'edit-title' => 'Edit User',
+	'delete-title' => 'Delete User',
+	'edit-clear-function' => 'function() { console.log("clear"); }',
+	'edit-load-function' => 'function(i, e) { console.log("load", i, e); }',
+	'edit-save-function' => 'function(i, e) { console.log("save", i, e); }',
 );
 
 if (isset($_POST['cm-list-action'])) {
@@ -42,7 +46,7 @@ if (isset($_POST['cm-list-action'])) {
 				$response['rows'][] = array(
 					'entity' => $user,
 					'html' => cm_admin_list_row($list_def, $user),
-					'search' => array($user['name'], $user['username'])
+					'search' => $user['search-content']
 				);
 			}
 			echo json_encode($response);
@@ -51,6 +55,14 @@ if (isset($_POST['cm-list-action'])) {
 			$user = json_decode($_POST['cm-list-entity']);
 			$ok = $adb->create_user($user);
 			$response = array('ok' => $ok);
+			if ($ok) {
+				$user = $adb->get_user($user['username']);
+				if ($user) $response['row'] = array(
+					'entity' => $user,
+					'html' => cm_admin_list_row($list_def, $user),
+					'search' => $user['search-content']
+				);
+			}
 			echo json_encode($response);
 			break;
 		case 'update':
@@ -58,6 +70,17 @@ if (isset($_POST['cm-list-action'])) {
 			$user = json_decode($_POST['cm-list-entity']);
 			$ok = $adb->update_user($username, $user);
 			$response = array('ok' => $ok);
+			if ($ok) {
+				if (isset($user['username']) && $user['username']) {
+					$username = $user['username'];
+				}
+				$user = $adb->get_user($username);
+				if ($user) $response['row'] = array(
+					'entity' => $user,
+					'html' => cm_admin_list_row($list_def, $user),
+					'search' => $user['search-content']
+				);
+			}
 			echo json_encode($response);
 			break;
 		case 'delete':
@@ -81,4 +104,10 @@ cm_admin_list_table($list_def);
 echo '</article>';
 
 cm_admin_dialogs();
+cm_admin_edit_dialog_start();
+
+echo '<p>Editor goes here.</p>';
+
+cm_admin_edit_dialog_end();
+cm_admin_delete_dialog($list_def);
 cm_admin_tail();

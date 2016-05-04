@@ -99,7 +99,8 @@ class cm_admin_db {
 			$result = array(
 				'name' => $name,
 				'username' => $username,
-				'permissions' => explode(',', $permissions)
+				'permissions' => explode(',', $permissions),
+				'search-content' => array($name, $username)
 			);
 			$stmt->close();
 			return $result;
@@ -121,7 +122,8 @@ class cm_admin_db {
 			$users[] = array(
 				'name' => $name,
 				'username' => $username,
-				'permissions' => explode(',', $permissions)
+				'permissions' => explode(',', $permissions),
+				'search-content' => array($name, $username)
 			);
 		}
 		$stmt->close();
