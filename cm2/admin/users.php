@@ -1,8 +1,8 @@
 <?php
 
 require_once dirname(__FILE__).'/../lib/util/util.php';
+require_once dirname(__FILE__).'/../lib/util/cmlists.php';
 require_once dirname(__FILE__).'/admin.php';
-require_once dirname(__FILE__).'/admin-lists.php';
 require_once dirname(__FILE__).'/admin-perms.php';
 
 cm_admin_check_permission('admin-users', 'admin-users');
@@ -79,7 +79,7 @@ if (isset($_POST['cm-list-action'])) {
 			foreach ($users as $user) {
 				$response['rows'][] = array(
 					'entity' => $user,
-					'html' => cm_admin_list_row($list_def, $user),
+					'html' => cm_list_row($list_def, $user),
 					'search' => $user['search-content']
 				);
 			}
@@ -93,7 +93,7 @@ if (isset($_POST['cm-list-action'])) {
 				$user = $adb->get_user($user['username']);
 				if ($user) $response['row'] = array(
 					'entity' => $user,
-					'html' => cm_admin_list_row($list_def, $user),
+					'html' => cm_list_row($list_def, $user),
 					'search' => $user['search-content']
 				);
 			}
@@ -111,7 +111,7 @@ if (isset($_POST['cm-list-action'])) {
 				$user = $adb->get_user($username);
 				if ($user) $response['row'] = array(
 					'entity' => $user,
-					'html' => cm_admin_list_row($list_def, $user),
+					'html' => cm_list_row($list_def, $user),
 					'search' => $user['search-content']
 				);
 			}
@@ -128,17 +128,17 @@ if (isset($_POST['cm-list-action'])) {
 }
 
 cm_admin_head('Admin Users');
-cm_admin_list_page_head($list_def);
+cm_list_head($list_def);
 cm_admin_body('Admin Users');
 cm_admin_nav('admin-users');
 
 echo '<article>';
-cm_admin_search_box($list_def);
-cm_admin_list_table($list_def);
+cm_list_search_box($list_def);
+cm_list_table($list_def);
 echo '</article>';
 
 cm_admin_dialogs();
-cm_admin_edit_dialog_start();
+cm_list_edit_dialog_start();
 
 echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-user-editor">';
 	echo '<tr>';
@@ -183,6 +183,6 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-
 	echo '</tr>';
 echo '</table>';
 
-cm_admin_edit_dialog_end();
-cm_admin_delete_dialog($list_def);
+cm_list_edit_dialog_end();
+cm_list_delete_dialog($list_def);
 cm_admin_tail();

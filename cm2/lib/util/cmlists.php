@@ -1,9 +1,9 @@
 <?php
 
-require_once dirname(__FILE__).'/../lib/util/res.php';
-require_once dirname(__FILE__).'/../lib/util/util.php';
+require_once dirname(__FILE__).'/res.php';
+require_once dirname(__FILE__).'/util.php';
 
-function cm_admin_list_page_head(&$list_def) {
+function cm_list_head(&$list_def) {
 	echo '<script type="text/javascript">';
 		$function_names = array(
 			'select-function',
@@ -26,7 +26,7 @@ function cm_admin_list_page_head(&$list_def) {
 	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('cmlists.js', false)) . '"></script>';
 }
 
-function cm_admin_search_box(&$list_def) {
+function cm_list_search_box(&$list_def) {
 	echo '<div class="cm-search-box">';
 		echo '<div class="cm-search-input">';
 			echo '<label for="cm-search-input">Search';
@@ -61,7 +61,7 @@ function cm_admin_search_box(&$list_def) {
 	echo '</div>';
 }
 
-function cm_admin_list_table(&$list_def) {
+function cm_list_table(&$list_def) {
 	echo '<div class="cm-list-table">';
 	echo '<table border="0" cellpadding="0" cellspacing="0">';
 		$column_count = 0;
@@ -104,7 +104,7 @@ function cm_admin_list_table(&$list_def) {
 	echo '</div>';
 }
 
-function cm_admin_list_row(&$list_def, &$entity) {
+function cm_list_row(&$list_def, &$entity) {
 	/* Get key and active state */
 	$key = (isset($list_def['row-key']) && $list_def['row-key']) ? $entity[$list_def['row-key']] : uniqid();
 	$active = (isset($list_def['active-key']) && $list_def['active-key']) ? $entity[$list_def['active-key']] : true;
@@ -157,13 +157,13 @@ function cm_admin_list_row(&$list_def, &$entity) {
 	return $out;
 }
 
-function cm_admin_edit_dialog_start() {
+function cm_list_edit_dialog_start() {
 	echo '<div class="dialog edit-dialog hidden">';
 		echo '<div class="dialog-title">Edit</div>';
 		echo '<div class="dialog-content">';
 }
 
-function cm_admin_edit_dialog_end() {
+function cm_list_edit_dialog_end() {
 		echo '</div>';
 		echo '<div class="dialog-buttons">';
 			echo '<button class="cancel-edit-button">Cancel</button>';
@@ -172,7 +172,7 @@ function cm_admin_edit_dialog_end() {
 	echo '</div>';
 }
 
-function cm_admin_delete_dialog(&$list_def) {
+function cm_list_delete_dialog(&$list_def) {
 	$type = (isset($list_def['entity-type']) && $list_def['entity-type']) ? $list_def['entity-type'] : 'item';
 	$switchable = (isset($list_def['row-actions']) && $list_def['row-actions'] && in_array('switch', $list_def['row-actions']));
 	echo '<div class="dialog delete-dialog hidden">';
