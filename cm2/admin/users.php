@@ -38,7 +38,7 @@ $list_def['edit-clear-function'] = <<<END
 		$('#ea-name').val('');
 		$('#ea-username').val('');
 		$('#ea-password').val('');
-		$('.ea-permissions').attr('checked', false);
+		$('.ea-permissions').prop('checked', false);
 	}
 END;
 $list_def['edit-load-function'] = <<<END
@@ -48,7 +48,7 @@ $list_def['edit-load-function'] = <<<END
 		$('#ea-password').val('');
 		$('.ea-permissions').each(function() {
 			var name = $(this).attr('id').substring(15);
-			$(this).attr('checked', e['permissions'].indexOf(name) >= 0);
+			$(this).prop('checked', e['permissions'].indexOf(name) >= 0);
 		});
 	}
 END;
