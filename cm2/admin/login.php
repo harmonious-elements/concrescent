@@ -53,7 +53,7 @@ echo '<article>';
 			if ($attempted) {
 				echo '<p class="cm-error-box">Login failed. Please try again.</p>';
 			}
-			echo '<table border="0" cellpadding="0" cellspacing="0">';
+			echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 				echo '<tr>';
 					echo '<th><label for="username">User Name:</label></th>';
 					echo '<td><input type="text" name="username" id="username"></td>';

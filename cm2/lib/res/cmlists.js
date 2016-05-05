@@ -69,13 +69,17 @@
 		var rows = [];
 		var matches = [];
 		var sortable = isSortable();
-		var sortOrder = [];
+		var sortOrder = listdef['sort-order'] || [];
 		var offset = 0;
 		var visible = [];
 		var html = '';
 		var htmlInit;
 		var entityIdUnderEdit;
+		var entityUnderEdit;
+		var entityNameUnderEdit;
 		var entityIdUnderDelete;
+		var entityUnderDelete;
+		var entityNameUnderDelete;
 
 		var doFilter = function() {
 			/* Filter */
@@ -143,27 +147,31 @@
 		var doLoad = function() {
 			var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
 			cmui.showButterbar(entityType ? ('Loading ' + entityType + '...') : 'Loading...');
-			var ajaxUrl = (listdef['ajax-url'] || '');
-			$.post(ajaxUrl, {'cm-list-action': 'list', 'cm-list-start-id': nextId}, function(data) {
-				if (!data['ok']) {
-					cmui.showButterbarPersistent('An error occurred. Please reload the page.');
-				} else {
-					var hasRows = (data['rows'] && data['rows'].length);
-					if (hasRows) {
-						rows = rows.concat(data['rows']);
-						doFilter();
-						doPage();
+			$.post(
+				(listdef['ajax-url'] || ''),
+				{'cm-list-action': 'list', 'cm-list-start-id': nextId},
+				function(data) {
+					if (!data['ok']) {
+						cmui.showButterbarPersistent('An error occurred. Please reload the page.');
 					} else {
-						cmui.hideButterbar();
+						var hasRows = (data['rows'] && data['rows'].length);
+						if (hasRows) {
+							rows = rows.concat(data['rows']);
+							doFilter();
+							doPage();
+						} else {
+							cmui.hideButterbar();
+						}
+						nextId = data['next-start-id'];
+						if (nextId) {
+							setTimeout(doLoad, hasRows ? 10 : 5000);
+						} else {
+							cmui.hideButterbar();
+						}
 					}
-					nextId = data['next-start-id'];
-					if (nextId) {
-						setTimeout(doLoad, hasRows ? 10 : 5000);
-					} else {
-						cmui.hideButterbar();
-					}
-				}
-			}, 'json');
+				},
+				'json'
+			);
 		};
 		var indexOfEntity = function(entityKey) {
 			var rowKey = listdef['row-key'] || 'id';
@@ -173,6 +181,22 @@
 				}
 			}
 			return -1;
+		};
+		var doAjax = function(message, request, done) {
+			cmui.showButterbar(message);
+			$.post(
+				(listdef['ajax-url'] || ''),
+				request,
+				function(response) {
+					if (!response['ok']) {
+						cmui.showButterbarPersistent('An error occurred. Please try again.');
+					} else {
+						done(response);
+						cmui.hideButterbar();
+					}
+				},
+				'json'
+			);
 		};
 
 		/* Search Text Field */
@@ -264,6 +288,19 @@
 		});
 		/* Sort Headers */
 		if (sortable) {
+			var updateSortIndicators = function() {
+				$('.cm-list-table thead th').removeClass('th-sort-ascending');
+				$('.cm-list-table thead th').removeClass('th-sort-descending');
+				$('.cm-list-table thead th').removeClass('th-sort-primary');
+				for (var i = 0, n = sortOrder.length; i < n; ++i) {
+					var columnIndex = sortOrder[i];
+					var descending = (columnIndex < 0);
+					if (descending) columnIndex = ~columnIndex;
+					var header = $('.cm-list-table thead th:eq(' + columnIndex + ')');
+					header.addClass(descending ? 'th-sort-descending' : 'th-sort-ascending');
+					if ((i + 1) == n) header.addClass('th-sort-primary');
+				}
+			};
 			var makeSortFunction = function(index) {
 				return function() {
 					if (!sortOrder || !sortOrder.length) {
@@ -279,22 +316,13 @@
 						if (od >= 0) sortOrder.splice(od, 1);
 						sortOrder.push(index);
 					}
-					$('.cm-list-table thead th').removeClass('th-sort-ascending');
-					$('.cm-list-table thead th').removeClass('th-sort-descending');
-					$('.cm-list-table thead th').removeClass('th-sort-primary');
-					for (var i = 0, n = sortOrder.length; i < n; ++i) {
-						var columnIndex = sortOrder[i];
-						var descending = (columnIndex < 0);
-						if (descending) columnIndex = ~columnIndex;
-						var header = $('.cm-list-table thead th:eq(' + columnIndex + ')');
-						header.addClass(descending ? 'th-sort-descending' : 'th-sort-ascending');
-						if ((i + 1) == n) header.addClass('th-sort-primary');
-					}
+					updateSortIndicators();
 					doFilter();
 					offset = 0;
 					doPage();
 				};
 			};
+			updateSortIndicators();
 			for (var i = 0, n = listdef['columns'].length; i < n; ++i) {
 				var type = listdef['columns'][i]['type'];
 				if (type && sortFunctions[type]) {
@@ -327,7 +355,30 @@
 					});
 				}
 				if (switchable) {
-					/* TODO */
+					var update = function(data) {
+						if (data['row']) {
+							var i = indexOfEntity(id);
+							if (i >= 0) {
+								rows[i] = data['row'];
+								doFilter();
+								doPage();
+							}
+						}
+					};
+					tr.find('.activate-button').bind('click', function() {
+						doAjax('Activating ' + name + '...', {
+							'cm-list-action': 'activate',
+							'cm-list-key': id,
+							'cm-list-entity': JSON.stringify(entity)
+						}, update);
+					});
+					tr.find('.deactivate-button').bind('click', function() {
+						doAjax('Deactivating ' + name + '...', {
+							'cm-list-action': 'deactivate',
+							'cm-list-key': id,
+							'cm-list-entity': JSON.stringify(entity)
+						}, update);
+					});
 				}
 				if (editable) {
 					tr.find('.edit-button').bind('click', function() {
@@ -335,6 +386,8 @@
 							window.location.href = listdef['edit-url'] + id;
 						} else {
 							entityIdUnderEdit = id;
+							entityUnderEdit = entity;
+							entityNameUnderEdit = name;
 							$('.edit-dialog .dialog-title').text(listdef['edit-title'] || 'Edit');
 							if (listdef['edit-load-function']) {
 								listdef['edit-load-function'](id, entity);
@@ -344,11 +397,43 @@
 					});
 				}
 				if (reorderable) {
-					/* TODO */
+					var reorder = function(direction) {
+						return function() {
+							var i = indexOfEntity(id);
+							if (i >= 0) {
+								var row = rows[i];
+								rows.splice(i, 1);
+								i += direction;
+								if (i < 0) i = 0;
+								if (i > rows.length) i = rows.length;
+								rows.splice(i, 0, row);
+								doFilter();
+								doPage();
+							}
+						};
+					};
+					tr.find('.up-button').bind('click', function() {
+						doAjax('Moving ' + name + '...', {
+							'cm-list-action': 'reorder',
+							'cm-list-key': id,
+							'cm-list-entity': JSON.stringify(entity),
+							'cm-list-reorder-direction': -1
+						}, reorder(-1));
+					});
+					tr.find('.down-button').bind('click', function() {
+						doAjax('Moving ' + name + '...', {
+							'cm-list-action': 'reorder',
+							'cm-list-key': id,
+							'cm-list-entity': JSON.stringify(entity),
+							'cm-list-reorder-direction': +1
+						}, reorder(+1));
+					});
 				}
 				if (deleteable) {
 					tr.find('.delete-button').bind('click', function() {
 						entityIdUnderDelete = id;
+						entityUnderDelete = entity;
+						entityNameUnderDelete = name;
 						$('.delete-dialog .dialog-title').text(listdef['delete-title'] || 'Delete');
 						$('.delete-dialog .delete-name').text(name);
 						cmui.showDialog('delete');
@@ -370,6 +455,9 @@
 					if (listdef['add-url']) {
 						window.location.href = listdef['add-url'];
 					} else {
+						entityIdUnderEdit = null;
+						entityUnderEdit = null;
+						entityNameUnderEdit = null;
 						$('.edit-dialog .dialog-title').text(listdef['add-title'] || 'Add');
 						if (listdef['edit-clear-function']) {
 							listdef['edit-clear-function']();
@@ -380,7 +468,78 @@
 			}
 		}
 
-		/* TODO */
+		/* Dialogs */
+		if (
+			(listdef['row-actions'] && (listdef['row-actions'].indexOf('edit') >= 0)) ||
+			(listdef['table-actions'] && (listdef['table-actions'].indexOf('add') >= 0))
+		) {
+			$('.edit-dialog .cancel-edit-button').bind('click', cmui.hideDialog);
+			$('.edit-dialog .confirm-edit-button').bind('click', function() {
+				cmui.hideDialog();
+				if (listdef['edit-save-function']) {
+					var newEntity = listdef['edit-save-function'](entityIdUnderEdit, entityUnderEdit);
+					if (newEntity) {
+						var newId = newEntity[listdef['row-key'] || 'id'] || entityIdUnderEdit;
+						var newName = newEntity[listdef['name-key'] || 'name'] || entityNameUnderEdit || newId;
+						doAjax('Saving ' + newName + '...', {
+							'cm-list-action': (entityUnderEdit ? 'update' : 'create'),
+							'cm-list-key': entityIdUnderEdit,
+							'cm-list-entity': JSON.stringify(newEntity)
+						}, function(data) {
+							if (data['row']) {
+								if (entityUnderEdit) {
+									var i = indexOfEntity(entityIdUnderEdit);
+									if (i >= 0) {
+										rows[i] = data['row'];
+										doFilter();
+										doPage();
+									}
+								} else {
+									rows.push(data['row']);
+									doFilter();
+									doPage();
+								}
+							}
+						});
+					}
+				}
+			});
+		}
+		if (listdef['row-actions'] && (listdef['row-actions'].indexOf('delete') >= 0)) {
+			$('.delete-dialog .cancel-delete-button').bind('click', cmui.hideDialog);
+			$('.delete-dialog .soft-delete-button').bind('click', function() {
+				cmui.hideDialog();
+				doAjax('Deactivating ' + entityNameUnderDelete + '...', {
+					'cm-list-action': 'deactivate',
+					'cm-list-key': entityIdUnderDelete,
+					'cm-list-entity': JSON.stringify(entityUnderDelete)
+				}, function(data) {
+					if (data['row']) {
+						var i = indexOfEntity(entityIdUnderDelete);
+						if (i >= 0) {
+							rows[i] = data['row'];
+							doFilter();
+							doPage();
+						}
+					}
+				});
+			});
+			$('.delete-dialog .confirm-delete-button').bind('click', function() {
+				cmui.hideDialog();
+				doAjax('Deleting ' + entityNameUnderDelete + '...', {
+					'cm-list-action': 'delete',
+					'cm-list-key': entityIdUnderDelete,
+					'cm-list-entity': JSON.stringify(entityUnderDelete)
+				}, function(data) {
+					var i = indexOfEntity(entityIdUnderDelete);
+					if (i >= 0) {
+						rows.splice(i, 1);
+						doFilter();
+						doPage();
+					}
+				});
+			});
+		}
 
 		doLoad();
 	});

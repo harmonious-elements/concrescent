@@ -216,6 +216,12 @@ th, td {
 	padding: 4px 1em 4px 4px;
 	text-align: left;
 }
+.cm-form-table tbody th {
+	text-align: right;
+}
+.cm-form-table tbody th label {
+	white-space: nowrap;
+}
 
 /* Form Elements */
 
@@ -437,6 +443,10 @@ select {
 	border-radius: 4px;
 	box-shadow: 0 2px 2px gray;
 }
+.dialog.edit-dialog {
+	top: 15%;
+	max-height: 80%;
+}
 .dialog .dialog-title {
 	padding: 8px 16px;
 	font-size: 18px;
@@ -462,7 +472,7 @@ select {
 }
 .dialog .dialog-buttons {
 	padding: 8px;
-	text-align: center;
+	text-align: right;
 	border-top: solid 1px #ccc;
 }
 
@@ -511,4 +521,10 @@ select {
 }
 .card.cm-home .card-content > p.cm-unauthorized {
 	text-align: center;
+}
+
+/* Admin Users Page */
+
+.cm-form-table.cm-user-editor tbody td hr {
+	margin: 2px 0;
 }

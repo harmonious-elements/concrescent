@@ -24,6 +24,7 @@ $list_def = array(
 			'type' => 'text'
 		),
 	),
+	'sort-order' => array(0),
 	'row-key' => 'username',
 	'name-key' => 'name',
 	'row-actions' => array('edit', 'delete'),
@@ -31,10 +32,43 @@ $list_def = array(
 	'add-title' => 'Add User',
 	'edit-title' => 'Edit User',
 	'delete-title' => 'Delete User',
-	'edit-clear-function' => 'function() { console.log("clear"); }',
-	'edit-load-function' => 'function(i, e) { console.log("load", i, e); }',
-	'edit-save-function' => 'function(i, e) { console.log("save", i, e); }',
 );
+$list_def['edit-clear-function'] = <<<END
+	function() {
+		$('#ea-name').val('');
+		$('#ea-username').val('');
+		$('#ea-password').val('');
+		$('.ea-permissions').attr('checked', false);
+	}
+END;
+$list_def['edit-load-function'] = <<<END
+	function(id, e) {
+		$('#ea-name').val(e['name']);
+		$('#ea-username').val(e['username']);
+		$('#ea-password').val('');
+		$('.ea-permissions').each(function() {
+			var name = $(this).attr('id').substring(15);
+			$(this).attr('checked', e['permissions'].indexOf(name) >= 0);
+		});
+	}
+END;
+$list_def['edit-save-function'] = <<<END
+	function(id, e) {
+		var ne = {
+			'name': $('#ea-name').val(),
+			'username': $('#ea-username').val(),
+			'password': $('#ea-password').val(),
+			'permissions': []
+		};
+		$('.ea-permissions').each(function() {
+			if ($(this).is(':checked')) {
+				var name = $(this).attr('id').substring(15);
+				ne['permissions'].push(name);
+			}
+		});
+		return ne;
+	}
+END;
 
 if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
@@ -52,7 +86,7 @@ if (isset($_POST['cm-list-action'])) {
 			echo json_encode($response);
 			break;
 		case 'create':
-			$user = json_decode($_POST['cm-list-entity']);
+			$user = json_decode($_POST['cm-list-entity'], true);
 			$ok = $adb->create_user($user);
 			$response = array('ok' => $ok);
 			if ($ok) {
@@ -67,7 +101,7 @@ if (isset($_POST['cm-list-action'])) {
 			break;
 		case 'update':
 			$username = $_POST['cm-list-key'];
-			$user = json_decode($_POST['cm-list-entity']);
+			$user = json_decode($_POST['cm-list-entity'], true);
 			$ok = $adb->update_user($username, $user);
 			$response = array('ok' => $ok);
 			if ($ok) {
@@ -106,7 +140,48 @@ echo '</article>';
 cm_admin_dialogs();
 cm_admin_edit_dialog_start();
 
-echo '<p>Editor goes here.</p>';
+echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-user-editor">';
+	echo '<tr>';
+		echo '<th><label for="ea-name">Name:</label></th>';
+		echo '<td><input type="text" name="ea-name" id="ea-name"></td>';
+	echo '</tr>';
+	echo '<tr>';
+		echo '<th><label for="ea-username">User Name:</label></th>';
+		echo '<td><input type="text" name="ea-username" id="ea-username"></td>';
+	echo '</tr>';
+	echo '<tr>';
+		echo '<th><label for="ea-password">Password:</label></th>';
+		echo '<td><input type="password" name="ea-password" id="ea-password"></td>';
+	echo '</tr>';
+	echo '<tr>';
+		echo '<th></th>';
+		echo '<td>';
+			$first_group = true;
+			foreach ($cm_admin_perms as $group) {
+				$first_link = true;
+				foreach ($group as $perm) {
+					if ($first_link && !$first_group) echo '<hr>';
+					echo '<div><label';
+					if (isset($perm['description']) && $perm['description']) {
+						echo ' title="';
+						echo htmlspecialchars($perm['description']);
+						echo '"';
+					}
+					echo '>';
+					$id = htmlspecialchars('ea-permissions-' . $perm['id']);
+					echo '<input type="checkbox"';
+					echo ' name="' . $id . '"';
+					echo ' id="' . $id . '"';
+					echo ' class="ea-permissions">';
+					echo htmlspecialchars($perm['name']);
+					echo '</label></div>';
+					$first_link = false;
+				}
+				if (!$first_link) $first_group = false;
+			}
+		echo '</td>';
+	echo '</tr>';
+echo '</table>';
 
 cm_admin_edit_dialog_end();
 cm_admin_delete_dialog($list_def);
