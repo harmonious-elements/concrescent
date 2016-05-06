@@ -65,6 +65,177 @@
 		return false;
 	};
 
+	var queryTokenChar = function(ch) {
+		if ('()|:=<>'.indexOf(ch) >= 0) return false;
+		if (ch == '"') return false;
+		var cp = ch.charCodeAt(0);
+		if (cp <= 32) return false;
+		if (cp < 127) return true;
+		if (cp <= 160) return false;
+		return true;
+	};
+	var queryTokenize = function(text) {
+		var tokens = [];
+		for (var i = 0, ch = text.charAt(0); ch; ch = text.charAt(++i)) {
+			if ('()|:=<>-'.indexOf(ch) >= 0) {
+				tokens.push([ch]);
+			} else if (ch == '"') {
+				var j = i + 1;
+				while (text.charAt(j) && text.charAt(j) != '"') ++j;
+				tokens.push([ch, text.substring(i + 1, j)]);
+				i = j;
+			} else if (queryTokenChar(ch)) {
+				var j = i + 1;
+				while (text.charAt(j) && queryTokenChar(text.charAt(j))) ++j;
+				tokens.push(['"', text.substring(i, j)]);
+				i = j - 1;
+			}
+		}
+		return tokens;
+	};
+	var queryParse = function(text) {
+		var tokens = queryTokenize(text);
+		var i = 0, n = tokens.length;
+		var parseExpression;
+		var parseFactor = function(depth) {
+			if (i >= n || tokens[i][0] == '|' || (depth && tokens[i][0] == ')')) {
+				return null;
+			} else if (tokens[i][0] == '(') {
+				++i;
+				var expression = parseExpression(depth + 1);
+				if (i < n && tokens[i][0] == ')') ++i;
+				return expression;
+			} else if (tokens[i][0] == '-') {
+				++i;
+				var factor = parseFactor(depth);
+				return factor ? ['-', factor] : null;
+			} else if (tokens[i][0] == '"') {
+				var key = tokens[i][1];
+				++i;
+				if (i < n && ':=<>'.indexOf(tokens[i][0]) >= 0) {
+					var operation = tokens[i][0];
+					++i;
+					if (('<>'.indexOf(operation) >= 0) && i < n && tokens[i][0] == '=') {
+						operation += '=';
+						++i;
+					}
+					var value = parseFactor(depth);
+					if (value) return [operation, key, value];
+				}
+				return ['"', key];
+			} else {
+				++i;
+				return null;
+			}
+		};
+		var parseTerm = function(depth) {
+			var factors = ['&'];
+			var factor = parseFactor(depth);
+			if (factor) factors.push(factor);
+			while (i < n && !(tokens[i][0] == '|' || (depth && tokens[i][0] == ')'))) {
+				factor = parseFactor(depth);
+				if (factor) factors.push(factor);
+			}
+			switch (factors.length) {
+				case 1: return null;
+				case 2: return factors[1];
+				default: return factors;
+			}
+		};
+		parseExpression = function(depth) {
+			var terms = ['|'];
+			var term = parseTerm(depth);
+			if (term) terms.push(term);
+			while (i < n && tokens[i][0] == '|') {
+				++i;
+				term = parseTerm(depth);
+				if (term) terms.push(term);
+			}
+			switch (terms.length) {
+				case 1: return null;
+				case 2: return terms[1];
+				default: return terms;
+			}
+		};
+		return parseExpression(0);
+	};
+	var queryMatchOperation = function(a, op, b) {
+		switch (op) {
+			case '<':
+				var an = Number(a), bn = Number(b);
+				if (isFinite(an) && isFinite(bn)) return (an < bn);
+				return naturalCompare(a, b) < 0;
+			case '>':
+				var an = Number(a), bn = Number(b);
+				if (isFinite(an) && isFinite(bn)) return (an > bn);
+				return naturalCompare(a, b) > 0;
+			case '<=':
+				var an = Number(a), bn = Number(b);
+				if (isFinite(an) && isFinite(bn)) return (an <= bn);
+				return naturalCompare(a, b) <= 0;
+			case '>=':
+				var an = Number(a), bn = Number(b);
+				if (isFinite(an) && isFinite(bn)) return (an >= bn);
+				return naturalCompare(a, b) >= 0;
+			case '=':
+				var al = String(a).toLowerCase();
+				var bl = String(b).toLowerCase();
+				return al == bl;
+			default:
+				var al = String(a).toLowerCase();
+				var bl = String(b).toLowerCase();
+				return al.indexOf(bl) >= 0;
+		}
+	};
+	var queryMatches = function(query, operation, searchContent, entity) {
+		if (!query) {
+			return true;
+		} else if (query[0] == '"') {
+			for (var i = 0, n = searchContent.length; i < n; ++i) {
+				if (queryMatchOperation(searchContent[i], operation, query[1])) {
+					return true;
+				}
+			}
+			return false;
+		} else if (query[0] == '-') {
+			return !queryMatches(query[1], operation, searchContent, entity);
+		} else if (query[0] == '&') {
+			for (var i = 1, n = query.length; i < n; ++i) {
+				if (!queryMatches(query[i], operation, searchContent, entity)) {
+					return false;
+				}
+			}
+			return true;
+		} else if (query[0] == '|') {
+			for (var i = 1, n = query.length; i < n; ++i) {
+				if (queryMatches(query[i], operation, searchContent, entity)) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			var newOperation = query[0];
+			var newEntity = entity[query[1]];
+			var newQuery = query[2];
+			if (newEntity == null) {
+				return false;
+			} else if ($.isPlainObject(newEntity)) {
+				var newSearchContent = newEntity['search-content'];
+				if (newSearchContent == null) {
+					return queryMatches(newQuery, newOperation, [String(newEntity)], newEntity);
+				} else if ($.isArray(newSearchContent)) {
+					return queryMatches(newQuery, newOperation, newSearchContent, newEntity);
+				} else {
+					return queryMatches(newQuery, newOperation, [String(newSearchContent)], newEntity);
+				}
+			} else if ($.isArray(newEntity)) {
+				return queryMatches(newQuery, newOperation, newEntity, newEntity);
+			} else {
+				return queryMatches(newQuery, newOperation, [String(newEntity)], newEntity);
+			}
+		}
+	};
+
 	$(document).ready(function() {
 		var rows = [];
 		var matches = [];
@@ -83,21 +254,14 @@
 
 		var doFilter = function() {
 			/* Filter */
-			var filterText = ($('.cm-search-input input').val() || '').trim().toLowerCase();
-			if (filterText) {
+			var query = queryParse($('.cm-search-input input').val() || '');
+			if (query) {
 				matches = [];
-				var rowMatches = function(row) {
-					if (row['search']) {
-						for (var i = 0, n = row['search'].length; i < n; ++i) {
-							var rowText = String(row['search'][i]).trim().toLowerCase();
-							if (rowText.indexOf(filterText) >= 0) return true;
-						}
-					}
-					return false;
-				};
 				for (var i = 0, n = rows.length; i < n; ++i) {
-					if (rowMatches(rows[i])) {
-						matches.push(rows[i]);
+					if (rows[i]['search'] && rows[i]['entity']) {
+						if (queryMatches(query, ':', rows[i]['search'], rows[i]['entity'])) {
+							matches.push(rows[i]);
+						}
 					}
 				}
 			} else {

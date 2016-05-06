@@ -417,6 +417,28 @@ select {
 	line-height: 1px;
 	padding-left: 8px;
 }
+/* Flexbox makes the cm-search-box look much nicer,
+   so let's use it if the browser supports it. */
+.cm-search-box {
+	display: flex;
+	align-items: center;
+}
+.cm-search-box .cm-search-input {
+	display: flex;
+	align-items: center;
+	flex: 1 0 0;
+}
+.cm-search-box .cm-search-input label {
+	flex: 0 1 0;
+}
+.cm-search-box .cm-search-input input {
+	flex: 1 0 0;
+}
+.cm-search-box .cm-search-options {
+	display: flex;
+	align-items: center;
+	flex: 0 1 0;
+}
 
 /* Dialogs */
 
