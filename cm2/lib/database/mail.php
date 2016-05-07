@@ -158,7 +158,7 @@ class cm_mail_db {
 					break;
 				case 'Simple HTML':
 					$content_type = 'text/html; charset=UTF-8';
-					$mail_body = mail_merge_html(safe_html_string($template['body']), $mail_fields);
+					$mail_body = '<html><body>' . mail_merge_html(safe_html_string($template['body']), $mail_fields) . '</body></html>';
 					break;
 				default:
 					$content_type = 'text/plain; charset=UTF-8';

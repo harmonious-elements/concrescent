@@ -209,6 +209,21 @@ nav + article {
 	background: #fcc;
 	padding: 12px;
 }
+.cm-warning-box {
+	border: solid 1px #cc0;
+	background: #ffc;
+	padding: 12px;
+}
+.cm-success-box {
+	border: solid 1px #0c0;
+	background: #cfc;
+	padding: 12px;
+}
+.cm-note-box {
+	border: solid 1px #08c;
+	background: #cef;
+	padding: 12px;
+}
 
 /* Tables */
 
@@ -438,6 +453,21 @@ select {
 	display: flex;
 	align-items: center;
 	flex: 0 1 0;
+}
+
+/* Form Letter Pages */
+
+.cm-mail-editor td input {
+	width: 390px;
+}
+.cm-mail-editor td textarea {
+	width: 392px;
+	height: 160px;
+}
+.cm-mail-editor td iframe {
+	border: solid 1px gray;
+	width: 398px;
+	height: 160px;
 }
 
 /* Dialogs */
