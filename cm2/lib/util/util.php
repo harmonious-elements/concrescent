@@ -49,14 +49,17 @@ function paragraph_string($s) {
 function safe_html_string($s) {
 	$s1 = '/&lt;a href=&quot;(([^"\'&<>]+|&amp;)*)&quot;&gt;(.*?)&lt;\\/a&gt;/';
 	$r1 = '<a href="$1" target="_blank">$3</a>';
-	$s2 = '/&lt;(b|i|u|s|q|tt|em|strong|sup|sub|big|small|ins|del|abbr|cite|code|dfn|kbd|samp|var)&gt;(.*?)&lt;\\/\\1&gt;/';
-	$r2 = '<$1>$2</$1>';
-	$s3 = '/&lt;(br|wbr)&gt;/';
-	$r3 = '<$1>';
+	$s2 = '/&lt;img src=&quot;(([^"\'&<>]+|&amp;)*)&quot;&gt;/';
+	$r2 = '<img src="$1">';
+	$s3 = '/&lt;(b|i|u|s|q|tt|em|strong|sup|sub|big|small|ins|del|abbr|cite|code|dfn|kbd|samp|var)&gt;(.*?)&lt;\\/\\1&gt;/';
+	$r3 = '<$1>$2</$1>';
+	$s4 = '/&lt;(br|wbr)&gt;/';
+	$r4 = '<$1>';
 	$s = paragraph_string($s);
 	while (preg_match($s1, $s)) $s = preg_replace($s1, $r1, $s);
 	while (preg_match($s2, $s)) $s = preg_replace($s2, $r2, $s);
 	while (preg_match($s3, $s)) $s = preg_replace($s3, $r3, $s);
+	while (preg_match($s4, $s)) $s = preg_replace($s4, $r4, $s);
 	return $s;
 }
 
