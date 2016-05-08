@@ -22,7 +22,7 @@ class cm_forms_db {
 			'`order` INTEGER NOT NULL,'.
 			'`text` TEXT NOT NULL,'.
 			'`type` ENUM('.
-				'\'h1\',\'h2\',\'h3\',\'p\','.
+				'\'h1\',\'h2\',\'h3\',\'p\',\'hr\','.
 				'\'text\',\'textarea\',\'url\',\'email\','.
 				'\'radio\',\'checkbox\',\'select\''.
 			') NOT NULL,'.
@@ -207,7 +207,7 @@ class cm_forms_db {
 		);
 		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
 		$stmt->close();
-		$this->cm_db->connection->commit();
+		$this->cm_db->connection->autocommit(true);
 		return $id;
 	}
 
@@ -286,8 +286,22 @@ class cm_forms_db {
 			$stmt->execute();
 			$stmt->close();
 		}
-		$this->cm_db->connection->commit();
+		$this->cm_db->connection->autocommit(true);
 		return $this->get_question_order();
+	}
+
+	public function question_is_visible($question, $subcontext) {
+		return ($question && $question['visible'] && (
+			in_array('*', $question['visible']) ||
+			in_array($subcontext, $question['visible'])
+		));
+	}
+
+	public function question_is_required($question, $subcontext) {
+		return ($question && $question['required'] && (
+			in_array('*', $question['required']) ||
+			in_array($subcontext, $question['required'])
+		));
 	}
 
 	public function get_answer($context_id, $question_id) {
@@ -302,7 +316,7 @@ class cm_forms_db {
 		$stmt->bind_result($text);
 		if ($stmt->fetch()) {
 			$stmt->close();
-			return explode("\n", $text);
+			return ($text ? explode("\n", $text) : array());
 		}
 		$stmt->close();
 		return false;
@@ -320,7 +334,7 @@ class cm_forms_db {
 		$stmt->execute();
 		$stmt->bind_result($question_id, $text);
 		while ($stmt->fetch()) {
-			$answers[$question_id] = explode("\n", $text);
+			$answers[$question_id] = ($text ? explode("\n", $text) : array());
 		}
 		$stmt->close();
 		return $answers;

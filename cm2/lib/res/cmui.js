@@ -21,7 +21,7 @@ cmui = (function($,window,document){
 		}
 		$('.butterbar').addClass('hidden');
 	};
-	
+
 	var showDialog, hideDialog, escapeDialog;
 	showDialog = function(name) {
 		$('.dialog-cover').removeClass('hidden');
@@ -41,12 +41,38 @@ cmui = (function($,window,document){
 			event.preventDefault();
 		}
 	};
-	
+
+	var htmlSpecialChars = function(s) {
+		s = s.replace(/&/g, '&amp;');
+		s = s.replace(/"/g, '&quot;');
+		s = s.replace(/</g, '&lt;');
+		s = s.replace(/>/g, '&gt;');
+		return s;
+	};
+	var paragraphString = function(s) {
+		s = htmlSpecialChars(s);
+		s = s.replace(/\r\n/g, '<br>');
+		s = s.replace(/\r/g, '<br>');
+		s = s.replace(/\n/g, '<br>');
+		return s;
+	};
+	var safeHtmlString = function(s) {
+		s = paragraphString(s);
+		s = s.replace(/&lt;a href=&quot;(([^"'&<>]+|&amp;)*)&quot;&gt;(.*?)&lt;\/a&gt;/g, '<a href="$1" target="_blank">$3</a>');
+		s = s.replace(/&lt;img src=&quot;(([^"'&<>]+|&amp;)*)&quot;&gt;/g, '<img src="$1">');
+		s = s.replace(/&lt;(b|i|u|s|q|tt|em|strong|sup|sub|big|small|ins|del|abbr|cite|code|dfn|kbd|samp|var)&gt;(.*?)&lt;\/\1&gt;/g, '<$1>$2</$1>');
+		s = s.replace(/&lt;(br|wbr)&gt;/g, '<$1>');
+		return s;
+	};
+
 	return {
 		showButterbar: showButterbar,
 		showButterbarPersistent: showButterbarPersistent,
 		hideButterbar: hideButterbar,
 		showDialog: showDialog,
 		hideDialog: hideDialog,
+		htmlSpecialChars: htmlSpecialChars,
+		paragraphString: paragraphString,
+		safeHtmlString: safeHtmlString
 	};
 })(jQuery,window,document);

@@ -237,6 +237,12 @@ th, td {
 .cm-form-table tbody th label {
 	white-space: nowrap;
 }
+.cm-form-table tbody td h1,
+.cm-form-table tbody td h2,
+.cm-form-table tbody td h3,
+.cm-form-table tbody td p {
+	margin-bottom: 8px;
+}
 
 /* Form Elements */
 
@@ -376,6 +382,7 @@ select {
 .cm-list-table table .td-actions {
 	width: 1px;
 	white-space: nowrap;
+	text-align: right;
 }
 .cm-list-table table thead th {
 	padding-top: 6px;
@@ -455,7 +462,59 @@ select {
 	flex: 0 1 0;
 }
 
-/* Form Letter Pages */
+/* Form Editor Pages */
+
+.cm-form-editor {
+	display: block;
+	margin: 16px;
+	padding: 16px;
+	overflow: hidden;
+	background: white;
+	border: gray;
+	border-radius: 4px;
+	box-shadow: 0 2px 2px gray;
+}
+.cm-form-editor table {
+	width: 100%;
+}
+.cm-form-editor table th:last-child,
+.cm-form-editor table td:last-child {
+	padding-right: 4px;
+}
+.cm-form-editor table .td-actions {
+	width: 1px;
+	white-space: nowrap;
+	text-align: right;
+}
+.cm-form-editor table .cm-form-editor-static-section {
+	color: gray;
+}
+.cm-form-editor table .cm-form-editor-custom-text-section .view-area {
+	cursor: pointer;
+}
+.cm-form-editor table .cm-form-editor-custom-text-section .view-area:empty:after {
+	content: "Click to add explanatory text";
+	color: gray;
+	font-style: italic;
+}
+.cm-form-editor table .cm-form-editor-custom-text-section:hover .view-area {
+	background: #ffc;
+}
+.cm-form-editor table .cm-form-editor-custom-text-section.editing .view-area {
+	background: #ff9;
+}
+.cm-form-editor table .cm-form-editor-custom-text-section textarea {
+	width: calc(100% - 12px);
+}
+.cm-form-editor hr {
+	height: 1px;
+	border: none;
+	background: #ccc;
+	color: #ccc;
+	margin: 16px -16px;
+}
+
+/* Mail Template Editor Pages */
 
 .cm-mail-editor td input {
 	width: 390px;
