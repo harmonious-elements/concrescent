@@ -1,7 +1,7 @@
-(function($,window,document,cmui,context){
+(function($,window,document,cmui,formdef){
 	var doAjax = function(message, request, done) {
 		cmui.showButterbar(message);
-		$.post('?', request, function(response) {
+		$.post((formdef['ajax-url'] || ''), request, function(response) {
 			if (!response['ok']) {
 				cmui.showButterbarPersistent('An error occurred. Please try again.');
 			} else {
@@ -24,7 +24,7 @@
 				}, function(response) {
 					var text = response['text'];
 					var html = cmui.safeHtmlString(text);
-					self.find('.view-row p').html(html);
+					self.find('.view-row .view-area').html(html);
 					self.find('.edit-row textarea').val(text);
 					currentText = text;
 					currentHtml = html;
@@ -38,18 +38,18 @@
 			var previewContent = function() {
 				var text = self.find('.edit-row textarea').val();
 				var html = cmui.safeHtmlString(text);
-				self.find('.view-row p').html(html);
+				self.find('.view-row .view-area').html(html);
 			};
 			var revertContent = function() {
 				self.removeClass('editing');
 				self.find('.edit-row').addClass('hidden');
-				self.find('.view-row p').html(currentHtml);
+				self.find('.view-row .view-area').html(currentHtml);
 				self.find('.edit-row textarea').val(currentText);
 			};
 			var saveContent = function() {
 				var text = self.find('.edit-row textarea').val();
 				var html = cmui.safeHtmlString(text);
-				self.find('.view-row p').html(html);
+				self.find('.view-row .view-area').html(html);
 				doAjax('Saving...', {
 					'cm-form-action': 'save-custom-text',
 					'cm-form-ct-name': id,
@@ -62,7 +62,7 @@
 				});
 			};
 			/* Bind Events */
-			self.find('.view-row p').bind('click', editContent);
+			self.find('.view-row').bind('click', editContent);
 			var textArea = self.find('.edit-row textarea');
 			var textAreaOldVal = textArea.val();
 			var textAreaChanged = function() {
@@ -80,4 +80,4 @@
 			loadContent();
 		});
 	});
-})(jQuery,window,document,cmui,cm_form_context);
+})(jQuery,window,document,cmui,cm_form_def);

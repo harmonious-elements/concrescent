@@ -489,22 +489,54 @@ select {
 .cm-form-editor table .cm-form-editor-static-section {
 	color: gray;
 }
-.cm-form-editor table .cm-form-editor-custom-text-section .view-area {
+.cm-form-editor table .cm-form-editor-custom-text-section:hover {
+	background: #eef;
+}
+.cm-form-editor table .cm-form-editor-custom-text-section.editing {
+	background: #ddf;
+}
+.cm-form-editor table .cm-form-editor-custom-text-section .view-row {
 	cursor: pointer;
 }
 .cm-form-editor table .cm-form-editor-custom-text-section .view-area:empty:after {
-	content: "Click to add explanatory text";
+	content: "Click to add explanatory text.";
 	color: gray;
 	font-style: italic;
 }
-.cm-form-editor table .cm-form-editor-custom-text-section:hover .view-area {
-	background: #ffc;
-}
-.cm-form-editor table .cm-form-editor-custom-text-section.editing .view-area {
-	background: #ff9;
-}
 .cm-form-editor table .cm-form-editor-custom-text-section textarea {
-	width: calc(100% - 12px);
+	width: calc(100% - 8px);
+}
+.cm-form-editor table .cm-form-editor-dynamic-row {
+	cursor: pointer;
+}
+.cm-form-editor table .cm-form-editor-dynamic-row:hover {
+	background: #eef;
+}
+.cm-form-editor table .cm-form-editor-dynamic-row.editing,
+.cm-form-editor table .cm-form-editor-row-editor-row {
+	background: #ddf;
+}
+.cm-form-editor table .cm-form-editor-dynamic-row h1:empty:after,
+.cm-form-editor table .cm-form-editor-dynamic-row h2:empty:after,
+.cm-form-editor table .cm-form-editor-dynamic-row h3:empty:after {
+	content: "Untitled Title";
+	color: gray;
+	font-style: italic;
+}
+.cm-form-editor table .cm-form-editor-dynamic-row p:empty:after {
+	content: "Untitled explanatory text.";
+	color: gray;
+	font-style: italic;
+}
+.cm-form-editor table .cm-form-editor-dynamic-row label:empty:after {
+	content: "Untitled Question";
+	color: gray;
+	font-style: italic;
+}
+.cm-form-editor table .cm-form-editor-row-editor-row.ear-visible-advanced label,
+.cm-form-editor table .cm-form-editor-row-editor-row.ear-required-advanced label {
+	display: block;
+	padding-left: 2em;
 }
 .cm-form-editor table hr {
 	height: 1px;
