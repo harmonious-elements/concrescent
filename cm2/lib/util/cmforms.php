@@ -154,7 +154,7 @@ function cm_form_edit_row($question, $answer) {
 	}
 }
 
-function cm_form_edit_static_section($questions) {
+function cm_form_edit_static_section(&$questions) {
 	echo '<tbody class="cm-form-editor-static-section">';
 	foreach ($questions as $question) {
 		cm_form_edit_row($question, array('Question provided by system'));
@@ -242,6 +242,26 @@ function cm_form_edit_dynamic_section(&$form_def) {
 function cm_form_edit_end() {
 	echo '</table>';
 	echo '</div>';
+}
+
+function cm_form_edit_body(&$form_def, $questions) {
+	cm_form_edit_start();
+	$section = array();
+	foreach ($questions as $question) {
+		if ($question['type'] == 'custom-text') {
+			if ($section) cm_form_edit_static_section($section);
+			cm_form_edit_custom_text_section($question['name']);
+			$section = array();
+		} else if ($question['type'] == 'custom-questions') {
+			if ($section) cm_form_edit_static_section($section);
+			cm_form_edit_dynamic_section($form_def);
+			$section = array();
+		} else {
+			$section[] = $question;
+		}
+	}
+	if ($section) cm_form_edit_static_section($section);
+	cm_form_edit_end();
 }
 
 function cm_form_edit_delete_dialog() {

@@ -36,8 +36,8 @@
 		setClass(editor.find('.ear-values'), 'hidden', !typeTakesValues(type));
 		/* Text */
 		var text = (question['text'] || '');
-		editor.find('.ea-text-short').val(typeTakesShortText(type) ? text : '');
-		editor.find('.ea-text-long').val(typeTakesLongText(type) ? text : '');
+		editor.find('.ea-text-short').val(text);
+		editor.find('.ea-text-long').val(text);
 		/* Values */
 		var values = (question['values'] || []).join('\n');
 		editor.find('.ea-values').val(values);
@@ -129,7 +129,7 @@
 				setClass(editor.find('.ear-text-short'), 'hidden', !typeTakesShortText(typeNewVal));
 				setClass(editor.find('.ear-text-long'), 'hidden', !typeTakesLongText(typeNewVal));
 				setClass(editor.find('.ear-values'), 'hidden', !typeTakesValues(typeNewVal));
-				if (onChange) onChange(editor, 'type');
+				if (onChange) onChange(editor, 'type', typeNewVal);
 			}
 		};
 		typeField.bind('change', typeChanged);
@@ -144,7 +144,8 @@
 			var shortTextFieldNewVal = shortTextField.val();
 			if (shortTextFieldNewVal != shortTextFieldOldVal) {
 				shortTextFieldOldVal = shortTextFieldNewVal;
-				if (onChange) onChange(editor, 'text');
+				editor.find('.ea-text-long').val(shortTextFieldNewVal);
+				if (onChange) onChange(editor, 'text', shortTextFieldNewVal);
 			}
 		};
 		shortTextField.bind('change', shortTextFieldChanged);
@@ -157,7 +158,8 @@
 			var longTextFieldNewVal = longTextField.val();
 			if (longTextFieldNewVal != longTextFieldOldVal) {
 				longTextFieldOldVal = longTextFieldNewVal;
-				if (onChange) onChange(editor, 'text');
+				editor.find('.ea-text-short').val(longTextFieldNewVal);
+				if (onChange) onChange(editor, 'text', longTextFieldNewVal);
 			}
 		};
 		longTextField.bind('change', longTextFieldChanged);
@@ -170,7 +172,7 @@
 			var valuesFieldNewVal = valuesField.val();
 			if (valuesFieldNewVal != valuesFieldOldVal) {
 				valuesFieldOldVal = valuesFieldNewVal;
-				if (onChange) onChange(editor, 'values');
+				if (onChange) onChange(editor, 'values', valuesFieldNewVal);
 			}
 		};
 		valuesField.bind('change', valuesFieldChanged);
@@ -178,16 +180,16 @@
 		valuesField.bind('keyup', valuesFieldChanged);
 		/* Active & Listed */
 		editor.find('.ea-active').bind('click', function() {
-			if (onChange) onChange(editor, 'active');
+			if (onChange) onChange(editor, 'active', $(this).is(':checked'));
 		});
 		editor.find('.ea-listed').bind('click', function() {
-			if (onChange) onChange(editor, 'listed');
+			if (onChange) onChange(editor, 'listed', $(this).is(':checked'));
 		});
 		/* Visible */
 		editor.find('.ea-visible').bind('click', function() {
 			var checked = editor.find('.ea-visible').is(':checked');
 			editor.find('.ear-visible-advanced input').prop('checked', checked);
-			if (onChange) onChange(editor, 'visible');
+			if (onChange) onChange(editor, 'visible', checked);
 		});
 		editor.find('.ea-visible-advanced').bind('click', function() {
 			var checked = editor.find('.ear-visible-advanced input').is(':checked');
@@ -197,13 +199,13 @@
 		editor.find('.ear-visible-advanced input').bind('click', function() {
 			var checked = !editor.find('.ear-visible-advanced input').is(':not(:checked)');
 			editor.find('.ea-visible').prop('checked', checked);
-			if (onChange) onChange(editor, 'visible');
+			if (onChange) onChange(editor, 'visible', checked);
 		});
 		/* Required */
 		editor.find('.ea-required').bind('click', function() {
 			var checked = editor.find('.ea-required').is(':checked');
 			editor.find('.ear-required-advanced input').prop('checked', checked);
-			if (onChange) onChange(editor, 'required');
+			if (onChange) onChange(editor, 'required', checked);
 		});
 		editor.find('.ea-required-advanced').bind('click', function() {
 			var checked = editor.find('.ear-required-advanced input').is(':checked');
@@ -213,7 +215,7 @@
 		editor.find('.ear-required-advanced input').bind('click', function() {
 			var checked = !editor.find('.ear-required-advanced input').is(':not(:checked)');
 			editor.find('.ea-required').prop('checked', checked);
-			if (onChange) onChange(editor, 'required');
+			if (onChange) onChange(editor, 'required', checked);
 		});
 	};
 	var renderQuestion = function(question, done) {
