@@ -210,7 +210,7 @@ function cm_form_edit_dynamic_section(&$form_def) {
 		echo '</td></tr>';
 		echo '<tr class="cm-form-editor-row-editor-row ear-text-short"><th><label>Label</label></th><td><input type="text" class="ea-text-short"></td></tr>';
 		echo '<tr class="cm-form-editor-row-editor-row ear-text-long hidden"><th><label>Text</label></th><td><textarea class="ea-text-long"></textarea></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row hidden"><th><label>Values</label></th><td><textarea class="ea-values"></textarea></td></tr>';
+		echo '<tr class="cm-form-editor-row-editor-row ear-values hidden"><th><label>Values</label></th><td><textarea class="ea-values"></textarea></td></tr>';
 		echo '<tr class="cm-form-editor-row-editor-row"><th><label>Active</label></th><td><label><input type="checkbox" checked class="ea-active">Question and answer appear on Review and Edit detail pages.</label></td></tr>';
 		echo '<tr class="cm-form-editor-row-editor-row"><th><label>In List</label></th><td><label><input type="checkbox" class="ea-listed">Answers appear in a column on Review and Edit list pages.</label></td></tr>';
 		echo '<tr class="cm-form-editor-row-editor-row"><th><label>Visible</label></th><td><label><input type="checkbox" checked class="ea-visible">Question appears on Register and Apply pages.</label> <a href="#" class="ea-visible-advanced">Advanced...</a></td></tr>';
