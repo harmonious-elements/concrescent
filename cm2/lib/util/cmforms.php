@@ -159,11 +159,7 @@ function cm_form_edit_static_section($questions) {
 				echo '</td></tr>';
 				break;
 			case 'hr':
-				echo '</tbody>';
-				echo '</table>';
-				echo '<hr>';
-				echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
-				echo '<tbody class="cm-form-editor-static-section">';
+				echo '<tr><td colspan="3"><hr></td></tr>';
 				break;
 			default:
 				echo '<tr><th>';

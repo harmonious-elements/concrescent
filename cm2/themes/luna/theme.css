@@ -506,12 +506,12 @@ select {
 .cm-form-editor table .cm-form-editor-custom-text-section textarea {
 	width: calc(100% - 12px);
 }
-.cm-form-editor hr {
+.cm-form-editor table hr {
 	height: 1px;
 	border: none;
 	background: #ccc;
 	color: #ccc;
-	margin: 16px -16px;
+	margin: 12px -20px;
 }
 
 /* Mail Template Editor Pages */
