@@ -238,6 +238,7 @@
 		$('.cm-form-editor-custom-text-section').each(function() {
 			var self = $(this);
 			var id = self.attr('id').substring(13);
+			var defaultHtml = self.find('.view-row .view-area').html();
 			var currentText, currentHtml;
 			var loadContent = function() {
 				doAjax('Loading...', {
@@ -246,7 +247,7 @@
 				}, function(response) {
 					var text = response['text'];
 					var html = cmui.safeHtmlString(text);
-					self.find('.view-row .view-area').html(html);
+					self.find('.view-row .view-area').html(html || defaultHtml);
 					self.find('.edit-row textarea').val(text);
 					currentText = text;
 					currentHtml = html;
@@ -260,18 +261,18 @@
 			var previewContent = function() {
 				var text = self.find('.edit-row textarea').val();
 				var html = cmui.safeHtmlString(text);
-				self.find('.view-row .view-area').html(html);
+				self.find('.view-row .view-area').html(html || defaultHtml);
 			};
 			var revertContent = function() {
 				self.removeClass('editing');
 				self.find('.edit-row').addClass('hidden');
-				self.find('.view-row .view-area').html(currentHtml);
+				self.find('.view-row .view-area').html(currentHtml || defaultHtml);
 				self.find('.edit-row textarea').val(currentText);
 			};
 			var saveContent = function() {
 				var text = self.find('.edit-row textarea').val();
 				var html = cmui.safeHtmlString(text);
-				self.find('.view-row .view-area').html(html);
+				self.find('.view-row .view-area').html(html || defaultHtml);
 				doAjax('Saving...', {
 					'cm-form-action': 'save-custom-text',
 					'cm-form-ct-name': id,

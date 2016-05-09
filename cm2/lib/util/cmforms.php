@@ -162,12 +162,14 @@ function cm_form_edit_static_section(&$questions) {
 	echo '</tbody>';
 }
 
-function cm_form_edit_custom_text_section($name) {
+function cm_form_edit_custom_text_section($name, $default) {
 	echo '<tbody class="cm-form-editor-custom-text-section"';
 	echo ' id="customtextid-' . htmlspecialchars($name) . '">';
 		echo '<tr title="Click to edit explanatory text." class="view-row">';
 			echo '<td colspan="2">';
-				echo '<p class="view-area"></p>';
+				echo '<p class="view-area">';
+				if ($default) echo safe_html_string($default);
+				echo '</p>';
 			echo '</td>';
 		echo '</tr>';
 		echo '<tr class="edit-row hidden">';
@@ -250,7 +252,9 @@ function cm_form_edit_body(&$form_def, $questions) {
 	foreach ($questions as $question) {
 		if ($question['type'] == 'custom-text') {
 			if ($section) cm_form_edit_static_section($section);
-			cm_form_edit_custom_text_section($question['name']);
+			$name = $question['name'];
+			$default = (isset($question['default']) ? $question['default'] : '');
+			cm_form_edit_custom_text_section($name, $default);
 			$section = array();
 		} else if ($question['type'] == 'custom-questions') {
 			if ($section) cm_form_edit_static_section($section);
