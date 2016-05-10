@@ -30,10 +30,10 @@
 		/* Type */
 		var type = (question['type'] || 'text');
 		editor.find('.ea-type').val(type);
-		editor.find('.ear-text-short label').text(typeTakesTitle(type) ? 'Title' : 'Label');
-		setClass(editor.find('.ear-text-short'), 'hidden', !typeTakesShortText(type));
-		setClass(editor.find('.ear-text-long'), 'hidden', !typeTakesLongText(type));
-		setClass(editor.find('.ear-values'), 'hidden', !typeTakesValues(type));
+		editor.filter('.ear-text-short').find('label').text(typeTakesTitle(type) ? 'Title' : 'Label');
+		setClass(editor.filter('.ear-text-short'), 'hidden', !typeTakesShortText(type));
+		setClass(editor.filter('.ear-text-long'), 'hidden', !typeTakesLongText(type));
+		setClass(editor.filter('.ear-values'), 'hidden', !typeTakesValues(type));
 		/* Text */
 		var text = (question['text'] || '');
 		editor.find('.ea-text-short').val(text);
@@ -47,33 +47,33 @@
 		/* Visible */
 		if (question['visible'] && question['visible'].indexOf('*') >= 0) {
 			editor.find('.ea-visible').prop('checked', true);
-			editor.find('.ear-visible-advanced').addClass('hidden');
-			editor.find('.ear-visible-advanced input').prop('checked', true);
+			editor.filter('.ear-visible-advanced').addClass('hidden');
+			editor.filter('.ear-visible-advanced').find('input').prop('checked', true);
 		} else {
 			editor.find('.ea-visible').prop('checked', false);
-			editor.find('.ear-visible-advanced').addClass('hidden');
-			editor.find('.ear-visible-advanced input').prop('checked', false);
+			editor.filter('.ear-visible-advanced').addClass('hidden');
+			editor.filter('.ear-visible-advanced').find('input').prop('checked', false);
 			for (var i = 0, n = formdef['subcontext'].length; i < n; ++i) {
 				var id = formdef['subcontext'][i]['id'];
 				var checked = (question['visible'] && question['visible'].indexOf(id) >= 0);
 				editor.find('.ea-visible-' + id).prop('checked', checked);
-				if (checked) editor.find('.ear-visible-advanced').removeClass('hidden');
+				if (checked) editor.filter('.ear-visible-advanced').removeClass('hidden');
 			}
 		}
 		/* Required */
 		if (question['required'] && question['required'].indexOf('*') >= 0) {
 			editor.find('.ea-required').prop('checked', true);
-			editor.find('.ear-required-advanced').addClass('hidden');
-			editor.find('.ear-required-advanced input').prop('checked', true);
+			editor.filter('.ear-required-advanced').addClass('hidden');
+			editor.filter('.ear-required-advanced').find('input').prop('checked', true);
 		} else {
 			editor.find('.ea-required').prop('checked', false);
-			editor.find('.ear-required-advanced').addClass('hidden');
-			editor.find('.ear-required-advanced input').prop('checked', false);
+			editor.filter('.ear-required-advanced').addClass('hidden');
+			editor.filter('.ear-required-advanced').find('input').prop('checked', false);
 			for (var i = 0, n = formdef['subcontext'].length; i < n; ++i) {
 				var id = formdef['subcontext'][i]['id'];
 				var checked = (question['required'] && question['required'].indexOf(id) >= 0);
 				editor.find('.ea-required-' + id).prop('checked', checked);
-				if (checked) editor.find('.ear-required-advanced').removeClass('hidden');
+				if (checked) editor.filter('.ear-required-advanced').removeClass('hidden');
 			}
 		}
 	};
@@ -125,10 +125,10 @@
 			var typeNewVal = typeField.val();
 			if (typeNewVal != typeOldVal) {
 				typeOldVal = typeNewVal;
-				editor.find('.ear-text-short label').text(typeTakesTitle(typeNewVal) ? 'Title' : 'Label');
-				setClass(editor.find('.ear-text-short'), 'hidden', !typeTakesShortText(typeNewVal));
-				setClass(editor.find('.ear-text-long'), 'hidden', !typeTakesLongText(typeNewVal));
-				setClass(editor.find('.ear-values'), 'hidden', !typeTakesValues(typeNewVal));
+				editor.filter('.ear-text-short').find('label').text(typeTakesTitle(typeNewVal) ? 'Title' : 'Label');
+				setClass(editor.filter('.ear-text-short'), 'hidden', !typeTakesShortText(typeNewVal));
+				setClass(editor.filter('.ear-text-long'), 'hidden', !typeTakesLongText(typeNewVal));
+				setClass(editor.filter('.ear-values'), 'hidden', !typeTakesValues(typeNewVal));
 				if (onChange) onChange(editor, 'type', typeNewVal);
 			}
 		};
@@ -188,32 +188,32 @@
 		/* Visible */
 		editor.find('.ea-visible').bind('click', function() {
 			var checked = editor.find('.ea-visible').is(':checked');
-			editor.find('.ear-visible-advanced input').prop('checked', checked);
+			editor.filter('.ear-visible-advanced').find('input').prop('checked', checked);
 			if (onChange) onChange(editor, 'visible', checked);
 		});
 		editor.find('.ea-visible-advanced').bind('click', function() {
-			var checked = editor.find('.ear-visible-advanced input').is(':checked');
-			var notChecked = editor.find('.ear-visible-advanced input').is(':not(:checked)');
-			if (!(checked && notChecked)) editor.find('.ear-visible-advanced').toggleClass('hidden');
+			var checked = editor.filter('.ear-visible-advanced').find('input').is(':checked');
+			var notChecked = editor.filter('.ear-visible-advanced').find('input').is(':not(:checked)');
+			if (!(checked && notChecked)) editor.filter('.ear-visible-advanced').toggleClass('hidden');
 		});
-		editor.find('.ear-visible-advanced input').bind('click', function() {
-			var checked = !editor.find('.ear-visible-advanced input').is(':not(:checked)');
+		editor.filter('.ear-visible-advanced').find('input').bind('click', function() {
+			var checked = !editor.filter('.ear-visible-advanced').find('input').is(':not(:checked)');
 			editor.find('.ea-visible').prop('checked', checked);
 			if (onChange) onChange(editor, 'visible', checked);
 		});
 		/* Required */
 		editor.find('.ea-required').bind('click', function() {
 			var checked = editor.find('.ea-required').is(':checked');
-			editor.find('.ear-required-advanced input').prop('checked', checked);
+			editor.filter('.ear-required-advanced').find('input').prop('checked', checked);
 			if (onChange) onChange(editor, 'required', checked);
 		});
 		editor.find('.ea-required-advanced').bind('click', function() {
-			var checked = editor.find('.ear-required-advanced input').is(':checked');
-			var notChecked = editor.find('.ear-required-advanced input').is(':not(:checked)');
-			if (!(checked && notChecked)) editor.find('.ear-required-advanced').toggleClass('hidden');
+			var checked = editor.filter('.ear-required-advanced').find('input').is(':checked');
+			var notChecked = editor.filter('.ear-required-advanced').find('input').is(':not(:checked)');
+			if (!(checked && notChecked)) editor.filter('.ear-required-advanced').toggleClass('hidden');
 		});
-		editor.find('.ear-required-advanced input').bind('click', function() {
-			var checked = !editor.find('.ear-required-advanced input').is(':not(:checked)');
+		editor.filter('.ear-required-advanced').find('input').bind('click', function() {
+			var checked = !editor.filter('.ear-required-advanced').find('input').is(':not(:checked)');
 			editor.find('.ea-required').prop('checked', checked);
 			if (onChange) onChange(editor, 'required', checked);
 		});
@@ -231,6 +231,17 @@
 				cmui.hideButterbar();
 			}
 		});
+	};
+	var saveQuestionOrder = function(tbody) {
+		var ids = [];
+		tbody.find('.cm-form-editor-dynamic-row').each(function() {
+			var id = $(this).attr('id').substring(11);
+			if (id.substring(0, 4) != 'NEW-') ids.push(id);
+		});
+		doAjax('Saving...', {
+			'cm-form-action': 'set-question-order',
+			'cm-form-question-order': JSON.stringify(ids)
+		}, function() {});
 	};
 
 	$(document).ready(function() {
@@ -304,6 +315,142 @@
 		});
 
 		/* Dynamic Form Section */
+		var prepDynamicRow = function(tbody, tr, question, isNew) {
+			tr.addClass('cm-form-editor-dynamic-row');
+			setClass(tr, 'inactive', !question['active']);
+			tr.attr('id', 'questionid-' + question['question-id']);
+			tr.attr('title', 'Click to edit question.');
+			tbody.append(tr);
+			tr.bind('click', function() {
+				if (tr.hasClass('editing')) return;
+				var editor = $('.cm-form-editor-dynamic-section-editor tr').clone();
+				editor.addClass('editorid-' + question['question-id']);
+				tr.after(editor);
+				tr.addClass('editing');
+				pushToEditor(editor, question);
+				prepEditor(editor, function(e, what, value) {
+					switch (what) {
+						case 'type':
+						case 'values':
+							var newQuestion = pullFromEditor(editor, {});
+							renderQuestion(newQuestion, function(html) {
+								tr.html($(html).html());
+							});
+							break;
+						case 'text':
+							var html = cmui.safeHtmlString(value);
+							tr.find('td > h1').html(html);
+							tr.find('td > h2').html(html);
+							tr.find('td > h3').html(html);
+							tr.find('td > p').html(html);
+							tr.find('th > label').text(value);
+							break;
+						case 'active':
+							setClass(tr, 'inactive', !value);
+							break;
+					}
+				});
+				editor.find('.confirm-edit-button').bind('click', function() {
+					var questionId = {'question-id': question['question-id']};
+					var newQuestion = pullFromEditor(editor, questionId);
+					doAjax('Saving...', {
+						'cm-form-action': (isNew ? 'create-question' : 'update-question'),
+						'cm-form-question': JSON.stringify(newQuestion)
+					}, function(response) {
+						question = response['question']; isNew = false;
+						setClass(tr, 'inactive', !question['active']);
+						tr.attr('id', 'questionid-' + question['question-id']);
+						tr.html($(response['html']).html());
+						editor.remove();
+						tr.removeClass('editing');
+						saveQuestionOrder(tbody);
+					});
+				});
+				editor.find('.cancel-edit-button').bind('click', function() {
+					if (isNew) {
+						tr.remove();
+						editor.remove();
+					} else {
+						renderQuestion(question, function(html) {
+							setClass(tr, 'inactive', !question['active']);
+							tr.html($(html).html());
+							editor.remove();
+							tr.removeClass('editing');
+						});
+					}
+				});
+				editor.find('.up-button').bind('click', function() {
+					var prevTr = tr.prevAll('.cm-form-editor-dynamic-row:eq(0)');
+					if (prevTr.length) {
+						prevTr.before(tr);
+						prevTr.before(editor);
+						saveQuestionOrder(tbody);
+					}
+				});
+				editor.find('.down-button').bind('click', function() {
+					var nextTr = tr.nextAll('.cm-form-editor-dynamic-row:eq(0)');
+					if (nextTr.length) {
+						var nextNextTr = nextTr.nextAll('.cm-form-editor-dynamic-row:eq(0)');
+						if (nextNextTr.length) {
+							nextNextTr.before(tr);
+							nextNextTr.before(editor);
+						} else {
+							tbody.append(tr);
+							tbody.append(editor);
+						}
+						saveQuestionOrder(tbody);
+					}
+				});
+				editor.find('.delete-button').bind('click', function() {
+					var newQuestion = pullFromEditor(editor, {});
+					var text = newQuestion['text'] || 'Untitled Question';
+					$('.delete-dialog .delete-name').text(text);
+					$('.delete-dialog .cancel-delete-button').unbind('click').bind('click', cmui.hideDialog);
+					$('.delete-dialog .soft-delete-button').unbind('click').bind('click', function() {
+						cmui.hideDialog();
+						tr.addClass('inactive');
+						editor.find('.ea-active').prop('checked', false);
+					});
+					$('.delete-dialog .confirm-delete-button').unbind('click').bind('click', function() {
+						cmui.hideDialog();
+						if (isNew) {
+							tr.remove();
+							editor.remove();
+						} else {
+							doAjax('Saving...', {
+								'cm-form-action': 'delete-question',
+								'cm-form-question-id': question['question-id']
+							}, function() {
+								tr.remove();
+								editor.remove();
+							});
+						}
+					});
+					cmui.showDialog('delete');
+				});
+			});
+		};
+		var doLoad = function() {
+			doAjax('Loading...', {'cm-form-action': 'list-questions'}, function(response) {
+				var tbody = $('.cm-form-editor-dynamic-section').empty();
+				for (var i = 0, n = response.questions.length; i < n; i++) {
+					var tr = $(response.html[i]);
+					var question = response.questions[i];
+					prepDynamicRow(tbody, tr, question, false);
+				}
+			});
+		};
+		$('.cm-form-editor-dynamic-section-actions .add-button').bind('click', function() {
+			var editor = $('.cm-form-editor-dynamic-section-editor tr');
+			var questionId = {'question-id': 'NEW-' + new Date().getTime()};
+			var question = pullFromEditor(editor, questionId);
+			renderQuestion(question, function(html) {
+				var tbody = $('.cm-form-editor-dynamic-section');
+				var tr = $(html);
+				prepDynamicRow(tbody, tr, question, true);
+				tr.click();
+			});
+		});
 
 		/* Keyboard Navigation */
 		$('body').bind('keydown', function(event) {
@@ -315,5 +462,7 @@
 				}
 			}
 		});
+
+		doLoad();
 	});
 })(jQuery,window,document,cmui,cm_form_def);

@@ -477,6 +477,9 @@ select {
 .cm-form-editor table {
 	width: 100%;
 }
+.cm-form-editor table th {
+	width: 200px;
+}
 .cm-form-editor table th:last-child,
 .cm-form-editor table td:last-child {
 	padding-right: 4px;
@@ -506,8 +509,12 @@ select {
 .cm-form-editor table .cm-form-editor-custom-text-section textarea {
 	width: calc(100% - 8px);
 }
-.cm-form-editor table .cm-form-editor-dynamic-row {
+.cm-form-editor table .cm-form-editor-dynamic-row,
+.cm-form-editor table .cm-form-editor-dynamic-row * {
 	cursor: pointer;
+}
+.cm-form-editor table .cm-form-editor-dynamic-row.inactive {
+	color: gray;
 }
 .cm-form-editor table .cm-form-editor-dynamic-row:hover {
 	background: #eef;
@@ -532,6 +539,10 @@ select {
 	content: "Untitled Question";
 	color: gray;
 	font-style: italic;
+}
+.cm-form-editor table .cm-form-editor-dynamic-row + .cm-form-editor-row-editor-row th,
+.cm-form-editor table .cm-form-editor-dynamic-row + .cm-form-editor-row-editor-row td {
+	border-top: 2px dashed rgba(0,0,0,0.3);
 }
 .cm-form-editor table .cm-form-editor-row-editor-row.ear-visible-advanced label,
 .cm-form-editor table .cm-form-editor-row-editor-row.ear-required-advanced label {

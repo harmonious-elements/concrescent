@@ -109,6 +109,8 @@ function cm_form_posted_answer($id, $type) {
 	}
 }
 
+/* Form Editor */
+
 function cm_form_edit_head(&$form_def) {
 	echo '<script type="text/javascript">';
 		echo 'cm_form_def = (' . json_encode($form_def) . ');';
@@ -127,37 +129,36 @@ function cm_form_edit_row($question, $answer) {
 		case 'h2':
 		case 'h3':
 		case 'p':
-			echo '<tr><td colspan="2">';
-			echo '<' . $question['type'] . '>';
-			echo safe_html_string($question['text']);
-			echo '</' . $question['type'] . '>';
-			echo '</td></tr>';
-			break;
+			$out = '<tr><td colspan="2">';
+			$out .= '<' . $question['type'] . '>';
+			$out .= safe_html_string($question['text']);
+			$out .= '</' . $question['type'] . '>';
+			$out .= '</td></tr>';
+			return $out;
 		case 'hr':
-			echo '<tr><td colspan="2"><hr></td></tr>';
-			break;
+			return '<tr><td colspan="2"><hr></td></tr>';
 		default:
-			echo '<tr><th>';
-			echo cm_form_label(
+			$out = '<tr><th>';
+			$out .= cm_form_label(
 				(isset($question['question-id']) ? $question['question-id'] : ''),
 				(isset($question['text']) ? $question['text'] : '')
 			);
-			echo '</th><td>';
-			echo cm_form_input(
+			$out .= '</th><td>';
+			$out .= cm_form_input(
 				(isset($question['question-id']) ? $question['question-id'] : ''),
 				(isset($question['type']) ? $question['type'] : ''),
 				(isset($question['values']) ? $question['values'] : ''),
 				$answer, false, true
 			);
-			echo '</td></tr>';
-			break;
+			$out .= '</td></tr>';
+			return $out;
 	}
 }
 
 function cm_form_edit_static_section(&$questions) {
 	echo '<tbody class="cm-form-editor-static-section">';
 	foreach ($questions as $question) {
-		cm_form_edit_row($question, array('Question provided by system'));
+		echo cm_form_edit_row($question, array('Question provided by system'));
 	}
 	echo '</tbody>';
 }
@@ -304,21 +305,32 @@ function cm_form_edit_process_requests($db) {
 			case 'render-dynamic-row':
 				$question = json_decode($_POST['cm-form-question'], true);
 				$answer = array('Answer provided by user');
-				cm_form_edit_row($question, $answer);
+				echo cm_form_edit_row($question, $answer);
 				break;
 			case 'get-question':
 				$id = $_POST['cm-form-question-id'];
 				$question = $db->get_question($id);
 				$ok = ($question !== false);
 				$response = array('ok' => $ok);
-				if ($ok) $response['question'] = $question;
+				if ($ok) {
+					$response['question'] = $question;
+					$answer = array('Answer provided by user');
+					$response['html'] = cm_form_edit_row($question, $answer);
+				}
 				echo json_encode($response);
 				break;
 			case 'list-questions':
 				$questions = $db->list_questions();
 				$ok = ($questions !== false);
 				$response = array('ok' => $ok);
-				if ($ok) $response['questions'] = $questions;
+				if ($ok) {
+					$response['questions'] = $questions;
+					$answer = array('Answer provided by user');
+					$response['html'] = array();
+					foreach ($questions as $question) {
+						$response['html'][] = cm_form_edit_row($question, $answer);
+					}
+				}
 				echo json_encode($response);
 				break;
 			case 'create-question':
@@ -329,7 +341,11 @@ function cm_form_edit_process_requests($db) {
 				if ($ok) {
 					$response['question-id'] = $id;
 					$question = $db->get_question($id);
-					if ($question !== false) $response['question'] = $question;
+					if ($question !== false) {
+						$response['question'] = $question;
+						$answer = array('Answer provided by user');
+						$response['html'] = cm_form_edit_row($question, $answer);
+					}
 				}
 				echo json_encode($response);
 				break;
@@ -341,7 +357,11 @@ function cm_form_edit_process_requests($db) {
 					$id = $question['question-id'];
 					$response['question-id'] = $id;
 					$question = $db->get_question($id);
-					if ($question !== false) $response['question'] = $question;
+					if ($question !== false) {
+						$response['question'] = $question;
+						$answer = array('Answer provided by user');
+						$response['html'] = cm_form_edit_row($question, $answer);
+					}
 				}
 				echo json_encode($response);
 				break;
