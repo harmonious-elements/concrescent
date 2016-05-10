@@ -1,38 +1,8 @@
-/* Basic */
-
-* {
-	margin: 0;
-	padding: 0;
-}
-body {
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 12px;
-}
-h1 {
-	font-size: 24px;
-}
-h2 {
-	font-size: 18px;
-}
-h3 {
-	font-size: 14px;
-}
-.hidden {
-	display: none !important;
-}
-
 /* Header */
 
 header {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 40px;
-	overflow: hidden;
 	background: #656cb9;
 	font-family: Georgia;
-	line-height: 40px;
 	color: white;
 }
 .cm-admin header {
@@ -63,52 +33,20 @@ header a:active,
 	text-decoration: none;
 }
 header .appname {
-	position: absolute;
-	top: 0;
-	left: 20px;
-	bottom: 0;
 	font-style: italic;
 	font-size: 24px;
-	line-height: 40px;
 }
-header .pagename {
-	position: absolute;
-	top: 0;
-	left: 20px;
-	bottom: 0;
-	font-size: 18px;
-	line-height: 40px;
-}
-header .appname + .pagename {
-	left: 236px;
-}
+header .pagename,
 header .header-items {
-	position: absolute;
-	top: 0;
-	right: 20px;
-	bottom: 0;
 	font-size: 18px;
-	line-height: 40px;
 }
 .cm-admin header .header-items {
 	right: 40px;
-}
-header .header-item {
-	display: inline;
-}
-header .header-item:not(:first-child):before {
-	content: "\00A0\00A0\00B7\00A0\00A0";
 }
 
 /* Navigation */
 
 nav {
-	position: absolute;
-	top: 40px;
-	left: 0;
-	bottom: 0;
-	width: 220px;
-	overflow: auto;
 	background: #7ca7fa;
 	color: white;
 }
@@ -119,13 +57,8 @@ nav > hr {
 	color: #656cb9;
 }
 nav > ul {
-	margin: 10px;
 	font-size: 14px;
 	font-weight: bold;
-	list-style-type: none;
-}
-nav > ul > li {
-	margin: 4px 0;
 }
 nav a:link,
 nav a:visited {
@@ -150,243 +83,45 @@ nav a:active {
 /* Content */
 
 article {
-	position: absolute;
-	top: 40px;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	overflow: auto;
 	background: #eef;
-}
-nav + article {
-	left: 220px;
 }
 
 /* Cards */
 
 .card {
-	display: block;
-	margin: 16px;
-	overflow: hidden;
 	background: white;
 	border: gray;
 	border-radius: 4px;
 	box-shadow: 0 2px 2px gray;
 }
 .card .card-title {
-	padding: 8px 16px;
 	font-size: 18px;
 	border-bottom: solid 1px #ccc;
 }
-.card .card-content {
-	/* break margin collapse */
-	overflow: auto;
-}
-.card .card-content > p,
-.card .card-content > table,
-.card .card-content > h1,
-.card .card-content > h2,
-.card .card-content > h3 {
-	margin: 16px;
-	line-height: 16px;
-}
-.card .card-content > hr {
+.card .card-content hr {
 	height: 1px;
 	border: none;
 	background: #ccc;
 	color: #ccc;
 }
 .card .card-buttons {
-	padding: 8px;
-	text-align: center;
 	border-top: solid 1px #ccc;
-}
-
-/* Notification Boxes */
-
-.cm-error-box {
-	border: solid 1px #c00;
-	background: #fcc;
-	padding: 12px;
-}
-.cm-warning-box {
-	border: solid 1px #cc0;
-	background: #ffc;
-	padding: 12px;
-}
-.cm-success-box {
-	border: solid 1px #0c0;
-	background: #cfc;
-	padding: 12px;
-}
-.cm-note-box {
-	border: solid 1px #08c;
-	background: #cef;
-	padding: 12px;
-}
-
-/* Tables */
-
-th, td {
-	padding: 4px 1em 4px 4px;
-	text-align: left;
-}
-.cm-form-table tbody th {
-	text-align: right;
-}
-.cm-form-table tbody th label {
-	white-space: nowrap;
-}
-.cm-form-table tbody td h1,
-.cm-form-table tbody td h2,
-.cm-form-table tbody td h3,
-.cm-form-table tbody td p {
-	margin-bottom: 8px;
-}
-
-/* Form Elements */
-
-input[type=text],
-input[type=password],
-input[type=email],
-input[type=url] {
-	padding: 3px;
-	width: 200px;
-}
-input[type=date],
-input[type=time] {
-	padding: 1px;
-	width: 120px;
-	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-input[type=datetime],
-input[type=datetime-local] {
-	padding: 1px;
-	width: 180px;
-	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-input[type=number] {
-	padding: 3px;
-	width: 116px;
-}
-input[type=checkbox],
-input[type=radio] {
-	margin: 4px;
-}
-input[type=color] {
-	padding: 1px 2px;
-}
-textarea {
-	padding: 3px;
-	width: 300px;
-	height: 60px;
-}
-button,
-a.button,
-input[type=submit],
-input[type=reset] {
-	background: #eee;
-	padding: 4px 8px;
-	border: solid 1px #ccc;
-	border-radius: 3px;
-	margin-right: 4px;
-	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
-	font-size: 11px;
-	line-height: normal;
-}
-button:active,
-a.button:active,
-input[type=submit]:active,
-input[type=reset]:active {
-	background: #ccc;
-	border: solid 1px #aaa;
-}
-a.button,
-a.button:link,
-a.button:focus,
-a.button:hover,
-a.button:active,
-a.button:visited {
-	display: inline-block;
-	color: black;
-	text-decoration: none;
-	cursor: default;
-}
-label {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-select {
-	background: #f8f8f8;
-	padding: 4px 8px;
-	border: solid 1px #ccc;
-	border-radius: 3px;
-	height: 24px;
-	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
-	font-size: 11px;
-	line-height: 16px;
 }
 
 /* List Pages */
 
 .cm-search-box {
-	display: block;
-	margin: 0 0 16px 0;
-	padding: 8px;
-	overflow: hidden;
 	background: white;
 	border-bottom: gray;
 	box-shadow: 0 2px 2px gray;
 }
-.cm-search-box .cm-search-input {
-	float: left;
-	white-space: nowrap;
-}
-.cm-search-box .cm-search-options {
-	text-align: right;
-	white-space: nowrap;
-}
-.cm-search-box .cm-search-input > *,
-.cm-search-box .cm-search-options > * {
-	margin: 0 3px;
-}
-.cm-search-box .cm-search-options button {
-	font-weight: bold;
-	font-size: 16px;
-	line-height: 13px;
-	padding: 3px 6px 5px 6px;
-}
 .cm-list-table {
-	display: block;
-	margin: 16px;
-	overflow: hidden;
 	background: white;
 	border: gray;
 	border-radius: 4px;
 	box-shadow: 0 2px 2px gray;
 }
-.cm-list-table table {
-	width: 100%;
-}
-.cm-list-table table th:first-child,
-.cm-list-table table td:first-child {
-	padding-left: 1em;
-}
-.cm-list-table table .td-numeric {
-	text-align: right;
-}
-.cm-list-table table .td-actions {
-	width: 1px;
-	white-space: nowrap;
-	text-align: right;
-}
 .cm-list-table table thead th {
-	padding-top: 6px;
-	padding-bottom: 6px;
 	background: #5d6fc1;
 	color: white;
 }
@@ -399,286 +134,61 @@ select {
 .cm-list-table table tbody tr.inactive {
 	color: #ccc;
 }
-.cm-list-table table tbody td {
-	border-top: solid 1px #ccc;
-}
+.cm-list-table table tbody td,
 .cm-list-table table tfoot th {
 	border-top: solid 1px #ccc;
-	text-align: right;
-}
-.cm-list-table table .th-sortable {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	cursor: pointer;
-}
-.cm-list-table table .th-sortable:focus,
-.cm-list-table table .th-sortable:hover {
-	text-decoration: underline;
-}
-.cm-list-table table .th-sort-ascending:after {
-	content: "\25B4";
-}
-.cm-list-table table .th-sort-ascending.th-sort-primary:after {
-	content: "\25B2";
-}
-.cm-list-table table .th-sort-descending:after {
-	content: "\25BE";
-}
-.cm-list-table table .th-sort-descending.th-sort-primary:after {
-	content: "\25BC";
-}
-.cm-list-table table .th-sort-ascending:after,
-.cm-list-table table .th-sort-descending:after {
-	display: inline-block;
-	font-family: "Apple Symbols", "Segoe UI Symbol", "Lucida Sans Unicode";
-	font-size: 14px;
-	line-height: 1px;
-	padding-left: 8px;
-}
-/* Flexbox makes the cm-search-box look much nicer,
-   so let's use it if the browser supports it. */
-.cm-search-box {
-	display: flex;
-	align-items: center;
-}
-.cm-search-box .cm-search-input {
-	display: flex;
-	align-items: center;
-	flex: 1 0 0;
-}
-.cm-search-box .cm-search-input label {
-	flex: 0 1 0;
-}
-.cm-search-box .cm-search-input input {
-	flex: 1 0 0;
-}
-.cm-search-box .cm-search-options {
-	display: flex;
-	align-items: center;
-	flex: 0 1 0;
 }
 
 /* Form Editor Pages */
 
 .cm-form-editor {
-	display: block;
-	margin: 16px;
-	padding: 16px;
-	overflow: hidden;
 	background: white;
 	border: gray;
 	border-radius: 4px;
 	box-shadow: 0 2px 2px gray;
 }
-.cm-form-editor table {
-	width: 100%;
-}
-.cm-form-editor table th {
-	width: 200px;
-}
-.cm-form-editor table th:last-child,
-.cm-form-editor table td:last-child {
-	padding-right: 4px;
-}
-.cm-form-editor table .td-actions {
-	width: 1px;
-	white-space: nowrap;
-	text-align: right;
-}
-.cm-form-editor table .cm-form-editor-static-section {
-	color: gray;
-}
-.cm-form-editor table .cm-form-editor-custom-text-section:hover {
-	background: #eef;
-}
-.cm-form-editor table .cm-form-editor-custom-text-section.editing {
-	background: #ddf;
-}
-.cm-form-editor table .cm-form-editor-custom-text-section .view-row {
-	cursor: pointer;
-}
-.cm-form-editor table .cm-form-editor-custom-text-section .view-area:empty:after {
-	content: "Click to add explanatory text.";
-	color: gray;
-	font-style: italic;
-}
-.cm-form-editor table .cm-form-editor-custom-text-section textarea {
-	width: calc(100% - 8px);
-}
-.cm-form-editor table .cm-form-editor-dynamic-row,
-.cm-form-editor table .cm-form-editor-dynamic-row * {
-	cursor: pointer;
-}
+.cm-form-editor table .cm-form-editor-static-section,
 .cm-form-editor table .cm-form-editor-dynamic-row.inactive {
 	color: gray;
 }
+.cm-form-editor table .cm-form-editor-custom-text-section:hover,
 .cm-form-editor table .cm-form-editor-dynamic-row:hover {
 	background: #eef;
 }
+.cm-form-editor table .cm-form-editor-custom-text-section.editing,
 .cm-form-editor table .cm-form-editor-dynamic-row.editing,
 .cm-form-editor table .cm-form-editor-row-editor-row {
 	background: #ddf;
 }
-.cm-form-editor table .cm-form-editor-dynamic-row h1:empty:after,
-.cm-form-editor table .cm-form-editor-dynamic-row h2:empty:after,
-.cm-form-editor table .cm-form-editor-dynamic-row h3:empty:after {
-	content: "Untitled Title";
-	color: gray;
-	font-style: italic;
-}
-.cm-form-editor table .cm-form-editor-dynamic-row p:empty:after {
-	content: "Untitled explanatory text.";
-	color: gray;
-	font-style: italic;
-}
-.cm-form-editor table .cm-form-editor-dynamic-row label:empty:after {
-	content: "Untitled Question";
-	color: gray;
-	font-style: italic;
-}
-.cm-form-editor table .cm-form-editor-dynamic-row + .cm-form-editor-row-editor-row th,
-.cm-form-editor table .cm-form-editor-dynamic-row + .cm-form-editor-row-editor-row td {
-	border-top: 2px dashed rgba(0,0,0,0.3);
-}
-.cm-form-editor table .cm-form-editor-row-editor-row.ear-visible-advanced label,
-.cm-form-editor table .cm-form-editor-row-editor-row.ear-required-advanced label {
-	display: block;
-	padding-left: 2em;
+.cm-form-editor table .cm-form-editor-dynamic-row.editing th,
+.cm-form-editor table .cm-form-editor-dynamic-row.editing td {
+	border-bottom: 2px dashed rgba(0,0,0,0.3);
 }
 .cm-form-editor table hr {
 	height: 1px;
 	border: none;
 	background: #ccc;
 	color: #ccc;
-	margin: 12px -20px;
-}
-
-/* Mail Template Editor Pages */
-
-.cm-mail-editor td input {
-	width: 390px;
-}
-.cm-mail-editor td textarea {
-	width: 392px;
-	height: 160px;
-}
-.cm-mail-editor td iframe {
-	border: solid 1px gray;
-	width: 398px;
-	height: 160px;
 }
 
 /* Dialogs */
 
-.dialog-cover {
-	display: block;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0.6);
-}
 .dialog {
-	display: block;
-	position: fixed;
-	top: 25%;
-	left: 50%;
-	width: 512px;
-	max-height: 50%;
-	margin-left: -256px;
-	overflow: auto;
 	background: white;
 	border: gray;
 	border-radius: 4px;
 	box-shadow: 0 2px 2px gray;
 }
-.dialog.edit-dialog {
-	top: 15%;
-	max-height: 80%;
-}
 .dialog .dialog-title {
-	padding: 8px 16px;
 	font-size: 18px;
 	border-bottom: solid 1px #ccc;
 }
-.dialog .dialog-content {
-	/* break margin collapse */
-	overflow: hidden;
-}
-.dialog .dialog-content > p,
-.dialog .dialog-content > table,
-.dialog .dialog-content > h1,
-.dialog .dialog-content > h2,
-.dialog .dialog-content > h3 {
-	margin: 16px;
-	line-height: 16px;
-}
-.dialog .dialog-content > hr {
+.dialog .dialog-content hr {
 	height: 1px;
 	border: none;
 	background: #ccc;
 	color: #ccc;
 }
 .dialog .dialog-buttons {
-	padding: 8px;
-	text-align: right;
 	border-top: solid 1px #ccc;
-}
-
-/* Butterbar */
-
-.butterbar {
-	position: fixed;
-	top: 0;
-	left: 50%;
-	width: 512px;
-	height: 20px;
-	line-height: 20px;
-	margin-left: -256px;
-	background: #ffc;
-	border: #996;
-	border-bottom-left-radius: 4px;
-	border-bottom-right-radius: 4px;
-	box-shadow: 0 2px 2px gray;
-	text-align: center;
-}
-
-/* Admin Login Page */
-
-.card.cm-login,
-.card.cm-logout,
-.card.cm-unauthorized {
-	text-align: center;
-}
-.card.cm-login table {
-	margin-left: auto;
-	margin-right: auto;
-}
-.card.cm-login .cm-error-box {
-	width: 300px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-/* Admin Home Page */
-
-.card.cm-home .card-content > h3 {
-	margin-bottom: 8px;
-}
-.card.cm-home .card-content > h3 + p {
-	margin-top: 8px;
-}
-.card.cm-home .card-content > p.cm-unauthorized {
-	text-align: center;
-}
-
-/* Admin Users Page */
-
-.cm-form-table.cm-user-editor tbody td hr {
-	margin: 2px 0;
 }

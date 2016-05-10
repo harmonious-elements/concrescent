@@ -31,6 +31,7 @@ echo '<head>';
 echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
 echo '<title>CONcrescent - Log In</title>';
 echo '<link rel="shortcut icon" href="' . htmlspecialchars(theme_file_url('favicon.ico', false)) . '">';
+echo '<link rel="stylesheet" href="' . htmlspecialchars(resource_file_url('cm.css', false)) . '">';
 echo '<link rel="stylesheet" href="' . htmlspecialchars(theme_file_url('theme.css', false)) . '">';
 echo '</head>';
 echo '<body class="cm-admin">';

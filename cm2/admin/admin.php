@@ -26,6 +26,7 @@ function cm_admin_head($title) {
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
 	echo '<title>CONcrescent - ' . htmlspecialchars($title) . '</title>';
 	echo '<link rel="shortcut icon" href="' . htmlspecialchars(theme_file_url('favicon.ico', false)) . '">';
+	echo '<link rel="stylesheet" href="' . htmlspecialchars(resource_file_url('cm.css', false)) . '">';
 	echo '<link rel="stylesheet" href="' . htmlspecialchars(theme_file_url('theme.css', false)) . '">';
 	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('jquery.js', false)) . '"></script>';
 	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('cmui.js', false)) . '"></script>';
