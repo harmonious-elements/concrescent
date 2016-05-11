@@ -1,3 +1,29 @@
+/* Basic */
+
+a:link {
+	color: #656cb9;
+	text-decoration: none;
+}
+a:visited {
+	color: #393993;
+	text-decoration: none;
+}
+a:focus,
+a:hover {
+	color: #7ca7fa;
+	text-decoration: underline;
+}
+a:active {
+	color: #0f034e;
+	text-decoration: underline;
+}
+hr {
+	height: 1px;
+	border: none;
+	background: #ccc;
+	color: #ccc;
+}
+
 /* Header */
 
 header {
@@ -51,8 +77,6 @@ nav {
 	color: white;
 }
 nav > hr {
-	height: 1px;
-	border: none;
 	background: #656cb9;
 	color: #656cb9;
 }
@@ -97,12 +121,6 @@ article {
 .card .card-title {
 	font-size: 18px;
 	border-bottom: solid 1px #ccc;
-}
-.card .card-content hr {
-	height: 1px;
-	border: none;
-	background: #ccc;
-	color: #ccc;
 }
 .card .card-buttons {
 	border-top: solid 1px #ccc;
@@ -164,12 +182,6 @@ article {
 .cm-form-editor table .cm-form-editor-dynamic-row.editing td {
 	border-bottom: 2px dashed rgba(0,0,0,0.3);
 }
-.cm-form-editor table hr {
-	height: 1px;
-	border: none;
-	background: #ccc;
-	color: #ccc;
-}
 
 /* Dialogs */
 
@@ -182,12 +194,6 @@ article {
 .dialog .dialog-title {
 	font-size: 18px;
 	border-bottom: solid 1px #ccc;
-}
-.dialog .dialog-content hr {
-	height: 1px;
-	border: none;
-	background: #ccc;
-	color: #ccc;
 }
 .dialog .dialog-buttons {
 	border-top: solid 1px #ccc;

@@ -191,10 +191,11 @@
 			editor.filter('.ear-visible-advanced').find('input').prop('checked', checked);
 			if (onChange) onChange(editor, 'visible', checked);
 		});
-		editor.find('.ea-visible-advanced').bind('click', function() {
+		editor.find('.ea-visible-advanced').bind('click', function(event) {
 			var checked = editor.filter('.ear-visible-advanced').find('input').is(':checked');
 			var notChecked = editor.filter('.ear-visible-advanced').find('input').is(':not(:checked)');
 			if (!(checked && notChecked)) editor.filter('.ear-visible-advanced').toggleClass('hidden');
+			event.preventDefault();
 		});
 		editor.filter('.ear-visible-advanced').find('input').bind('click', function() {
 			var checked = !editor.filter('.ear-visible-advanced').find('input').is(':not(:checked)');
@@ -207,10 +208,11 @@
 			editor.filter('.ear-required-advanced').find('input').prop('checked', checked);
 			if (onChange) onChange(editor, 'required', checked);
 		});
-		editor.find('.ea-required-advanced').bind('click', function() {
+		editor.find('.ea-required-advanced').bind('click', function(event) {
 			var checked = editor.filter('.ear-required-advanced').find('input').is(':checked');
 			var notChecked = editor.filter('.ear-required-advanced').find('input').is(':not(:checked)');
 			if (!(checked && notChecked)) editor.filter('.ear-required-advanced').toggleClass('hidden');
+			event.preventDefault();
 		});
 		editor.filter('.ear-required-advanced').find('input').bind('click', function() {
 			var checked = !editor.filter('.ear-required-advanced').find('input').is(':not(:checked)');

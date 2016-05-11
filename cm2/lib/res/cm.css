@@ -29,8 +29,8 @@ header {
 	left: 0;
 	right: 0;
 	height: 40px;
-	overflow: hidden;
 	line-height: 40px;
+	overflow: hidden;
 }
 header .appname {
 	position: absolute;
