@@ -12,6 +12,13 @@ $cm_admin_nav = array(
 	),
 	array(
 		array(
+			'id' => 'attendee-badge-types',
+			'href' => '/admin/attendee/badge-types.php',
+			'name' => 'Attendee Badge Types',
+			'description' => 'Create or modify the types of badges available to attendees.',
+			'permission' => 'attendee-badge-types'
+		),
+		array(
 			'id' => 'attendee-mail',
 			'href' => '/admin/attendee/mail.php',
 			'name' => 'Attendee Form Letters',

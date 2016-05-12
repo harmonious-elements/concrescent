@@ -341,6 +341,10 @@ select {
 	line-height: 1px;
 	padding-left: 8px;
 }
+.cm-list-table table .activate-button,
+.cm-list-table table .deactivate-button {
+	width: 76px;
+}
 /* Flexbox makes the cm-search-box look much nicer,
    so let's use it if the browser supports it. */
 .cm-search-box {
@@ -539,4 +543,8 @@ select {
 
 .cm-form-table.cm-user-editor tbody td hr {
 	margin: 2px 0;
+}
+.cm-form-table.cm-user-editor tbody th.permissions-label {
+	vertical-align: top;
+	padding-top: 6px;
 }

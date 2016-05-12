@@ -46,6 +46,7 @@
 		'email'      : naturalCompare,
 		'email-short': naturalCompare,
 		'numeric'    : numericCompare,
+		'quantity'   : numericCompare,
 		'price'      : numericCompare
 	};
 	var isSortable = function() {

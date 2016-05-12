@@ -102,6 +102,30 @@ function parse_date($x) {
 	}
 }
 
+function date_range_string($start_date, $end_date) {
+	if ($start_date && $end_date) {
+		return htmlspecialchars($start_date) . ' &mdash; ' . htmlspecialchars($end_date);
+	} else if ($start_date) {
+		return 'starting ' . htmlspecialchars($start_date);
+	} else if ($end_date) {
+		return 'ending ' . htmlspecialchars($end_date);
+	} else {
+		return 'forever';
+	}
+}
+
+function age_range_string($min_age, $max_age) {
+	if ($min_age && $max_age) {
+		return (int)$min_age . ' &mdash; ' . (int)$max_age;
+	} else if ($min_age) {
+		return (int)$min_age . ' and over';
+	} else if ($max_age) {
+		return (int)$max_age . ' and under';
+	} else {
+		return 'all ages';
+	}
+}
+
 function mail_merge($text, $fields) {
 	$s = array();
 	$r = array();

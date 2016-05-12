@@ -176,8 +176,8 @@ class cm_forms_db {
 		if (!$question) return false;
 		$this->cm_db->connection->autocommit(false);
 		$stmt = $this->cm_db->connection->prepare(
-			'SELECT IFNULL(MAX(`order`),0)+1'.
-			' FROM '.$this->cm_db->table_name('form_questions').
+			'SELECT IFNULL(MAX(`order`),0)+1 FROM '.
+			$this->cm_db->table_name('form_questions').
 			' WHERE `context` = ?'
 		);
 		$stmt->bind_param('s', $this->context);
@@ -197,7 +197,6 @@ class cm_forms_db {
 			'`context` = ?, `order` = ?, `text` = ?, `type` = ?, `values` = ?, '.
 			'`active` = ?, `listed` = ?, `visible` = ?, `required` = ?'
 		);
-		echo $this->cm_db->connection->error;
 		$stmt->bind_param(
 			'sisssiiss',
 			$this->context, $order,

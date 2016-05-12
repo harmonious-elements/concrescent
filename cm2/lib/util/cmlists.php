@@ -73,9 +73,10 @@ function cm_list_table(&$list_def) {
 						$name = (isset($column['name']) && $column['name']) ? $column['name'] : '?';
 						$type = (isset($column['type']) && $column['type']) ? $column['type'] : '?';
 						switch ($type) {
-							case 'numeric': echo '<th class="td-numeric">'; break;
-							case 'price'  : echo '<th class="td-numeric">'; break;
-							default       : echo '<th>'; break;
+							case 'numeric' : echo '<th class="td-numeric">'; break;
+							case 'quantity': echo '<th class="td-numeric">'; break;
+							case 'price'   : echo '<th class="td-numeric">'; break;
+							default        : echo '<th>'; break;
 						}
 						echo htmlspecialchars($name);
 						echo '</th>';
@@ -113,6 +114,8 @@ function cm_list_row(&$list_def, &$entity) {
 	if (isset($list_def['columns']) && $list_def['columns']) {
 		foreach ($list_def['columns'] as $column) {
 			$value = (isset($column['key']) && $column['key']) ? $entity[$column['key']] : '?';
+			$value1 = (isset($column['key1']) && $column['key1']) ? $entity[$column['key1']] : '?';
+			$value2 = (isset($column['key2']) && $column['key2']) ? $entity[$column['key2']] : '?';
 			$type = (isset($column['type']) && $column['type']) ? $column['type'] : '?';
 			switch ($type) {
 				case 'html'       : $out .= '<td>' . $value                   . '</td>'; break;
@@ -121,8 +124,11 @@ function cm_list_row(&$list_def, &$entity) {
 				case 'url-short'  : $out .= '<td>' . url_link_short($value)   . '</td>'; break;
 				case 'email'      : $out .= '<td>' . email_link($value)       . '</td>'; break;
 				case 'email-short': $out .= '<td>' . email_link_short($value) . '</td>'; break;
-				case 'numeric'    : $out .= '<td class="td-numeric">' . htmlspecialchars($value)               . '</td>'; break;
-				case 'price'      : $out .= '<td class="td-numeric">' . htmlspecialchars(price_string($value)) . '</td>'; break;
+				case 'date-range' : $out .= '<td>' . date_range_string($value1, $value2) . '</td>'; break;
+				case 'age-range'  : $out .= '<td>' . age_range_string($value1, $value2)  . '</td>'; break;
+				case 'numeric'    : $out .= '<td class="td-numeric">' . htmlspecialchars($value)                                 . '</td>'; break;
+				case 'quantity'   : $out .= '<td class="td-numeric">' . htmlspecialchars(is_null($value) ? 'unlimited' : $value) . '</td>'; break;
+				case 'price'      : $out .= '<td class="td-numeric">' . htmlspecialchars(price_string($value))                   . '</td>'; break;
 				default           : $out .= '<td>?</td>'; break;
 			}
 		}

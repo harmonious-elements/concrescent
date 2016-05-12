@@ -73,4 +73,12 @@ class cm_db {
 		}
 	}
 
+	public function uuid() {
+		$result = $this->connection->query('SELECT UUID()');
+		$row = $result->fetch_row();
+		$uuid = $row[0];
+		$result->close();
+		return $uuid;
+	}
+
 }

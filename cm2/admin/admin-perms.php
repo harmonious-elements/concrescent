@@ -3,6 +3,11 @@
 $cm_admin_perms = array(
 	array(
 		array(
+			'id' => 'attendee-badge-types',
+			'name' => 'Attendee Badge Types',
+			'description' => 'Create or modify the types of badges available to attendees.'
+		),
+		array(
 			'id' => 'attendee-mail',
 			'name' => 'Attendee Form Letters',
 			'description' => 'Write form letters to be emailed to attendees.'
