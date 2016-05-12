@@ -126,6 +126,19 @@ function age_range_string($min_age, $max_age) {
 	}
 }
 
+function cm_array_string($a) {
+	if (!$a) return 'none';
+	if (in_array('*', $a)) return 'all';
+	return implode(', ', $a);
+}
+
+function cm_array_string_short($a) {
+	if (!$a) return 'none';
+	if (in_array('*', $a)) return 'all';
+	if (count($a) > 1) return 'many';
+	return $a[0];
+}
+
 function mail_merge($text, $fields) {
 	$s = array();
 	$r = array();

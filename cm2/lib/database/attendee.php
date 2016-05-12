@@ -1,14 +1,15 @@
 <?php
 
 require_once dirname(__FILE__).'/../../config/config.php';
-require_once dirname(__FILE__).'/../util/util.php';
 require_once dirname(__FILE__).'/database.php';
 
 class cm_attendee_db {
 
+	public $event_info;
 	public $cm_db;
 
 	public function __construct($cm_db) {
+		$this->event_info = $GLOBALS['cm_config']['event'];
 		$this->cm_db = $cm_db;
 		$this->cm_db->table_def('attendee_badge_types', (
 			'`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,'.
@@ -131,9 +132,8 @@ class cm_attendee_db {
 			$quantity_sold
 		);
 		if ($stmt->fetch()) {
-			$event = $GLOBALS['cm_config']['event'];
-			$event_start_date = $event['start_date'];
-			$event_end_date   = $event['end_date'  ];
+			$event_start_date = $this->event_info['start_date'];
+			$event_end_date   = $this->event_info['end_date'  ];
 			$min_birthdate = $max_age ? (((int)$event_start_date - $max_age - 1) . substr($event_start_date, 4)) : null;
 			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
 			$result = array(
@@ -143,7 +143,6 @@ class cm_attendee_db {
 				'description' => $description,
 				'rewards' => ($rewards ? explode("\n", $rewards) : array()),
 				'price' => $price,
-				'price-string' => price_string($price),
 				'payable-onsite' => !!$payable_onsite,
 				'active' => !!$active,
 				'quantity' => $quantity,
@@ -195,9 +194,8 @@ class cm_attendee_db {
 			$start_date, $end_date, $min_age, $max_age,
 			$quantity_sold
 		);
-		$event = $GLOBALS['cm_config']['event'];
-		$event_start_date = $event['start_date'];
-		$event_end_date   = $event['end_date'  ];
+		$event_start_date = $this->event_info['start_date'];
+		$event_end_date   = $this->event_info['end_date'  ];
 		while ($stmt->fetch()) {
 			if ($unsold_only && !(is_null($quantity) || $quantity > $quantity_sold)) continue;
 			$min_birthdate = $max_age ? (((int)$event_start_date - $max_age - 1) . substr($event_start_date, 4)) : null;
@@ -209,7 +207,6 @@ class cm_attendee_db {
 				'description' => $description,
 				'rewards' => ($rewards ? explode("\n", $rewards) : array()),
 				'price' => $price,
-				'price-string' => price_string($price),
 				'payable-onsite' => !!$payable_onsite,
 				'active' => !!$active,
 				'quantity' => $quantity,

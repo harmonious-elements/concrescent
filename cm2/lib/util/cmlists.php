@@ -73,10 +73,15 @@ function cm_list_table(&$list_def) {
 						$name = (isset($column['name']) && $column['name']) ? $column['name'] : '?';
 						$type = (isset($column['type']) && $column['type']) ? $column['type'] : '?';
 						switch ($type) {
-							case 'numeric' : echo '<th class="td-numeric">'; break;
-							case 'quantity': echo '<th class="td-numeric">'; break;
-							case 'price'   : echo '<th class="td-numeric">'; break;
-							default        : echo '<th>'; break;
+							case 'html-numeric':
+							case 'numeric':
+							case 'quantity':
+							case 'price':
+								echo '<th class="td-numeric">';
+								break;
+							default:
+								echo '<th>';
+								break;
 						}
 						echo htmlspecialchars($name);
 						echo '</th>';
@@ -118,18 +123,21 @@ function cm_list_row(&$list_def, &$entity) {
 			$value2 = (isset($column['key2']) && $column['key2']) ? $entity[$column['key2']] : '?';
 			$type = (isset($column['type']) && $column['type']) ? $column['type'] : '?';
 			switch ($type) {
-				case 'html'       : $out .= '<td>' . $value                   . '</td>'; break;
-				case 'text'       : $out .= '<td>' . htmlspecialchars($value) . '</td>'; break;
-				case 'url'        : $out .= '<td>' . url_link($value)         . '</td>'; break;
-				case 'url-short'  : $out .= '<td>' . url_link_short($value)   . '</td>'; break;
-				case 'email'      : $out .= '<td>' . email_link($value)       . '</td>'; break;
-				case 'email-short': $out .= '<td>' . email_link_short($value) . '</td>'; break;
-				case 'date-range' : $out .= '<td>' . date_range_string($value1, $value2) . '</td>'; break;
-				case 'age-range'  : $out .= '<td>' . age_range_string($value1, $value2)  . '</td>'; break;
-				case 'numeric'    : $out .= '<td class="td-numeric">' . htmlspecialchars($value)                                 . '</td>'; break;
-				case 'quantity'   : $out .= '<td class="td-numeric">' . htmlspecialchars(is_null($value) ? 'unlimited' : $value) . '</td>'; break;
-				case 'price'      : $out .= '<td class="td-numeric">' . htmlspecialchars(price_string($value))                   . '</td>'; break;
-				default           : $out .= '<td>?</td>'; break;
+				case 'html'        : $out .= '<td>' . $value                   . '</td>'; break;
+				case 'text'        : $out .= '<td>' . htmlspecialchars($value) . '</td>'; break;
+				case 'url'         : $out .= '<td>' . url_link($value)         . '</td>'; break;
+				case 'url-short'   : $out .= '<td>' . url_link_short($value)   . '</td>'; break;
+				case 'email'       : $out .= '<td>' . email_link($value)       . '</td>'; break;
+				case 'email-short' : $out .= '<td>' . email_link_short($value) . '</td>'; break;
+				case 'date-range'  : $out .= '<td>' . date_range_string($value1, $value2)             . '</td>'; break;
+				case 'age-range'   : $out .= '<td>' . age_range_string($value1, $value2)              . '</td>'; break;
+				case 'array'       : $out .= '<td>' . htmlspecialchars(cm_array_string($value))       . '</td>'; break;
+				case 'array-short' : $out .= '<td>' . htmlspecialchars(cm_array_string_short($value)) . '</td>'; break;
+				case 'html-numeric': $out .= '<td class="td-numeric">' . $value                                                   . '</td>'; break;
+				case 'numeric'     : $out .= '<td class="td-numeric">' . htmlspecialchars($value)                                 . '</td>'; break;
+				case 'quantity'    : $out .= '<td class="td-numeric">' . htmlspecialchars(is_null($value) ? 'unlimited' : $value) . '</td>'; break;
+				case 'price'       : $out .= '<td class="td-numeric">' . htmlspecialchars(price_string($value))                   . '</td>'; break;
+				default            : $out .= '<td>?</td>'; break;
 			}
 		}
 	}
