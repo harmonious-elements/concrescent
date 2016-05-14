@@ -13,6 +13,11 @@ $cm_admin_perms = array(
 			'description' => 'Add or remove codes for discounts on badges for attendees.'
 		),
 		array(
+			'id' => 'attendee-blacklist',
+			'name' => 'Attendee Blacklist',
+			'description' => 'Block certain people from being able to register as attendees.'
+		),
+		array(
 			'id' => 'attendee-mail',
 			'name' => 'Attendee Form Letters',
 			'description' => 'Write form letters to be emailed to attendees.'

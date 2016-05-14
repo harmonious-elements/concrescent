@@ -305,12 +305,18 @@ select {
 	white-space: nowrap;
 	text-align: right;
 }
+.cm-list-table table .td-actions button:last-child {
+	margin-right: 0;
+}
 .cm-list-table table thead th {
 	padding-top: 6px;
 	padding-bottom: 6px;
 }
 .cm-list-table table tfoot th {
 	text-align: right;
+}
+.cm-list-table table tfoot th button:last-child {
+	margin-right: 0;
 }
 .cm-list-table table .th-sortable {
 	-webkit-touch-callout: none;

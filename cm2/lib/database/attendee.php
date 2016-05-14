@@ -598,4 +598,287 @@ class cm_attendee_db {
 		return $success;
 	}
 
+	public function get_blacklist_entry($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
+			' `email_address`, `phone_number`, `added_by`,'.
+			' `normalized_real_name`,'.
+			' `normalized_reversed_name`,'.
+			' `normalized_fandom_name`,'.
+			' `normalized_email_address`,'.
+			' `normalized_phone_number`'.
+			' FROM '.$this->cm_db->table_name('attendee_blacklist').
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number
+		);
+		if ($stmt->fetch()) {
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$reversed_name = trim(trim($last_name) . ' ' . trim($first_name));
+			$result = array(
+				'id' => $id,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'reversed-name' => $reversed_name,
+				'fandom-name' => $fandom_name,
+				'email-address' => $email_address,
+				'phone-number' => $phone_number,
+				'added-by' => $added_by,
+				'normalized-real-name' => $normalized_real_name,
+				'normalized-reversed-name' => $normalized_reversed_name,
+				'normalized-fandom-name' => $normalized_fandom_name,
+				'normalized-email-address' => $normalized_email_address,
+				'normalized-phone-number' => $normalized_phone_number,
+				'search-content' => array(
+					$first_name, $last_name, $real_name, $reversed_name,
+					$fandom_name, $email_address, $phone_number, $added_by
+				)
+			);
+			$stmt->close();
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_blacklist_entries() {
+		$blacklist = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
+			' `email_address`, `phone_number`, `added_by`,'.
+			' `normalized_real_name`,'.
+			' `normalized_reversed_name`,'.
+			' `normalized_fandom_name`,'.
+			' `normalized_email_address`,'.
+			' `normalized_phone_number`'.
+			' FROM '.$this->cm_db->table_name('attendee_blacklist').
+			' ORDER BY `first_name`, `last_name`'
+		);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number
+		);
+		while ($stmt->fetch()) {
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$reversed_name = trim(trim($last_name) . ' ' . trim($first_name));
+			$blacklist[] = array(
+				'id' => $id,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'reversed-name' => $reversed_name,
+				'fandom-name' => $fandom_name,
+				'email-address' => $email_address,
+				'phone-number' => $phone_number,
+				'added-by' => $added_by,
+				'normalized-real-name' => $normalized_real_name,
+				'normalized-reversed-name' => $normalized_reversed_name,
+				'normalized-fandom-name' => $normalized_fandom_name,
+				'normalized-email-address' => $normalized_email_address,
+				'normalized-phone-number' => $normalized_phone_number,
+				'search-content' => array(
+					$first_name, $last_name, $real_name, $reversed_name,
+					$fandom_name, $email_address, $phone_number, $added_by
+				)
+			);
+		}
+		$stmt->close();
+		return $blacklist;
+	}
+
+	public function create_blacklist_entry($entry) {
+		if (!$entry) return false;
+		$first_name = (isset($entry['first-name']) ? $entry['first-name'] : '');
+		$last_name = (isset($entry['last-name']) ? $entry['last-name'] : '');
+		$fandom_name = (isset($entry['fandom-name']) ? $entry['fandom-name'] : '');
+		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
+		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
+		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
+		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
+		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
+		$normalized_email_address = strtoupper(preg_replace('/\\+.*@|[^A-Za-z0-9]+/', '', $email_address));
+		$normalized_phone_number = preg_replace('/[^0-9]+/', '', $phone_number);
+		if (!$first_name) $first_name = null;
+		if (!$last_name) $last_name = null;
+		if (!$fandom_name) $fandom_name = null;
+		if (!$email_address) $email_address = null;
+		if (!$phone_number) $phone_number = null;
+		if (!$added_by) $added_by = null;
+		if (!$normalized_real_name) $normalized_real_name = null;
+		if (!$normalized_reversed_name) $normalized_reversed_name = null;
+		if (!$normalized_fandom_name) $normalized_fandom_name = null;
+		if (!$normalized_email_address) $normalized_email_address = null;
+		if (!$normalized_phone_number) $normalized_phone_number = null;
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('attendee_blacklist').' SET '.
+			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`normalized_real_name` = ?, '.
+			'`normalized_reversed_name` = ?, '.
+			'`normalized_fandom_name` = ?, '.
+			'`normalized_email_address` = ?, '.
+			'`normalized_phone_number` = ?'
+		);
+		$stmt->bind_param(
+			'sssssssssss',
+			$first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		$this->cm_db->connection->autocommit(true);
+		return $id;
+	}
+
+	public function update_blacklist_entry($entry) {
+		if (!$entry || !isset($entry['id']) || !$entry['id']) return false;
+		$first_name = (isset($entry['first-name']) ? $entry['first-name'] : '');
+		$last_name = (isset($entry['last-name']) ? $entry['last-name'] : '');
+		$fandom_name = (isset($entry['fandom-name']) ? $entry['fandom-name'] : '');
+		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
+		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
+		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
+		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
+		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
+		$normalized_email_address = strtoupper(preg_replace('/\\+.*@|[^A-Za-z0-9]+/', '', $email_address));
+		$normalized_phone_number = preg_replace('/[^0-9]+/', '', $phone_number);
+		if (!$first_name) $first_name = null;
+		if (!$last_name) $last_name = null;
+		if (!$fandom_name) $fandom_name = null;
+		if (!$email_address) $email_address = null;
+		if (!$phone_number) $phone_number = null;
+		if (!$added_by) $added_by = null;
+		if (!$normalized_real_name) $normalized_real_name = null;
+		if (!$normalized_reversed_name) $normalized_reversed_name = null;
+		if (!$normalized_fandom_name) $normalized_fandom_name = null;
+		if (!$normalized_email_address) $normalized_email_address = null;
+		if (!$normalized_phone_number) $normalized_phone_number = null;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendee_blacklist').' SET '.
+			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`normalized_real_name` = ?, '.
+			'`normalized_reversed_name` = ?, '.
+			'`normalized_fandom_name` = ?, '.
+			'`normalized_email_address` = ?, '.
+			'`normalized_phone_number` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'sssssssssssi',
+			$first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number,
+			$entry['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function delete_blacklist_entry($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('attendee_blacklist').
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function is_blacklisted($person) {
+		if (!$person) return false;
+		$first_name = (isset($person['first-name']) ? $person['first-name'] : '');
+		$last_name = (isset($person['last-name']) ? $person['last-name'] : '');
+		$fandom_name = (isset($person['fandom-name']) ? $person['fandom-name'] : '');
+		$email_address = (isset($person['email-address']) ? $person['email-address'] : '');
+		$phone_number = (isset($person['phone-number']) ? $person['phone-number'] : '');
+		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
+		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
+		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
+		$normalized_email_address = strtoupper(preg_replace('/\\+.*@|[^A-Za-z0-9]+/', '', $email_address));
+		$normalized_phone_number = preg_replace('/[^0-9]+/', '', $phone_number);
+		$query_params = array();
+		$bind_params = array('');
+		if ($normalized_real_name) {
+			$query_params[] = '`normalized_real_name` = ?';
+			$query_params[] = '`normalized_reversed_name` = ?';
+			$query_params[] = '`normalized_fandom_name` = ?';
+			$bind_params[0] .= 'sss';
+			$bind_params[] = &$normalized_real_name;
+			$bind_params[] = &$normalized_real_name;
+			$bind_params[] = &$normalized_real_name;
+		}
+		if ($normalized_reversed_name) {
+			$query_params[] = '`normalized_real_name` = ?';
+			$query_params[] = '`normalized_reversed_name` = ?';
+			$query_params[] = '`normalized_fandom_name` = ?';
+			$bind_params[0] .= 'sss';
+			$bind_params[] = &$normalized_reversed_name;
+			$bind_params[] = &$normalized_reversed_name;
+			$bind_params[] = &$normalized_reversed_name;
+		}
+		if ($normalized_fandom_name) {
+			$query_params[] = '`normalized_real_name` = ?';
+			$query_params[] = '`normalized_reversed_name` = ?';
+			$query_params[] = '`normalized_fandom_name` = ?';
+			$bind_params[0] .= 'sss';
+			$bind_params[] = &$normalized_fandom_name;
+			$bind_params[] = &$normalized_fandom_name;
+			$bind_params[] = &$normalized_fandom_name;
+		}
+		if ($normalized_email_address) {
+			$query_params[] = '`normalized_email_address` = ?';
+			$bind_params[0] .= 's';
+			$bind_params[] = &$normalized_email_address;
+		}
+		if ($normalized_phone_number) {
+			$query_params[] = '`normalized_phone_number` = ?';
+			$bind_params[0] .= 's';
+			$bind_params[] = &$normalized_phone_number;
+		}
+		if (!$query_params) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id` FROM '.
+			$this->cm_db->table_name('attendee_blacklist').
+			' WHERE '.implode(' OR ', $query_params).' LIMIT 1'
+		);
+		call_user_func_array(array($stmt, 'bind_param'), $bind_params);
+		$stmt->execute();
+		$stmt->bind_result($id);
+		$success = $stmt->fetch();
+		$stmt->close();
+		return $success ? $this->get_blacklist_entry($id) : false;
+	}
+
 }

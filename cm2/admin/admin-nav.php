@@ -26,6 +26,13 @@ $cm_admin_nav = array(
 			'permission' => 'attendee-promo-codes'
 		),
 		array(
+			'id' => 'attendee-blacklist',
+			'href' => '/admin/attendee/blacklist.php',
+			'name' => 'Attendee Blacklist',
+			'description' => 'Block certain people from being able to register as attendees.',
+			'permission' => 'attendee-blacklist'
+		),
+		array(
 			'id' => 'attendee-mail',
 			'href' => '/admin/attendee/mail.php',
 			'name' => 'Attendee Form Letters',

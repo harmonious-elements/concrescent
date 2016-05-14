@@ -194,7 +194,7 @@ echo '</article>';
 cm_admin_dialogs();
 cm_list_edit_dialog_start();
 
-echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-promo-code-editor">';
+echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 	echo '<tr>';
 		echo '<th><label for="ea-code">Code:</label></th>';
 		echo '<td><input type="text" name="ea-code" id="ea-code"></td>';
