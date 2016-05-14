@@ -154,7 +154,7 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-
 		echo '<td><input type="password" name="ea-password" id="ea-password"></td>';
 	echo '</tr>';
 	echo '<tr>';
-		echo '<th class="permissions-label">Permissions:</th>';
+		echo '<th class="th-tall">Permissions:</th>';
 		echo '<td>';
 			$first_group = true;
 			foreach ($cm_admin_perms as $group) {

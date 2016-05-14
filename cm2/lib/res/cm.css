@@ -158,6 +158,10 @@ th, td {
 .cm-form-table tbody th {
 	text-align: right;
 }
+.cm-form-table tbody th.th-tall {
+	vertical-align: top;
+	padding-top: 6px;
+}
 .cm-form-table tbody th label {
 	white-space: nowrap;
 }
@@ -543,8 +547,4 @@ select {
 
 .cm-form-table.cm-user-editor tbody td hr {
 	margin: 2px 0;
-}
-.cm-form-table.cm-user-editor tbody th.permissions-label {
-	vertical-align: top;
-	padding-top: 6px;
 }

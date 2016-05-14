@@ -34,7 +34,7 @@ class cm_attendee_db {
 			'`percentage` BOOLEAN NOT NULL,'.
 			'`active` BOOLEAN NOT NULL,'.
 			'`badge_type_ids` TEXT NULL,'.
-			'`quantity` INTEGER NULL,'.
+			'`limit_per_customer` INTEGER NULL,'.
 			'`start_date` DATE NULL,'.
 			'`end_date` DATE NULL'
 		));
@@ -161,6 +161,41 @@ class cm_attendee_db {
 		}
 		$stmt->close();
 		return false;
+	}
+
+	public function get_badge_type_name_map() {
+		$badge_types = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `name`'.
+			' FROM '.$this->cm_db->table_name('attendee_badge_types').
+			' ORDER BY `order`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($id, $name);
+		while ($stmt->fetch()) {
+			$badge_types[$id] = $name;
+		}
+		$stmt->close();
+		return $badge_types;
+	}
+
+	public function list_badge_type_names() {
+		$badge_types = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `name`'.
+			' FROM '.$this->cm_db->table_name('attendee_badge_types').
+			' ORDER BY `order`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($id, $name);
+		while ($stmt->fetch()) {
+			$badge_types[] = array(
+				'id' => $id,
+				'name' => $name
+			);
+		}
+		$stmt->close();
+		return $badge_types;
 	}
 
 	public function list_badge_types($active_only = false, $unsold_only = false, $onsite_only = false) {
@@ -366,6 +401,201 @@ class cm_attendee_db {
 		}
 		$this->cm_db->connection->autocommit(true);
 		return ($index >= 0);
+	}
+
+	public function promo_code_normalize($code) {
+		return strtoupper(preg_replace('/[^A-Za-z0-9!@#$%&*?]/', '', $code));
+	}
+
+	public function promo_code_price_html($promo_code) {
+		if (!isset($promo_code['price']) || !$promo_code['price']) return 'NONE';
+		$price = htmlspecialchars(number_format($promo_code['price'], 2, '.', ','));
+		$percentage = isset($promo_code['percentage']) && $promo_code['percentage'];
+		return $percentage ? ($price . '<b>%</b>') : ('<b>$</b>' . $price);
+	}
+
+	public function promo_code_applies($promo_code, $badge_type_id) {
+		return ($promo_code && $promo_code['badge-type-ids'] && (
+			in_array('*', $promo_code['badge-type-ids']) ||
+			in_array($badge_type_id, $promo_code['badge-type-ids'])
+		));
+	}
+
+	public function get_promo_code($id, $is_code = false, $name_map = null) {
+		if (!$id) return false;
+		if ($is_code) $id = $this->promo_code_normalize($id);
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT p.`id`, p.`code`, p.`description`, p.`price`,'.
+			' p.`percentage`, p.`active`, p.`badge_type_ids`,'.
+			' p.`limit_per_customer`, p.`start_date`, p.`end_date`,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('attendees').' a'.
+			' WHERE a.`payment_promo_code` = p.`code`'.
+			' AND a.`payment_status` = \'Completed\') c'.
+			' FROM '.$this->cm_db->table_name('attendee_promo_codes').' p'.
+			' WHERE p.`'.($is_code ? 'code' : 'id').'` = ? LIMIT 1'
+		);
+		$stmt->bind_param(($is_code ? 's' : 'i'), $id);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $code, $description, $price, $percentage,
+			$active, $badge_type_ids, $limit_per_customer,
+			$start_date, $end_date, $quantity_used
+		);
+		if ($stmt->fetch()) {
+			$result = array(
+				'id' => $id,
+				'code' => $code,
+				'description' => $description,
+				'price' => $price,
+				'percentage' => !!$percentage,
+				'price-html' => '?',
+				'active' => !!$active,
+				'badge-type-ids' => ($badge_type_ids ? explode(',', $badge_type_ids) : array()),
+				'badge-type-names' => array(),
+				'limit-per-customer' => $limit_per_customer,
+				'start-date' => $start_date,
+				'end-date' => $end_date,
+				'quantity-used' => $quantity_used,
+				'search-content' => array($code, $description)
+			);
+			$result['price-html'] = $this->promo_code_price_html($result);
+			foreach ($result['badge-type-ids'] as $btid) {
+				$result['badge-type-names'][] = isset($name_map[$btid]) ? $name_map[$btid] : $btid;
+			}
+			$stmt->close();
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_promo_codes($name_map = null) {
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		$promo_codes = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT p.`id`, p.`code`, p.`description`, p.`price`,'.
+			' p.`percentage`, p.`active`, p.`badge_type_ids`,'.
+			' p.`limit_per_customer`, p.`start_date`, p.`end_date`,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('attendees').' a'.
+			' WHERE a.`payment_promo_code` = p.`code`'.
+			' AND a.`payment_status` = \'Completed\') c'.
+			' FROM '.$this->cm_db->table_name('attendee_promo_codes').' p'.
+			' ORDER BY p.`code`'
+		);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $code, $description, $price, $percentage,
+			$active, $badge_type_ids, $limit_per_customer,
+			$start_date, $end_date, $quantity_used
+		);
+		while ($stmt->fetch()) {
+			$result = array(
+				'id' => $id,
+				'code' => $code,
+				'description' => $description,
+				'price' => $price,
+				'percentage' => !!$percentage,
+				'price-html' => '?',
+				'active' => !!$active,
+				'badge-type-ids' => ($badge_type_ids ? explode(',', $badge_type_ids) : array()),
+				'badge-type-names' => array(),
+				'limit-per-customer' => $limit_per_customer,
+				'start-date' => $start_date,
+				'end-date' => $end_date,
+				'quantity-used' => $quantity_used,
+				'search-content' => array($code, $description)
+			);
+			$result['price-html'] = $this->promo_code_price_html($result);
+			foreach ($result['badge-type-ids'] as $btid) {
+				$result['badge-type-names'][] = isset($name_map[$btid]) ? $name_map[$btid] : $btid;
+			}
+			$promo_codes[] = $result;
+		}
+		$stmt->close();
+		return $promo_codes;
+	}
+
+	public function create_promo_code($promo_code) {
+		if (!$promo_code || !isset($promo_code['code']) || !$promo_code['code']) return false;
+		$code = $this->promo_code_normalize($promo_code['code']);
+		$description = (isset($promo_code['description']) ? $promo_code['description'] : '');
+		$price = (isset($promo_code['price']) ? (float)$promo_code['price'] : 0);
+		$percentage = (isset($promo_code['percentage']) ? ($promo_code['percentage'] ? 1 : 0) : 0);
+		$active = (isset($promo_code['active']) ? ($promo_code['active'] ? 1 : 0) : 1);
+		$badge_type_ids = (isset($promo_code['badge-type-ids']) ? implode(',', $promo_code['badge-type-ids']) : '*');
+		$limit_per_customer = (isset($promo_code['limit-per-customer']) ? $promo_code['limit-per-customer'] : null);
+		$start_date = (isset($promo_code['start-date']) ? $promo_code['start-date'] : null);
+		$end_date = (isset($promo_code['end-date']) ? $promo_code['end-date'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('attendee_promo_codes').' SET '.
+			'`code` = ?, `description` = ?, `price` = ?, '.
+			'`percentage` = ?, `active` = ?, `badge_type_ids` = ?, '.
+			'`limit_per_customer` = ?, `start_date` = ?, `end_date` = ?'
+		);
+		$stmt->bind_param(
+			'ssdiisiss',
+			$code, $description, $price, $percentage, $active,
+			$badge_type_ids, $limit_per_customer, $start_date, $end_date
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		return $id;
+	}
+
+	public function update_promo_code($promo_code) {
+		if (!$promo_code || !isset($promo_code['id']) || !$promo_code['id'] ||
+		    !isset($promo_code['code']) || !$promo_code['code']) return false;
+		$code = $this->promo_code_normalize($promo_code['code']);
+		$description = (isset($promo_code['description']) ? $promo_code['description'] : '');
+		$price = (isset($promo_code['price']) ? (float)$promo_code['price'] : 0);
+		$percentage = (isset($promo_code['percentage']) ? ($promo_code['percentage'] ? 1 : 0) : 0);
+		$active = (isset($promo_code['active']) ? ($promo_code['active'] ? 1 : 0) : 1);
+		$badge_type_ids = (isset($promo_code['badge-type-ids']) ? implode(',', $promo_code['badge-type-ids']) : '*');
+		$limit_per_customer = (isset($promo_code['limit-per-customer']) ? $promo_code['limit-per-customer'] : null);
+		$start_date = (isset($promo_code['start-date']) ? $promo_code['start-date'] : null);
+		$end_date = (isset($promo_code['end-date']) ? $promo_code['end-date'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendee_promo_codes').' SET '.
+			'`code` = ?, `description` = ?, `price` = ?, '.
+			'`percentage` = ?, `active` = ?, `badge_type_ids` = ?, '.
+			'`limit_per_customer` = ?, `start_date` = ?, `end_date` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'ssdiisissi',
+			$code, $description, $price, $percentage, $active,
+			$badge_type_ids, $limit_per_customer, $start_date, $end_date,
+			$promo_code['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function delete_promo_code($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('attendee_promo_codes').
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function activate_promo_code($id, $active) {
+		if (!$id) return false;
+		$active = $active ? 1 : 0;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendee_promo_codes').
+			' SET `active` = ? WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('ii', $active, $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
 	}
 
 }

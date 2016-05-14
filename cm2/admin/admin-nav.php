@@ -19,6 +19,13 @@ $cm_admin_nav = array(
 			'permission' => 'attendee-badge-types'
 		),
 		array(
+			'id' => 'attendee-promo-codes',
+			'href' => '/admin/attendee/promo-codes.php',
+			'name' => 'Attendee Promo Codes',
+			'description' => 'Add or remove codes for discounts on badges for attendees.',
+			'permission' => 'attendee-promo-codes'
+		),
+		array(
 			'id' => 'attendee-mail',
 			'href' => '/admin/attendee/mail.php',
 			'name' => 'Attendee Form Letters',
