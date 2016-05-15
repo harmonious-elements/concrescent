@@ -450,36 +450,35 @@
 					break;
 				case 65:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.add-button'); if (e.length != 1) return;
-					e.click();
+					var e = $('.add-button');
+					if (e.length == 1) e.click();
 					break;
 				case 68:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.delete-button'); if (e.length != 1) return;
-					e.click();
+					var e = $('.delete-button');
+					if (e.length == 1) e.click();
 					break;
 				case 69:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.edit-button'); if (e.length != 1) return;
-					e.click();
+					var e = $('.edit-button');
+					if (e.length == 1) e.click();
 					break;
 				case 82:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.review-button'); if (e.length != 1) return;
-					e.click();
+					var e = $('.review-button');
+					if (e.length == 1) e.click();
 					break;
 				case 83:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.select-button'); if (e.length != 1) return;
-					e.click();
+					var e = $('.select-button');
+					if (e.length == 1) e.click();
 					break;
 				case 88:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
 					var e1 = $('.activate-button');
 					var e2 = $('.deactivate-button');
-					     if (e1.length == 1 && e2.length == 0) e1.click();
-					else if (e1.length == 0 && e2.length == 1) e2.click();
-					else return;
+					if (e1.length == 1 && e2.length == 0) e1.click();
+					if (e1.length == 0 && e2.length == 1) e2.click();
 					break;
 				default:
 					return;

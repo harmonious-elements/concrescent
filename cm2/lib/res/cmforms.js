@@ -465,33 +465,33 @@
 					break;
 				case 38:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.up-button:visible'); if (e.length != 1) return;
-					e.click();
+					var e = $('.up-button:visible');
+					if (e.length == 1) e.click();
 					break;
 				case 40:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.down-button:visible'); if (e.length != 1) return;
-					e.click();
+					var e = $('.down-button:visible');
+					if (e.length == 1) e.click();
 					break;
 				case 65:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.add-button:visible'); if (e.length != 1) return;
-					e.click();
+					var e = $('.add-button:visible');
+					if (e.length == 1) e.click();
 					break;
 				case 68:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.delete-button:visible'); if (e.length != 1) return;
-					e.click();
+					var e = $('.delete-button:visible');
+					if (e.length == 1) e.click();
 					break;
 				case 83:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.confirm-edit-button:visible'); if (e.length != 1) return;
-					e.click();
+					var e = $('.confirm-edit-button:visible');
+					if (e.length == 1) e.click();
 					break;
 				case 88:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-					var e = $('.ea-active:visible'); if (e.length != 1) return;
-					e.click();
+					var e = $('.ea-active:visible');
+					if (e.length == 1) e.click();
 					break;
 				default:
 					return;

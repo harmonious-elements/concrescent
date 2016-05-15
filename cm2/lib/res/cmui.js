@@ -43,18 +43,18 @@ cmui = (function($,window,document){
 				break;
 			case 68:
 				if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-				var e = $('.dialog:not(.hidden) .confirm-delete-button'); if (e.length != 1) return;
-				e.click();
+				var e = $('.dialog:not(.hidden) .confirm-delete-button');
+				if (e.length == 1) e.click();
 				break;
 			case 83:
 				if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-				var e = $('.dialog:not(.hidden) .confirm-edit-button'); if (e.length != 1) return;
-				e.click();
+				var e = $('.dialog:not(.hidden) .confirm-edit-button');
+				if (e.length == 1) e.click();
 				break;
 			case 88:
 				if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
-				var e = $('.dialog:not(.hidden) .soft-delete-button'); if (e.length != 1) return;
-				e.click();
+				var e = $('.dialog:not(.hidden) .soft-delete-button');
+				if (e.length == 1) e.click();
 				break;
 			default:
 				return;
