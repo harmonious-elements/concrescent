@@ -139,6 +139,16 @@ function cm_array_string_short($a) {
 	return $a[0];
 }
 
+function calculate_age($today, $birthdate) {
+	if (!$today || !$birthdate) return null;
+	$date1 = new DateTime($today);
+	$date2 = new DateTime($birthdate);
+	if (!$date1 || !$date2) return null;
+	$interval = $date1->diff($date2);
+	if (!$interval) return null;
+	return $interval->y;
+}
+
 function mail_merge($text, $fields) {
 	$s = array();
 	$r = array();

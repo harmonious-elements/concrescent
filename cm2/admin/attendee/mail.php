@@ -47,13 +47,16 @@ echo '<article>';
 				echo '<hr>';
 			}
 			cm_mail_merge_help(array(
+				'qr-data' => 'The QR code data for this attendee.',
+				'qr-url' => 'A URL of a QR code for this attendee.',
+				'badge-type-name' => 'The name of the badge type the attendee has chosen.',
 				'real-name' => 'The attendee\'s first and last name.',
 				'fandom-name' => 'The attendee\'s fandom name.',
 				'display-name' => 'The name the attendee has chosen to appear on their badge.',
-				'badge-name' => 'The badge type the attendee has chosen.',
-				'qr-data' => 'The QR code data for this attendee.',
-				'transaction-id' => 'The PayPal transaction ID.',
-				'order-url' => 'The URL of the page to review a completed registration.'
+				'unsubscribe-link' => 'A URL to remove the attendee\'s email address from the mailing list.',
+				'payment-txn-id' => 'The PayPal transaction ID.',
+				'payment-txn-amt' => 'The PayPal transaction amount.',
+				'review-link' => 'The URL of the page to review a completed registration.'
 			));
 		echo '</div>';
 		echo '<div class="card-buttons">';

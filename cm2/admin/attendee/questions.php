@@ -64,14 +64,14 @@ cm_form_edit_body($form_def, array(
 	array('type' => 'h1', 'text' => 'Payment Complete <i>(Attendee successfully paid online.)</i>'),
 	array('type' => 'custom-text', 'name' => 'payment-complete', 'default' =>
 		'Your payment has been accepted.<br><br>'.
-		'You can <b><a href="[[order-url]]">review your order</a></b> at any time.'
+		'You can <b><a href="[[review-link]]">review your order</a></b> at any time.'
 	),
 ));
 cm_form_edit_body($form_def, array(
 	array('type' => 'h1', 'text' => 'Registration Complete <i>(Attendee opted to pay on-site.)</i>'),
 	array('type' => 'custom-text', 'name' => 'registration-complete', 'default' =>
 		'Your registration has been submitted. You will need to pay at the door.<br><br>'.
-		'You can <b><a href="[[order-url]]">review your order</a></b> at any time.'
+		'You can <b><a href="[[review-link]]">review your order</a></b> at any time.'
 	),
 ));
 cm_form_edit_body($form_def, array(

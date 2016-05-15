@@ -1,7 +1,9 @@
 <?php
 
 require_once dirname(__FILE__).'/../../config/config.php';
+require_once dirname(__FILE__).'/../util/util.php';
 require_once dirname(__FILE__).'/database.php';
+require_once dirname(__FILE__).'/forms.php';
 
 class cm_attendee_db {
 
@@ -879,6 +881,556 @@ class cm_attendee_db {
 		$success = $stmt->fetch();
 		$stmt->close();
 		return $success ? $this->get_blacklist_entry($id) : false;
+	}
+
+	public function get_attendee($id, $uuid = null, $name_map = null, $fdb = null) {
+		if (!$id && !$uuid) return false;
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'attendee');
+		$query = (
+			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
+			' `print_count`, `print_first_time`, `print_last_time`,'.
+			' `checkin_count`, `checkin_first_time`, `checkin_last_time`,'.
+			' `badge_type_id`, `notes`, `first_name`, `last_name`,'.
+			' `fandom_name`, `name_on_badge`, `date_of_birth`,'.
+			' `subscribed`, `email_address`, `phone_number`,'.
+			' `address_1`, `address_2`, `city`, `state`, `zip_code`,'.
+			' `country`, `ice_name`, `ice_relationship`,'.
+			' `ice_email_address`, `ice_phone_number`,'.
+			' `payment_status`, `payment_badge_price`,'.
+			' `payment_promo_code`, `payment_promo_price`,'.
+			' `payment_group_uuid`, `payment_type`,'.
+			' `payment_txn_id`, `payment_txn_amt`,'.
+			' `payment_date`, `payment_details`'.
+			' FROM '.$this->cm_db->table_name('attendees')
+		);
+		if ($id) {
+			if ($uuid) $query .= ' WHERE `id` = ? AND `uuid` = ? LIMIT 1';
+			else $query .= ' WHERE `id` = ? LIMIT 1';
+		} else {
+			$query .= ' WHERE `uuid` = ? LIMIT 1';
+		}
+		$stmt = $this->cm_db->connection->prepare($query);
+		if ($id) {
+			if ($uuid) $stmt->bind_param('is', $id, $uuid);
+			else $stmt->bind_param('i', $id);
+		} else {
+			$stmt->bind_param('s', $uuid);
+		}
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $uuid, $date_created, $date_modified,
+			$print_count, $print_first_time, $print_last_time,
+			$checkin_count, $checkin_first_time, $checkin_last_time,
+			$badge_type_id, $notes, $first_name, $last_name,
+			$fandom_name, $name_on_badge, $date_of_birth,
+			$subscribed, $email_address, $phone_number,
+			$address_1, $address_2, $city, $state, $zip_code,
+			$country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number,
+			$payment_status, $payment_badge_price,
+			$payment_promo_code, $payment_promo_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details
+		);
+		if ($stmt->fetch()) {
+			$reg_url = get_site_url(true) . '/register';
+			$id_string = 'A' . $id;
+			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
+			$qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' . $qr_data;
+			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$only_name = $real_name;
+			$large_name = '';
+			$small_name = '';
+			$display_name = $real_name;
+			if ($fandom_name) {
+				switch ($name_on_badge) {
+					case 'Fandom Name Large, Real Name Small':
+						$only_name = '';
+						$large_name = $fandom_name;
+						$small_name = $real_name;
+						$display_name = trim($fandom_name) . ' (' . trim($real_name) . ')';
+						break;
+					case 'Real Name Large, Fandom Name Small':
+						$only_name = '';
+						$large_name = $real_name;
+						$small_name = $fandom_name;
+						$display_name = trim($real_name) . ' (' . trim($fandom_name) . ')';
+						break;
+					case 'Fandom Name Only':
+						$only_name = $fandom_name;
+						$display_name = $fandom_name;
+						break;
+				}
+			}
+			$age = calculate_age($this->event_info['start_date'], $date_of_birth);
+			$email_address_subscribed = ($subscribed ? $email_address : null);
+			$unsubscribe_link = ($subscribed ? ($reg_url . '/unsubscribe.php?email=' . $email_address) : null);
+			$address = trim(trim($address_1) . "\n" . trim($address_2));
+			$csz = trim(trim(trim($city) . ' ' . trim($state)) . ' ' . trim($zip_code));
+			$address_full = trim(trim(trim($address) . "\n" . trim($csz)) . "\n" . trim($country));
+			$review_link = (($payment_group_uuid && $payment_txn_id) ? (
+				$reg_url . '/review.php' .
+				'?gid=' . $payment_group_uuid .
+				'&tid=' . $payment_txn_id
+			) : null);
+			$search_content = array(
+				$id, $uuid, $notes, $first_name, $last_name, $fandom_name,
+				$date_of_birth, $email_address, $phone_number,
+				$address_1, $address_2, $city, $state, $zip_code,
+				$country, $payment_status, $payment_promo_code,
+				$payment_group_uuid, $payment_txn_id,
+				$id_string, $qr_data, $badge_type_name,
+				$real_name, $only_name, $large_name, $small_name,
+				$display_name, $address, $csz, $address_full
+			);
+			$result = array(
+				'id' => $id,
+				'id-string' => $id_string,
+				'uuid' => $uuid,
+				'qr-data' => $qr_data,
+				'qr-url' => $qr_url,
+				'date-created' => $date_created,
+				'date-modified' => $date_modified,
+				'print-count' => $print_count,
+				'print-first-time' => $print_first_time,
+				'print-last-time' => $print_last_time,
+				'checkin-count' => $checkin_count,
+				'checkin-first-time' => $checkin_first_time,
+				'checkin-last-time' => $checkin_last_time,
+				'badge-type-id' => $badge_type_id,
+				'badge-type-name' => $badge_type_name,
+				'notes' => $notes,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'fandom-name' => $fandom_name,
+				'name-on-badge' => $name_on_badge,
+				'only-name' => $only_name,
+				'large-name' => $large_name,
+				'small-name' => $small_name,
+				'display-name' => $display_name,
+				'date-of-birth' => $date_of_birth,
+				'age' => $age,
+				'subscribed' => !!$subscribed,
+				'email-address' => $email_address,
+				'email-address-subscribed' => $email_address_subscribed,
+				'unsubscribe-link' => $unsubscribe_link,
+				'phone-number' => $phone_number,
+				'address-1' => $address_1,
+				'address-2' => $address_2,
+				'address' => $address,
+				'city' => $city,
+				'state' => $state,
+				'zip-code' => $zip_code,
+				'csz' => $csz,
+				'country' => $country,
+				'address-full' => $address_full,
+				'ice-name' => $ice_name,
+				'ice-relationship' => $ice_relationship,
+				'ice-email-address' => $ice_email_address,
+				'ice-phone-number' => $ice_phone_number,
+				'payment-status' => $payment_status,
+				'payment-badge-price' => $payment_badge_price,
+				'payment-promo-code' => $payment_promo_code,
+				'payment-promo-price' => $payment_promo_price,
+				'payment-group-uuid' => $payment_group_uuid,
+				'payment-type' => $payment_type,
+				'payment-txn-id' => $payment_txn_id,
+				'payment-txn-amt' => $payment_txn_amt,
+				'payment-date' => $payment_date,
+				'payment-details' => $payment_details,
+				'review-link' => $review_link,
+				'search-content' => $search_content
+			);
+			$stmt->close();
+			$answers = $fdb->list_answers($id);
+			if ($answers) {
+				$result['form-answers'] = $answers;
+				foreach ($answers as $qid => $answer) {
+					$answer_string = implode("\n", $answer);
+					$result['form-answer-array-' . $qid] = $answer;
+					$result['form-answer-string-' . $qid] = $answer_string;
+					$result['search-content'][] = $answer_string;
+				}
+			}
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_attendees($start_id = null, $max_results = null, $gid = null, $tid = null, $name_map = null, $fdb = null) {
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'attendee');
+		$attendees = array();
+		$query = (
+			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
+			' `print_count`, `print_first_time`, `print_last_time`,'.
+			' `checkin_count`, `checkin_first_time`, `checkin_last_time`,'.
+			' `badge_type_id`, `notes`, `first_name`, `last_name`,'.
+			' `fandom_name`, `name_on_badge`, `date_of_birth`,'.
+			' `subscribed`, `email_address`, `phone_number`,'.
+			' `address_1`, `address_2`, `city`, `state`, `zip_code`,'.
+			' `country`, `ice_name`, `ice_relationship`,'.
+			' `ice_email_address`, `ice_phone_number`,'.
+			' `payment_status`, `payment_badge_price`,'.
+			' `payment_promo_code`, `payment_promo_price`,'.
+			' `payment_group_uuid`, `payment_type`,'.
+			' `payment_txn_id`, `payment_txn_amt`,'.
+			' `payment_date`, `payment_details`'.
+			' FROM '.$this->cm_db->table_name('attendees')
+		);
+		$first = true;
+		$bind = array('');
+		if ($start_id) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `id` >= ?';
+			$first = false;
+			$bind[0] .= 'i';
+			$bind[] = &$start_id;
+		}
+		if ($gid) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `payment_group_uuid` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$gid;
+		}
+		if ($tid) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `payment_txn_id` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$tid;
+		}
+		$query .= ' ORDER BY `id`';
+		if ($max_results) {
+			$query .= ' LIMIT ?';
+			$first = false;
+			$bind[0] .= 'i';
+			$bind[] = &$max_results;
+		}
+		$stmt = $this->cm_db->connection->prepare($query);
+		if (!$first) call_user_func_array(array($stmt, 'bind_param'), $bind);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $uuid, $date_created, $date_modified,
+			$print_count, $print_first_time, $print_last_time,
+			$checkin_count, $checkin_first_time, $checkin_last_time,
+			$badge_type_id, $notes, $first_name, $last_name,
+			$fandom_name, $name_on_badge, $date_of_birth,
+			$subscribed, $email_address, $phone_number,
+			$address_1, $address_2, $city, $state, $zip_code,
+			$country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number,
+			$payment_status, $payment_badge_price,
+			$payment_promo_code, $payment_promo_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details
+		);
+		$reg_url = get_site_url(true) . '/register';
+		while ($stmt->fetch()) {
+			$id_string = 'A' . $id;
+			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
+			$qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' . $qr_data;
+			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$only_name = $real_name;
+			$large_name = '';
+			$small_name = '';
+			$display_name = $real_name;
+			if ($fandom_name) {
+				switch ($name_on_badge) {
+					case 'Fandom Name Large, Real Name Small':
+						$only_name = '';
+						$large_name = $fandom_name;
+						$small_name = $real_name;
+						$display_name = trim($fandom_name) . ' (' . trim($real_name) . ')';
+						break;
+					case 'Real Name Large, Fandom Name Small':
+						$only_name = '';
+						$large_name = $real_name;
+						$small_name = $fandom_name;
+						$display_name = trim($real_name) . ' (' . trim($fandom_name) . ')';
+						break;
+					case 'Fandom Name Only':
+						$only_name = $fandom_name;
+						$display_name = $fandom_name;
+						break;
+				}
+			}
+			$age = calculate_age($this->event_info['start_date'], $date_of_birth);
+			$email_address_subscribed = ($subscribed ? $email_address : null);
+			$unsubscribe_link = ($subscribed ? ($reg_url . '/unsubscribe.php?email=' . $email_address) : null);
+			$address = trim(trim($address_1) . "\n" . trim($address_2));
+			$csz = trim(trim(trim($city) . ' ' . trim($state)) . ' ' . trim($zip_code));
+			$address_full = trim(trim(trim($address) . "\n" . trim($csz)) . "\n" . trim($country));
+			$review_link = (($payment_group_uuid && $payment_txn_id) ? (
+				$reg_url . '/review.php' .
+				'?gid=' . $payment_group_uuid .
+				'&tid=' . $payment_txn_id
+			) : null);
+			$search_content = array(
+				$id, $uuid, $notes, $first_name, $last_name, $fandom_name,
+				$date_of_birth, $email_address, $phone_number,
+				$address_1, $address_2, $city, $state, $zip_code,
+				$country, $payment_status, $payment_promo_code,
+				$payment_group_uuid, $payment_txn_id,
+				$id_string, $qr_data, $badge_type_name,
+				$real_name, $only_name, $large_name, $small_name,
+				$display_name, $address, $csz, $address_full
+			);
+			$attendees[] = array(
+				'id' => $id,
+				'id-string' => $id_string,
+				'uuid' => $uuid,
+				'qr-data' => $qr_data,
+				'qr-url' => $qr_url,
+				'date-created' => $date_created,
+				'date-modified' => $date_modified,
+				'print-count' => $print_count,
+				'print-first-time' => $print_first_time,
+				'print-last-time' => $print_last_time,
+				'checkin-count' => $checkin_count,
+				'checkin-first-time' => $checkin_first_time,
+				'checkin-last-time' => $checkin_last_time,
+				'badge-type-id' => $badge_type_id,
+				'badge-type-name' => $badge_type_name,
+				'notes' => $notes,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'fandom-name' => $fandom_name,
+				'name-on-badge' => $name_on_badge,
+				'only-name' => $only_name,
+				'large-name' => $large_name,
+				'small-name' => $small_name,
+				'display-name' => $display_name,
+				'date-of-birth' => $date_of_birth,
+				'age' => $age,
+				'subscribed' => !!$subscribed,
+				'email-address' => $email_address,
+				'email-address-subscribed' => $email_address_subscribed,
+				'unsubscribe-link' => $unsubscribe_link,
+				'phone-number' => $phone_number,
+				'address-1' => $address_1,
+				'address-2' => $address_2,
+				'address' => $address,
+				'city' => $city,
+				'state' => $state,
+				'zip-code' => $zip_code,
+				'csz' => $csz,
+				'country' => $country,
+				'address-full' => $address_full,
+				'ice-name' => $ice_name,
+				'ice-relationship' => $ice_relationship,
+				'ice-email-address' => $ice_email_address,
+				'ice-phone-number' => $ice_phone_number,
+				'payment-status' => $payment_status,
+				'payment-badge-price' => $payment_badge_price,
+				'payment-promo-code' => $payment_promo_code,
+				'payment-promo-price' => $payment_promo_price,
+				'payment-group-uuid' => $payment_group_uuid,
+				'payment-type' => $payment_type,
+				'payment-txn-id' => $payment_txn_id,
+				'payment-txn-amt' => $payment_txn_amt,
+				'payment-date' => $payment_date,
+				'payment-details' => $payment_details,
+				'review-link' => $review_link,
+				'search-content' => $search_content
+			);
+		}
+		$stmt->close();
+		foreach ($attendees as $i => $attendee) {
+			$answers = $fdb->list_answers($attendee['id']);
+			if ($answers) {
+				$attendees[$i]['form-answers'] = $answers;
+				foreach ($answers as $qid => $answer) {
+					$answer_string = implode("\n", $answer);
+					$attendees[$i]['form-answer-array-' . $qid] = $answer;
+					$attendees[$i]['form-answer-string-' . $qid] = $answer_string;
+					$attendees[$i]['search-content'][] = $answer_string;
+				}
+			}
+		}
+		return $attendees;
+	}
+
+	public function create_attendee($attendee) {
+		if (!$attendee) return false;
+		$badge_type_id = (isset($attendee['badge-type-id']) ? $attendee['badge-type-id'] : null);
+		$notes = (isset($attendee['notes']) ? $attendee['notes'] : null);
+		$first_name = (isset($attendee['first-name']) ? $attendee['first-name'] : '');
+		$last_name = (isset($attendee['last-name']) ? $attendee['last-name'] : '');
+		$fandom_name = (isset($attendee['fandom-name']) ? $attendee['fandom-name'] : '');
+		$name_on_badge = (($fandom_name && isset($attendee['name-on-badge'])) ? $attendee['name-on-badge'] : 'Real Name Only');
+		$date_of_birth = (isset($attendee['date-of-birth']) ? $attendee['date-of-birth'] : null);
+		$subscribed = (isset($attendee['subscribed']) ? ($attendee['subscribed'] ? 1 : 0) : 0);
+		$email_address = (isset($attendee['email-address']) ? $attendee['email-address'] : '');
+		$phone_number = (isset($attendee['phone-number']) ? $attendee['phone-number'] : '');
+		$address_1 = (isset($attendee['address-1']) ? $attendee['address-1'] : '');
+		$address_2 = (isset($attendee['address-2']) ? $attendee['address-2'] : '');
+		$city = (isset($attendee['city']) ? $attendee['city'] : '');
+		$state = (isset($attendee['state']) ? $attendee['state'] : '');
+		$zip_code = (isset($attendee['zip-code']) ? $attendee['zip-code'] : '');
+		$country = (isset($attendee['country']) ? $attendee['country'] : '');
+		$ice_name = (isset($attendee['ice-name']) ? $attendee['ice-name'] : '');
+		$ice_relationship = (isset($attendee['ice-relationship']) ? $attendee['ice-relationship'] : '');
+		$ice_email_address = (isset($attendee['ice-email-address']) ? $attendee['ice-email-address'] : '');
+		$ice_phone_number = (isset($attendee['ice-phone-number']) ? $attendee['ice-phone-number'] : '');
+		$payment_status = (isset($attendee['payment-status']) ? $attendee['payment-status'] : null);
+		$payment_badge_price = (isset($attendee['payment-badge-price']) ? $attendee['payment-badge-price'] : null);
+		$payment_promo_code = (isset($attendee['payment-promo-code']) ? $attendee['payment-promo-code'] : null);
+		$payment_promo_price = (isset($attendee['payment-promo-price']) ? $attendee['payment-promo-price'] : null);
+		$payment_group_uuid = (isset($attendee['payment-group-uuid']) ? $attendee['payment-group-uuid'] : null);
+		$payment_type = (isset($attendee['payment-type']) ? $attendee['payment-type'] : null);
+		$payment_txn_id = (isset($attendee['payment-txn-id']) ? $attendee['payment-txn-id'] : null);
+		$payment_txn_amt = (isset($attendee['payment-txn-amt']) ? $attendee['payment-txn-amt'] : null);
+		$payment_date = (isset($attendee['payment-date']) ? $attendee['payment-date'] : null);
+		$payment_details = (isset($attendee['payment-details']) ? $attendee['payment-details'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('attendees').' SET '.
+			'`uuid` = UUID(), `date_created` = NOW(), `date_modified` = NOW(), '.
+			'`badge_type_id` = ?, `notes` = ?, `first_name` = ?, `last_name` = ?, '.
+			'`fandom_name` = ?, `name_on_badge` = ?, `date_of_birth` = ?, '.
+			'`subscribed` = ?, `email_address` = ?, `phone_number` = ?, '.
+			'`address_1` = ?, `address_2` = ?, `city` = ?, `state` = ?, '.
+			'`zip_code` = ?, `country` = ?, `ice_name` = ?, `ice_relationship` = ?, '.
+			'`ice_email_address` = ?, `ice_phone_number` = ?, '.
+			'`payment_status` = ?, `payment_badge_price` = ?, '.
+			'`payment_promo_code` = ?, `payment_promo_price` = ?, '.
+			'`payment_group_uuid` = ?, `payment_type` = ?, '.
+			'`payment_txn_id` = ?, `payment_txn_amt` = ?, '.
+			'`payment_date` = ?, `payment_details` = ?'
+		);
+		$stmt->bind_param(
+			'issssssisssssssssssssdsdsssdss',
+			$badge_type_id, $notes, $first_name, $last_name,
+			$fandom_name, $name_on_badge, $date_of_birth,
+			$subscribed, $email_address, $phone_number,
+			$address_1, $address_2, $city, $state,
+			$zip_code, $country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number,
+			$payment_status, $payment_badge_price,
+			$payment_promo_code, $payment_promo_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		return $id;
+	}
+
+	public function update_attendee($attendee) {
+		if (!$attendee || !isset($attendee['id']) || !$attendee['id']) return false;
+		$badge_type_id = (isset($attendee['badge-type-id']) ? $attendee['badge-type-id'] : null);
+		$notes = (isset($attendee['notes']) ? $attendee['notes'] : null);
+		$first_name = (isset($attendee['first-name']) ? $attendee['first-name'] : '');
+		$last_name = (isset($attendee['last-name']) ? $attendee['last-name'] : '');
+		$fandom_name = (isset($attendee['fandom-name']) ? $attendee['fandom-name'] : '');
+		$name_on_badge = (($fandom_name && isset($attendee['name-on-badge'])) ? $attendee['name-on-badge'] : 'Real Name Only');
+		$date_of_birth = (isset($attendee['date-of-birth']) ? $attendee['date-of-birth'] : null);
+		$subscribed = (isset($attendee['subscribed']) ? ($attendee['subscribed'] ? 1 : 0) : 0);
+		$email_address = (isset($attendee['email-address']) ? $attendee['email-address'] : '');
+		$phone_number = (isset($attendee['phone-number']) ? $attendee['phone-number'] : '');
+		$address_1 = (isset($attendee['address-1']) ? $attendee['address-1'] : '');
+		$address_2 = (isset($attendee['address-2']) ? $attendee['address-2'] : '');
+		$city = (isset($attendee['city']) ? $attendee['city'] : '');
+		$state = (isset($attendee['state']) ? $attendee['state'] : '');
+		$zip_code = (isset($attendee['zip-code']) ? $attendee['zip-code'] : '');
+		$country = (isset($attendee['country']) ? $attendee['country'] : '');
+		$ice_name = (isset($attendee['ice-name']) ? $attendee['ice-name'] : '');
+		$ice_relationship = (isset($attendee['ice-relationship']) ? $attendee['ice-relationship'] : '');
+		$ice_email_address = (isset($attendee['ice-email-address']) ? $attendee['ice-email-address'] : '');
+		$ice_phone_number = (isset($attendee['ice-phone-number']) ? $attendee['ice-phone-number'] : '');
+		$payment_status = (isset($attendee['payment-status']) ? $attendee['payment-status'] : null);
+		$payment_badge_price = (isset($attendee['payment-badge-price']) ? $attendee['payment-badge-price'] : null);
+		$payment_promo_code = (isset($attendee['payment-promo-code']) ? $attendee['payment-promo-code'] : null);
+		$payment_promo_price = (isset($attendee['payment-promo-price']) ? $attendee['payment-promo-price'] : null);
+		$payment_group_uuid = (isset($attendee['payment-group-uuid']) ? $attendee['payment-group-uuid'] : null);
+		$payment_type = (isset($attendee['payment-type']) ? $attendee['payment-type'] : null);
+		$payment_txn_id = (isset($attendee['payment-txn-id']) ? $attendee['payment-txn-id'] : null);
+		$payment_txn_amt = (isset($attendee['payment-txn-amt']) ? $attendee['payment-txn-amt'] : null);
+		$payment_date = (isset($attendee['payment-date']) ? $attendee['payment-date'] : null);
+		$payment_details = (isset($attendee['payment-details']) ? $attendee['payment-details'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendees').' SET '.
+			'`date_modified` = NOW(), '.
+			'`badge_type_id` = ?, `notes` = ?, `first_name` = ?, `last_name` = ?, '.
+			'`fandom_name` = ?, `name_on_badge` = ?, `date_of_birth` = ?, '.
+			'`subscribed` = ?, `email_address` = ?, `phone_number` = ?, '.
+			'`address_1` = ?, `address_2` = ?, `city` = ?, `state` = ?, '.
+			'`zip_code` = ?, `country` = ?, `ice_name` = ?, `ice_relationship` = ?, '.
+			'`ice_email_address` = ?, `ice_phone_number` = ?, '.
+			'`payment_status` = ?, `payment_badge_price` = ?, '.
+			'`payment_promo_code` = ?, `payment_promo_price` = ?, '.
+			'`payment_group_uuid` = ?, `payment_type` = ?, '.
+			'`payment_txn_id` = ?, `payment_txn_amt` = ?, '.
+			'`payment_date` = ?, `payment_details` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'issssssisssssssssssssdsdsssdssi',
+			$badge_type_id, $notes, $first_name, $last_name,
+			$fandom_name, $name_on_badge, $date_of_birth,
+			$subscribed, $email_address, $phone_number,
+			$address_1, $address_2, $city, $state,
+			$zip_code, $country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number,
+			$payment_status, $payment_badge_price,
+			$payment_promo_code, $payment_promo_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details,
+			$attendee['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function delete_attendee($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('attendees').
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function attendee_printed($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendees').' SET '.
+			'`print_count` = IFNULL(`print_count`, 0) + 1, '.
+			'`print_first_time` = IFNULL(`print_first_time`, NOW()), '.
+			'`print_last_time` = NOW()'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function attendee_checked_in($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendees').' SET '.
+			'`checkin_count` = IFNULL(`checkin_count`, 0) + 1, '.
+			'`checkin_first_time` = IFNULL(`checkin_first_time`, NOW()), '.
+			'`checkin_last_time` = NOW()'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
 	}
 
 }

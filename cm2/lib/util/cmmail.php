@@ -151,6 +151,10 @@ function cm_mail_merge_help($fields) {
 			echo '<td><code>[[event-end-date]]</code></td>';
 			echo '<td>The date of the last day of the event.</td>';
 		echo '</tr>';
+		echo '<tr>';
+			echo '<td><code>[[contact-address]]</code></td>';
+			echo '<td>The email address set as the Contact for this message.</td>';
+		echo '</tr>';
 		foreach ($fields as $k => $v) {
 			echo '<tr>';
 				echo '<td><code>[[' . htmlspecialchars($k) . ']]</code></td>';
