@@ -79,10 +79,38 @@ class cm_admin_db {
 	}
 
 	public function user_has_permission($user, $permission) {
-		return ($user && $user['permissions'] && (
-			in_array('*', $user['permissions']) ||
-			in_array($permission, $user['permissions'])
-		));
+		if (is_array($permission)) {
+			switch ($permission[0]) {
+				case '|': case '||':
+					for ($i = 1, $n = count($permission); $i < $n; $i++) {
+						if ($this->user_has_permission($user, $permission[$i])) {
+							return true;
+						}
+					}
+					return false;
+				case '!': case '!!':
+					for ($i = 1, $n = count($permission); $i < $n; $i++) {
+						if ($this->user_has_permission($user, $permission[$i])) {
+							return false;
+						}
+					}
+					return true;
+				case '&': case '&&':
+					for ($i = 1, $n = count($permission); $i < $n; $i++) {
+						if (!$this->user_has_permission($user, $permission[$i])) {
+							return false;
+						}
+					}
+					return true;
+				default:
+					return false;
+			}
+		} else {
+			return ($user && $user['permissions'] && (
+				in_array('*', $user['permissions']) ||
+				in_array($permission, $user['permissions'])
+			));
+		}
 	}
 
 	public function get_user($username) {

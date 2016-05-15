@@ -605,20 +605,16 @@
 						}, update);
 					});
 				}
-				if (editable) {
+				if (editable && !listdef['edit-url']) {
 					tr.find('.edit-button').bind('click', function() {
-						if (listdef['edit-url']) {
-							window.location.href = listdef['edit-url'] + id;
-						} else {
-							entityIdUnderEdit = id;
-							entityUnderEdit = entity;
-							entityNameUnderEdit = name;
-							$('.edit-dialog .dialog-title').text(listdef['edit-title'] || 'Edit');
-							if (listdef['edit-load-function']) {
-								listdef['edit-load-function'](id, entity);
-							}
-							cmui.showDialog('edit');
+						entityIdUnderEdit = id;
+						entityUnderEdit = entity;
+						entityNameUnderEdit = name;
+						$('.edit-dialog .dialog-title').text(listdef['edit-title'] || 'Edit');
+						if (listdef['edit-load-function']) {
+							listdef['edit-load-function'](id, entity);
 						}
+						cmui.showDialog('edit');
 					});
 				}
 				if (reorderable) {
@@ -664,10 +660,10 @@
 						cmui.showDialog('delete');
 					});
 				}
-				if (reviewable) {
+				if (reviewable && !listdef['review-url']) {
 					tr.find('.review-button').bind('click', function() {
-						if (listdef['review-url']) {
-							window.location.href = listdef['review-url'] + id;
+						if (listdef['review-function']) {
+							listdef['review-function'](id, entity);
 						}
 					});
 				}
@@ -675,20 +671,17 @@
 		};
 		/* Table Action Buttons */
 		if (listdef['table-actions']) {
-			if (listdef['table-actions'].indexOf('add') >= 0) {
+			var addable = (listdef['table-actions'].indexOf('add') >= 0);
+			if (addable && !listdef['add-url']) {
 				$('.cm-list-table .add-button').bind('click', function() {
-					if (listdef['add-url']) {
-						window.location.href = listdef['add-url'];
-					} else {
-						entityIdUnderEdit = null;
-						entityUnderEdit = null;
-						entityNameUnderEdit = null;
-						$('.edit-dialog .dialog-title').text(listdef['add-title'] || 'Add');
-						if (listdef['edit-clear-function']) {
-							listdef['edit-clear-function']();
-						}
-						cmui.showDialog('edit');
+					entityIdUnderEdit = null;
+					entityUnderEdit = null;
+					entityNameUnderEdit = null;
+					$('.edit-dialog .dialog-title').text(listdef['add-title'] || 'Add');
+					if (listdef['edit-clear-function']) {
+						listdef['edit-clear-function']();
 					}
+					cmui.showDialog('edit');
 				});
 			}
 		}

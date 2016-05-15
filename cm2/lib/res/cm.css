@@ -214,6 +214,7 @@ input[type=reset] {
 	margin-right: 4px;
 	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
 	font-size: 11px;
+	font-weight: normal;
 	line-height: normal;
 }
 button:active,
@@ -299,7 +300,8 @@ select {
 	white-space: nowrap;
 	text-align: right;
 }
-.cm-list-table table .td-actions button:last-child {
+.cm-list-table table .td-actions button:last-child,
+.cm-list-table table .td-actions a.button:last-child {
 	margin-right: 0;
 }
 .cm-list-table table thead th {
@@ -309,7 +311,8 @@ select {
 .cm-list-table table tfoot th {
 	text-align: right;
 }
-.cm-list-table table tfoot th button:last-child {
+.cm-list-table table tfoot th button:last-child,
+.cm-list-table table tfoot th a.button:last-child {
 	margin-right: 0;
 }
 .cm-list-table table .th-sortable {

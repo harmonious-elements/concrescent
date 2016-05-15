@@ -9,7 +9,8 @@ function cm_list_head(&$list_def) {
 			'select-function',
 			'edit-clear-function',
 			'edit-load-function',
-			'edit-save-function'
+			'edit-save-function',
+			'review-function'
 		);
 		$function_bodies = array();
 		foreach ($function_names as $k) {
@@ -100,7 +101,11 @@ function cm_list_table(&$list_def) {
 				echo '<tr>';
 					echo '<th colspan="' . $column_count . '">';
 						if (in_array('add', $list_def['table-actions'])) {
-							echo '<button class="add-button">Add</button>';
+							if (isset($list_def['add-url']) && $list_def['add-url']) {
+								echo '<a href="' . htmlspecialchars($list_def['add-url']) . '" target="_blank" role="button" class="button add-button">Add</a>';
+							} else {
+								echo '<button class="add-button">Add</button>';
+							}
 						}
 					echo '</th>';
 				echo '</tr>';
@@ -153,7 +158,11 @@ function cm_list_row(&$list_def, &$entity) {
 				$out .= '<button class="' . $class . '-button">' . $label . '</button>';
 			}
 			if (in_array('edit', $list_def['row-actions'])) {
-				$out .= '<button class="edit-button">Edit</button>';
+				if (isset($list_def['edit-url']) && $list_def['edit-url']) {
+					$out .= '<a href="' . htmlspecialchars($list_def['edit-url'] . $key) . '" target="_blank" role="button" class="button edit-button">Edit</a>';
+				} else {
+					$out .= '<button class="edit-button">Edit</button>';
+				}
 			}
 			if (in_array('reorder', $list_def['row-actions'])) {
 				$out .= '<button class="up-button">&#x2191;</button>';
@@ -163,7 +172,11 @@ function cm_list_row(&$list_def, &$entity) {
 				$out .= '<button class="delete-button">Delete</button>';
 			}
 			if (in_array('review', $list_def['row-actions'])) {
-				$out .= '<button class="review-button">Review</button>';
+				if (isset($list_def['review-url']) && $list_def['review-url']) {
+					$out .= '<a href="' . htmlspecialchars($list_def['review-url'] . $key) . '" target="_blank" role="button" class="button review-button">Review</a>';
+				} else {
+					$out .= '<button class="review-button">Review</button>';
+				}
 			}
 		$out .= '</td>';
 	}
