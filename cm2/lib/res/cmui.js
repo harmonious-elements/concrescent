@@ -27,6 +27,8 @@ cmui = (function($,window,document){
 		$('.dialog-cover').removeClass('hidden');
 		$('.dialog').addClass('hidden');
 		$('.'+name+'-dialog').removeClass('hidden');
+		$('*').blur();
+		$('.'+name+'-dialog input:eq(0)').focus();
 		$('body').bind('keydown', escapeDialog);
 	};
 	hideDialog = function() {
@@ -35,11 +37,30 @@ cmui = (function($,window,document){
 		$('body').unbind('keydown', escapeDialog);
 	};
 	escapeDialog = function(event) {
-		if (event.which == 27) {
-			hideDialog();
-			event.stopPropagation();
-			event.preventDefault();
+		switch (event.which) {
+			case 27:
+				hideDialog();
+				break;
+			case 68:
+				if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+				var e = $('.dialog:not(.hidden) .confirm-delete-button'); if (e.length != 1) return;
+				e.click();
+				break;
+			case 83:
+				if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+				var e = $('.dialog:not(.hidden) .confirm-edit-button'); if (e.length != 1) return;
+				e.click();
+				break;
+			case 88:
+				if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+				var e = $('.dialog:not(.hidden) .soft-delete-button'); if (e.length != 1) return;
+				e.click();
+				break;
+			default:
+				return;
 		}
+		event.stopPropagation();
+		event.preventDefault();
 	};
 
 	var htmlSpecialChars = function(s) {
