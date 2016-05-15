@@ -184,5 +184,5 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-
 echo '</table>';
 
 cm_list_edit_dialog_end();
-cm_list_delete_dialog($list_def);
+cm_list_dialogs($list_def);
 cm_admin_tail();

@@ -480,8 +480,9 @@ select {
 	margin-left: -256px;
 	overflow: auto;
 }
-.dialog.edit-dialog {
-	top: 15%;
+.dialog.edit-dialog,
+.dialog.shortcuts-dialog {
+	top: 10%;
 	max-height: 80%;
 }
 .dialog .dialog-title {
@@ -502,6 +503,19 @@ select {
 .dialog .dialog-buttons {
 	padding: 8px;
 	text-align: right;
+}
+.dialog.shortcuts-dialog .kbd {
+	display: inline-block;
+	border: 3px outset #ccc;
+	background: #eee;
+	padding: 1px 4px;
+	color: black;
+	min-width: 10px;
+	text-align: center;
+	margin: -2px 0;
+}
+.dialog.shortcuts-dialog .kbdw {
+	min-width: 32px;
 }
 
 /* Butterbar */

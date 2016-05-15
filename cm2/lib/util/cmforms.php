@@ -271,7 +271,7 @@ function cm_form_edit_body(&$form_def, $questions) {
 	cm_form_edit_end();
 }
 
-function cm_form_edit_delete_dialog() {
+function cm_form_edit_dialogs() {
 	echo '<div class="dialog delete-dialog hidden">';
 		echo '<div class="dialog-title">Delete Question</div>';
 		echo '<div class="dialog-content">';
@@ -282,6 +282,28 @@ function cm_form_edit_delete_dialog() {
 			echo '<button class="cancel-delete-button">Cancel</button>';
 			echo '<button class="soft-delete-button">Mark Inactive</button>';
 			echo '<button class="confirm-delete-button">Delete</button>';
+		echo '</div>';
+	echo '</div>';
+	echo '<div class="dialog shortcuts-dialog hidden">';
+		echo '<div class="dialog-title">Keyboard Shortcuts</div>';
+		echo '<div class="dialog-content">';
+			echo '<table border="0" cellpadding="0" cellspacing="0">';
+				echo '<tr><th colspan="2">Form Edit Pages</th></tr>';
+				echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Cancel all edits in progress</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">/</span></td><td>Show keyboard shortcuts</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">A</span></td><td>Add title, explanatory text, or question</td></tr>';
+				echo '<tr><th colspan="2">Single Edit In Progress</th></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">&uarr;</span></td><td>Move up</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">&darr;</span></td><td>Move down</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">D</span></td><td>Delete</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Save</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">X</span></td><td>Toggle Active</td></tr>';
+				echo '<tr><th colspan="2">Dialog Boxes</th></tr>';
+				echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Cancel / Close</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">D</span></td><td>Delete</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Save</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">X</span></td><td>Mark Inactive</td></tr>';
+			echo '</table>';
 		echo '</div>';
 	echo '</div>';
 }

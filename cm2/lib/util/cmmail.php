@@ -173,6 +173,21 @@ function cm_mail_form_submit() {
 	echo '<input type="submit" name="submit" value="Save Changes">';
 }
 
+function cm_mail_dialogs() {
+	echo '<div class="dialog shortcuts-dialog hidden">';
+		echo '<div class="dialog-title">Keyboard Shortcuts</div>';
+		echo '<div class="dialog-content">';
+			echo '<table border="0" cellpadding="0" cellspacing="0">';
+				echo '<tr><th colspan="2">Form Letter Pages</th></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">/</span></td><td>Show keyboard shortcuts</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Save Changes</td></tr>';
+				echo '<tr><th colspan="2">Dialog Boxes</th></tr>';
+				echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Cancel / Close</td></tr>';
+			echo '</table>';
+		echo '</div>';
+	echo '</div>';
+}
+
 function cm_mail_posted_template($id) {
 	$contact = isset($_POST['cm-mail-contact-'.$id]) ? $_POST['cm-mail-contact-'.$id] : '';
 	$from    = isset($_POST['cm-mail-from-'   .$id]) ? $_POST['cm-mail-from-'   .$id] : '';

@@ -100,5 +100,5 @@ cm_form_edit_body($form_def, array(
 echo '</article>';
 
 cm_admin_dialogs();
-cm_form_edit_delete_dialog();
+cm_form_edit_dialogs();
 cm_admin_tail();

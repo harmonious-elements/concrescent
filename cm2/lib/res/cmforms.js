@@ -444,6 +444,7 @@
 				}
 			});
 		};
+
 		$('.cm-form-editor-dynamic-section-actions .add-button').bind('click', function() {
 			var editor = $('.cm-form-editor-dynamic-section-editor tr');
 			var questionId = {'question-id': 'NEW-' + new Date().getTime()};
@@ -492,6 +493,10 @@
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
 					var e = $('.ea-active:visible');
 					if (e.length == 1) e.click();
+					break;
+				case 191:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					cmui.showDialog('shortcuts');
 					break;
 				default:
 					return;

@@ -451,7 +451,9 @@
 				case 65:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
 					var e = $('.add-button');
-					if (e.length == 1) e.click();
+					if (e.length != 1) break;
+					if (e.is('a')) e[0].click();
+					else e.click();
 					break;
 				case 68:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
@@ -461,12 +463,16 @@
 				case 69:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
 					var e = $('.edit-button');
-					if (e.length == 1) e.click();
+					if (e.length != 1) break;
+					if (e.is('a')) e[0].click();
+					else e.click();
 					break;
 				case 82:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
 					var e = $('.review-button');
-					if (e.length == 1) e.click();
+					if (e.length != 1) break;
+					if (e.is('a')) e[0].click();
+					else e.click();
 					break;
 				case 83:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
@@ -479,6 +485,10 @@
 					var e2 = $('.deactivate-button');
 					if (e1.length == 1 && e2.length == 0) e1.click();
 					if (e1.length == 0 && e2.length == 1) e2.click();
+					break;
+				case 191:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					cmui.showDialog('shortcuts');
 					break;
 				default:
 					return;

@@ -62,5 +62,25 @@
 
 			updatePreview();
 		});
+
+		/* Keyboard Navigation */
+		$('body').bind('keydown', function(event) {
+			if (!$('.dialog-cover').hasClass('hidden')) return;
+			switch (event.which) {
+				case 83:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					var e = $('input[type=submit]');
+					if (e.length == 1) e.click();
+					break;
+				case 191:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					cmui.showDialog('shortcuts');
+					break;
+				default:
+					return;
+			}
+			event.stopPropagation();
+			event.preventDefault();
+		});
 	});
 })(jQuery,window,document,cmui);

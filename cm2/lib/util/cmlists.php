@@ -199,7 +199,7 @@ function cm_list_edit_dialog_end() {
 	echo '</div>';
 }
 
-function cm_list_delete_dialog(&$list_def) {
+function cm_list_dialogs(&$list_def) {
 	$type = (isset($list_def['entity-type']) && $list_def['entity-type']) ? $list_def['entity-type'] : 'item';
 	$switchable = (isset($list_def['row-actions']) && $list_def['row-actions'] && in_array('switch', $list_def['row-actions']));
 	echo '<div class="dialog delete-dialog hidden">';
@@ -219,6 +219,32 @@ function cm_list_delete_dialog(&$list_def) {
 			echo '<button class="cancel-delete-button">Cancel</button>';
 			if ($switchable) echo '<button class="soft-delete-button">Mark Inactive</button>';
 			echo '<button class="confirm-delete-button">Delete</button>';
+		echo '</div>';
+	echo '</div>';
+	echo '<div class="dialog shortcuts-dialog hidden">';
+		echo '<div class="dialog-title">Keyboard Shortcuts</div>';
+		echo '<div class="dialog-content">';
+			echo '<table border="0" cellpadding="0" cellspacing="0">';
+				echo '<tr><th colspan="2">List Pages</th></tr>';
+				echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Clear and focus on search box</td></tr>';
+				echo '<tr><td><span class="kbd kbdw">home</span></td><td>Go to first page of results</td></tr>';
+				echo '<tr><td><span class="kbd kbdw">pgup</span></td><td>Go to previous page of results</td></tr>';
+				echo '<tr><td><span class="kbd kbdw">pgdn</span></td><td>Go to next page of results</td></tr>';
+				echo '<tr><td><span class="kbd kbdw">end</span></td><td>Go to last page of results</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">/</span></td><td>Show keyboard shortcuts</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">A</span></td><td>Add</td></tr>';
+				echo '<tr><th colspan="2">Single Search Result</th></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">D</span></td><td>Delete</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">E</span></td><td>Edit</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">R</span></td><td>Review</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Select</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">X</span></td><td>Activate / Deactivate</td></tr>';
+				echo '<tr><th colspan="2">Dialog Boxes</th></tr>';
+				echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Cancel / Close</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">D</span></td><td>Delete</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Save</td></tr>';
+				echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">X</span></td><td>Mark Inactive</td></tr>';
+			echo '</table>';
 		echo '</div>';
 	echo '</div>';
 }
