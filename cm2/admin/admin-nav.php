@@ -19,6 +19,13 @@ $cm_admin_nav = array(
 			'permission' => 'attendee-badge-types'
 		),
 		array(
+			'id' => 'attendee-questions',
+			'href' => '/admin/attendee/questions.php',
+			'name' => 'Attendee Questions',
+			'description' => 'Add explanatory text and questions to the attendee registration form.',
+			'permission' => 'attendee-questions'
+		),
+		array(
 			'id' => 'attendee-promo-codes',
 			'href' => '/admin/attendee/promo-codes.php',
 			'name' => 'Attendee Promo Codes',

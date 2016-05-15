@@ -8,6 +8,11 @@ $cm_admin_perms = array(
 			'description' => 'Create or modify the types of badges available to attendees.'
 		),
 		array(
+			'id' => 'attendee-questions',
+			'name' => 'Attendee Questions',
+			'description' => 'Add explanatory text and questions to the attendee registration form.'
+		),
+		array(
 			'id' => 'attendee-promo-codes',
 			'name' => 'Attendee Promo Codes',
 			'description' => 'Add or remove codes for discounts on badges for attendees.'

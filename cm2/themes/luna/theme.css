@@ -170,7 +170,8 @@ article {
 	color: gray;
 }
 .cm-form-editor table .cm-form-editor-custom-text-section:hover,
-.cm-form-editor table .cm-form-editor-dynamic-row:hover {
+.cm-form-editor table .cm-form-editor-dynamic-row:hover,
+.cm-form-editor table .cm-form-editor-dynamic-section-actions tr:hover {
 	background: #eef;
 }
 .cm-form-editor table .cm-form-editor-custom-text-section.editing,

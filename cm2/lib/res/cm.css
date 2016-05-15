@@ -165,12 +165,6 @@ th, td {
 .cm-form-table tbody th label {
 	white-space: nowrap;
 }
-.cm-form-table tbody td h1,
-.cm-form-table tbody td h2,
-.cm-form-table tbody td h3,
-.cm-form-table tbody td p {
-	margin-bottom: 8px;
-}
 
 /* Form Elements */
 
@@ -437,6 +431,11 @@ select {
 .cm-form-editor table .cm-form-editor-row-editor-row.ear-required-advanced label {
 	display: block;
 	padding-left: 2em;
+}
+.cm-form-editor table .cm-form-editor-dynamic-section-actions tr {
+	color: gray;
+	font-style: italic;
+	cursor: pointer;
 }
 .cm-form-editor table hr {
 	margin: 12px -20px;

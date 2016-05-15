@@ -190,9 +190,11 @@ function cm_form_edit_custom_text_section($name, $default) {
 function cm_form_edit_dynamic_section(&$form_def) {
 	echo '<tbody class="cm-form-editor-dynamic-section"></tbody>';
 	echo '<tbody class="cm-form-editor-dynamic-section-actions">';
-		echo '<tr><td colspan="2" class="td-actions">';
-			echo '<button class="add-button">Add New Question</button>';
-		echo '</td></tr>';
+		echo '<tr>';
+			echo '<td colspan="2" title="Click to add title, explanatory text, or question." class="add-button">';
+				echo 'Click to add title, explanatory text, or question.';
+			echo '</td>';
+		echo '</tr>';
 	echo '</tbody>';
 	echo '<tbody class="cm-form-editor-dynamic-section-editor hidden">';
 		echo '<tr class="cm-form-editor-row-editor-row"><th><label>Type</label></th><td>';
