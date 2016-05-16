@@ -1,22 +1,12 @@
 (function($,window,document,cmui,listdef){
 	var naturalTokenize = function(text) {
 		var tokens = [];
-		var token = '';
-		var tokenNumeric;
-		for (var i = 0, ch = text.charAt(0); ch; ch = text.charAt(++i)) {
-			var cp = ch.charCodeAt(0);
-			var numeric = (cp >= 48 && cp <= 57);
-			if (token) {
-				if (tokenNumeric == numeric) {
-					token += ch;
-					continue;
-				}
-				tokens.push(token);
-			}
-			token = ch;
-			tokenNumeric = numeric;
+		var re = /[0-9]+|[^0-9]+/g;
+		var m = re.exec(text);
+		while (m) {
+			tokens.push(m[0]);
+			m = re.exec(text);
 		}
-		if (token) tokens.push(token);
 		return tokens;
 	};
 	var naturalCompare = function(a, b) {
