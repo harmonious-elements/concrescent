@@ -883,6 +883,18 @@ class cm_attendee_db {
 		return $success ? $this->get_blacklist_entry($id) : false;
 	}
 
+	public function get_next_attendee_id() {
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT IFNULL(MAX(`id`),0)+1 FROM '.
+			$this->cm_db->table_name('attendees')
+		);
+		$stmt->execute();
+		$stmt->bind_result($id);
+		if (!$stmt->fetch()) $id = 0;
+		$stmt->close();
+		return $id;
+	}
+
 	public function get_attendee($id, $uuid = null, $name_map = null, $fdb = null) {
 		if (!$id && !$uuid) return false;
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
@@ -1062,7 +1074,7 @@ class cm_attendee_db {
 		return false;
 	}
 
-	public function list_attendees($start_id = null, $max_results = null, $gid = null, $tid = null, $name_map = null, $fdb = null) {
+	public function list_attendees($start_id = null, $end_id = null, $gid = null, $tid = null, $name_map = null, $fdb = null) {
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
 		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'attendee');
 		$attendees = array();
@@ -1091,6 +1103,12 @@ class cm_attendee_db {
 			$bind[0] .= 'i';
 			$bind[] = &$start_id;
 		}
+		if ($end_id) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `id` < ?';
+			$first = false;
+			$bind[0] .= 'i';
+			$bind[] = &$end_id;
+		}
 		if ($gid) {
 			$query .= ($first ? ' WHERE' : ' AND') . ' `payment_group_uuid` = ?';
 			$first = false;
@@ -1104,12 +1122,6 @@ class cm_attendee_db {
 			$bind[] = &$tid;
 		}
 		$query .= ' ORDER BY `id`';
-		if ($max_results) {
-			$query .= ' LIMIT ?';
-			$first = false;
-			$bind[0] .= 'i';
-			$bind[] = &$max_results;
-		}
 		$stmt = $this->cm_db->connection->prepare($query);
 		if (!$first) call_user_func_array(array($stmt, 'bind_param'), $bind);
 		$stmt->execute();

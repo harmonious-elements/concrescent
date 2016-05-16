@@ -73,7 +73,8 @@ $columns = array_merge($columns, array(
 	),
 ));
 $list_def = array(
-	'loader' => 'sequential',
+	'prealloc' => 10000,
+	'loader' => 'parallel',
 	'ajax-url' => get_site_url(false) . '/admin/attendee/index.php',
 	'entity-type' => 'attendee',
 	'entity-type-pl' => 'attendees',
@@ -97,20 +98,22 @@ $list_def = array(
 if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
+		case 'get-next-id':
+			$next_id = $atdb->get_next_attendee_id();
+			$response = array('ok' => true, 'next-id' => $next_id);
+			echo json_encode($response);
+			break;
 		case 'list':
 			$start_id = $_POST['cm-list-start-id'];
-			$response = array('ok' => true, 'rows' => array(), 'next-start-id' => $start_id);
-			$attendees = $atdb->list_attendees($start_id, 100, null, null, $name_map, $fdb);
+			$end_id = $_POST['cm-list-end-id'];
+			$response = array('ok' => true, 'rows' => array());
+			$attendees = $atdb->list_attendees($start_id, $end_id, null, null, $name_map, $fdb);
 			foreach ($attendees as $attendee) {
 				$response['rows'][] = array(
 					'entity' => $attendee,
 					'html' => cm_list_row($list_def, $attendee),
 					'search' => $attendee['search-content']
 				);
-				$next_id = $attendee['id'] + 1;
-				if ($response['next-start-id'] < $next_id) {
-					$response['next-start-id'] = $next_id;
-				}
 			}
 			echo json_encode($response);
 			break;

@@ -395,10 +395,76 @@
 			};
 			return doLoad;
 		};
+		var makeParallelLoader = function() {
+			var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
+			var message = (entityType ? ('Loading ' + entityType + '...') : 'Loading...');
+			var url = listdef['ajax-url'] || '';
+			var startId = ('start-id' in listdef) ? listdef['start-id'] : 0;
+			var doLoadPage = function(start, end, done) {
+				var request = {'cm-list-action': 'list', 'cm-list-start-id': start, 'cm-list-end-id': end};
+				$.post(url, request, function(data) {
+					if (!data['ok']) {
+						cmui.showButterbarPersistent('An error occurred. Please reload the page.');
+						done(false);
+					} else {
+						var hasRows = (data['rows'] && data['rows'].length);
+						if (hasRows) {
+							rows = rows.concat(data['rows']);
+							doFilter();
+							doPage();
+						}
+						done(true);
+					}
+				}, 'json');
+			};
+			var doLoadBlock = function(start, end, done) {
+				var pageSize = 20;
+				var numPages = Math.ceil((end - start) / pageSize);
+				var numPagesLoaded = 0;
+				var allPagesOK = true;
+				var pageLoaded = function(ok) {
+					numPagesLoaded++;
+					if (!ok) allPagesOK = false;
+					if (numPagesLoaded >= numPages) done(allPagesOK);
+				};
+				for (var i = start; i < end; i += pageSize) {
+					var j = i + pageSize;
+					if (j > end) j = end;
+					doLoadPage(i, j, pageLoaded);
+				}
+			};
+			var doLoad = function() {
+				cmui.showButterbar(message);
+				var request = {'cm-list-action': 'get-next-id'};
+				$.post(url, request, function(data) {
+					if (!data['ok']) {
+						cmui.showButterbarPersistent('An error occurred. Please reload the page.');
+					} else {
+						var endId = data['next-id'];
+						if (endId != startId) {
+							doLoadBlock(startId, endId, function(ok) {
+								if (!ok) {
+									cmui.showButterbarPersistent('An error occurred. Please reload the page.');
+								} else {
+									startId = endId;
+									cmui.hideButterbar();
+									setTimeout(doLoad, 5000);
+								}
+							});
+						} else {
+							cmui.hideButterbar();
+							setTimeout(doLoad, 5000);
+						}
+					}
+				}, 'json');
+			};
+			return doLoad;
+		};
 		var doLoad;
 		switch (listdef['loader']) {
 			default          : doLoad = makeSimpleLoader    (); break;
 			case 'sequential': doLoad = makeSequentialLoader(); break;
+			case 'parallel'  : doLoad = makeParallelLoader  (); break;
 		}
 
 		/* Search Text Field */
