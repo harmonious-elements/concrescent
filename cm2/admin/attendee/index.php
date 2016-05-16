@@ -73,6 +73,7 @@ $columns = array_merge($columns, array(
 	),
 ));
 $list_def = array(
+	'loader' => 'sequential',
 	'ajax-url' => get_site_url(false) . '/admin/attendee/index.php',
 	'entity-type' => 'attendee',
 	'entity-type-pl' => 'attendees',

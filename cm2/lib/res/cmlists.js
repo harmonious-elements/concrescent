@@ -317,36 +317,6 @@
 			$('.cm-list-table tbody').html(html);
 			if (htmlInit) htmlInit();
 		};
-		var nextId = ('start-id' in listdef) ? listdef['start-id'] : 1;
-		var doLoad = function() {
-			var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
-			cmui.showButterbar(entityType ? ('Loading ' + entityType + '...') : 'Loading...');
-			$.post(
-				(listdef['ajax-url'] || ''),
-				{'cm-list-action': 'list', 'cm-list-start-id': nextId},
-				function(data) {
-					if (!data['ok']) {
-						cmui.showButterbarPersistent('An error occurred. Please reload the page.');
-					} else {
-						var hasRows = (data['rows'] && data['rows'].length);
-						if (hasRows) {
-							rows = rows.concat(data['rows']);
-							doFilter();
-							doPage();
-						} else {
-							cmui.hideButterbar();
-						}
-						nextId = data['next-start-id'];
-						if (nextId) {
-							setTimeout(doLoad, hasRows ? 10 : 5000);
-						} else {
-							cmui.hideButterbar();
-						}
-					}
-				},
-				'json'
-			);
-		};
 		var indexOfEntity = function(entityKey) {
 			var rowKey = listdef['row-key'] || 'id';
 			for (var i = 0, n = rows.length; i < n; ++i) {
@@ -372,6 +342,64 @@
 				'json'
 			);
 		};
+
+		/* Loaders */
+		var makeSimpleLoader = function() {
+			var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
+			var message = (entityType ? ('Loading ' + entityType + '...') : 'Loading...');
+			var url = listdef['ajax-url'] || '';
+			var request = {'cm-list-action': 'list'};
+			var doLoad = function() {
+				cmui.showButterbar(message);
+				$.post(url, request, function(data) {
+					if (!data['ok']) {
+						cmui.showButterbarPersistent('An error occurred. Please reload the page.');
+					} else {
+						rows = data['rows'] || [];
+						doFilter();
+						doPage();
+						cmui.hideButterbar();
+					}
+				}, 'json');
+			};
+			return doLoad;
+		};
+		var makeSequentialLoader = function() {
+			var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
+			var message = (entityType ? ('Loading ' + entityType + '...') : 'Loading...');
+			var url = listdef['ajax-url'] || '';
+			var startId = ('start-id' in listdef) ? listdef['start-id'] : 0;
+			var request = {'cm-list-action': 'list', 'cm-list-start-id': startId};
+			var doLoad = function() {
+				cmui.showButterbar(message);
+				$.post(url, request, function(data) {
+					if (!data['ok']) {
+						cmui.showButterbarPersistent('An error occurred. Please reload the page.');
+					} else {
+						var hasRows = (data['rows'] && data['rows'].length);
+						var nextId = data['next-start-id'];
+						if (hasRows) {
+							rows = rows.concat(data['rows']);
+							doFilter();
+							doPage();
+						}
+						if (!hasRows || !nextId) {
+							cmui.hideButterbar();
+						}
+						if (nextId) {
+							request['cm-list-start-id'] = nextId;
+							setTimeout(doLoad, hasRows ? 10 : 5000);
+						}
+					}
+				}, 'json');
+			};
+			return doLoad;
+		};
+		var doLoad;
+		switch (listdef['loader']) {
+			default          : doLoad = makeSimpleLoader    (); break;
+			case 'sequential': doLoad = makeSequentialLoader(); break;
+		}
 
 		/* Search Text Field */
 		var searchField = $('.cm-search-input input');
