@@ -12,6 +12,13 @@ $cm_admin_nav = array(
 	),
 	array(
 		array(
+			'id' => 'attendees',
+			'href' => '/admin/attendee/index.php',
+			'name' => 'Attendees',
+			'description' => 'View and modify attendee registration records.',
+			'permission' => array('||', 'attendees', 'attendees-view', 'attendees-edit', 'attendees-delete')
+		),
+		array(
 			'id' => 'attendee-badge-types',
 			'href' => '/admin/attendee/badge-types.php',
 			'name' => 'Attendee Badge Types',

@@ -375,6 +375,38 @@ select {
 	flex: 0 1 0;
 }
 
+/* Special Columns */
+
+.email-subbed {
+	white-space: nowrap;
+}
+.email-subbed .subscribed {
+	display: inline-block;
+	width: 10px;
+	text-align: center;
+}
+.email-subbed .subscribed.subscribed-true {
+	color: green;
+}
+.email-subbed .subscribed.subscribed-false {
+	color: red;
+}
+.cm-status-label.cm-status-incomplete {
+	color: blue;
+}
+.cm-status-label.cm-status-cancelled {
+	color: gray;
+}
+.cm-status-label.cm-status-rejected {
+	color: red;
+}
+.cm-status-label.cm-status-completed {
+	color: green;
+}
+.cm-status-label.cm-status-refunded {
+	color: orange;
+}
+
 /* Form Editor Pages */
 
 .cm-form-editor {

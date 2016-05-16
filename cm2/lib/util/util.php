@@ -139,6 +139,24 @@ function cm_array_string_short($a) {
 	return $a[0];
 }
 
+function cm_email_subbed($subbed, $email) {
+	$subbed_class = ($subbed ? 'subscribed-true' : 'subscribed-false');
+	$subbed_title = ($subbed ? 'OK to Contact' : 'DO NOT Contact');
+	$subbed_text = ($subbed ? '&#x2713;' : '&#x2717;');
+	$subbed_icon = '<span class="subscribed ' . $subbed_class . '"';
+	$subbed_icon .= ' title="' . $subbed_title . '">';
+	$subbed_icon .= $subbed_text . '</span>';
+	$subbed_span = '<span class="email-subbed">' . $subbed_icon;
+	$subbed_span .= ' ' . email_link($email) . '</span>';
+	return $subbed_span;
+}
+
+function cm_status_label($status) {
+	$label_class = strtolower(preg_replace('/[^A-Za-z0-9]+/', '', $status));
+	$label = '<span class="cm-status-label cm-status-' . $label_class . '">';
+	return $label . htmlspecialchars($status) . '</span>';
+}
+
 function calculate_age($today, $birthdate) {
 	if (!$today || !$birthdate) return null;
 	$date1 = new DateTime($today);

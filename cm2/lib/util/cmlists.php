@@ -49,14 +49,17 @@ function cm_list_search_box(&$list_def) {
 			echo '<button class="cm-search-last-page">&#xBB;</button>';
 			echo '<label>Results:</label>';
 			echo '<select class="cm-search-max-results">';
-				echo '<option value="5">5</option>';
-				echo '<option value="10">10</option>';
-				echo '<option value="20" selected>20</option>';
-				echo '<option value="50">50</option>';
-				echo '<option value="100">100</option>';
-				echo '<option value="200">200</option>';
-				echo '<option value="500">500</option>';
-				echo '<option value="1000">1000</option>';
+				$options = array(5, 10, 20, 50, 100, 200, 500, 1000);
+				$max_results = (
+					( isset($list_def['max-results']) &&
+					  in_array((int)$list_def['max-results'], $options) )
+					? (int)$list_def['max-results'] : 20
+				);
+				foreach ($options as $option) {
+					echo '<option value="' . $option .'"';
+					if ($max_results == $option) echo ' selected';
+					echo '>' . $option . '</option>';
+				}
 			echo '</select>';
 		echo '</div>';
 	echo '</div>';
@@ -101,10 +104,11 @@ function cm_list_table(&$list_def) {
 				echo '<tr>';
 					echo '<th colspan="' . $column_count . '">';
 						if (in_array('add', $list_def['table-actions'])) {
+							$label = (isset($list_def['add-label']) ? htmlspecialchars($list_def['add-label']) : 'Add');
 							if (isset($list_def['add-url']) && $list_def['add-url']) {
-								echo '<a href="' . htmlspecialchars($list_def['add-url']) . '" target="_blank" role="button" class="button add-button">Add</a>';
+								echo '<a href="' . htmlspecialchars($list_def['add-url']) . '" target="_blank" role="button" class="button add-button">' . $label . '</a>';
 							} else {
-								echo '<button class="add-button">Add</button>';
+								echo '<button class="add-button">' . $label . '</button>';
 							}
 						}
 					echo '</th>';
@@ -116,16 +120,15 @@ function cm_list_table(&$list_def) {
 }
 
 function cm_list_row(&$list_def, &$entity) {
-	/* Get key and active state */
 	$key = (isset($list_def['row-key']) && $list_def['row-key']) ? $entity[$list_def['row-key']] : uniqid();
 	$active = (isset($list_def['active-key']) && $list_def['active-key']) ? $entity[$list_def['active-key']] : true;
+	$subscribed = (isset($entity['subscribed']) && $entity['subscribed']);
 	$out = ($active ? '<tr' : '<tr class="inactive"') . ' id="rowid-' . htmlspecialchars($key) . '">';
-	/* Render columns */
 	if (isset($list_def['columns']) && $list_def['columns']) {
 		foreach ($list_def['columns'] as $column) {
-			$value = (isset($column['key']) && $column['key']) ? $entity[$column['key']] : '?';
-			$value1 = (isset($column['key1']) && $column['key1']) ? $entity[$column['key1']] : '?';
-			$value2 = (isset($column['key2']) && $column['key2']) ? $entity[$column['key2']] : '?';
+			$value = (isset($column['key']) && $column['key'] && isset($entity[$column['key']])) ? $entity[$column['key']] : '';
+			$value1 = (isset($column['key1']) && $column['key1'] && isset($entity[$column['key1']])) ? $entity[$column['key1']] : '';
+			$value2 = (isset($column['key2']) && $column['key2'] && isset($entity[$column['key2']])) ? $entity[$column['key2']] : '';
 			$type = (isset($column['type']) && $column['type']) ? $column['type'] : '?';
 			switch ($type) {
 				case 'html'        : $out .= '<td>' . $value                   . '</td>'; break;
@@ -138,6 +141,8 @@ function cm_list_row(&$list_def, &$entity) {
 				case 'age-range'   : $out .= '<td>' . age_range_string($value1, $value2)              . '</td>'; break;
 				case 'array'       : $out .= '<td>' . htmlspecialchars(cm_array_string($value))       . '</td>'; break;
 				case 'array-short' : $out .= '<td>' . htmlspecialchars(cm_array_string_short($value)) . '</td>'; break;
+				case 'email-subbed': $out .= '<td>' . cm_email_subbed($subscribed, $value)            . '</td>'; break;
+				case 'status-label': $out .= '<td>' . cm_status_label($value)                         . '</td>'; break;
 				case 'html-numeric': $out .= '<td class="td-numeric">' . $value                                                   . '</td>'; break;
 				case 'numeric'     : $out .= '<td class="td-numeric">' . htmlspecialchars($value)                                 . '</td>'; break;
 				case 'quantity'    : $out .= '<td class="td-numeric">' . htmlspecialchars(is_null($value) ? 'unlimited' : $value) . '</td>'; break;
@@ -146,11 +151,11 @@ function cm_list_row(&$list_def, &$entity) {
 			}
 		}
 	}
-	/* Render action buttons */
 	if (isset($list_def['row-actions']) && $list_def['row-actions']) {
 		$out .= '<td class="td-actions">';
 			if (in_array('select', $list_def['row-actions'])) {
-				$out .= '<button class="select-button">Select</button>';
+				$label = (isset($list_def['select-label']) ? htmlspecialchars($list_def['select-label']) : 'Select');
+				$out .= '<button class="select-button">' . $label . '</button>';
 			}
 			if (in_array('switch', $list_def['row-actions'])) {
 				$class = $active ? 'deactivate' : 'activate';
@@ -158,10 +163,11 @@ function cm_list_row(&$list_def, &$entity) {
 				$out .= '<button class="' . $class . '-button">' . $label . '</button>';
 			}
 			if (in_array('edit', $list_def['row-actions'])) {
+				$label = (isset($list_def['edit-label']) ? htmlspecialchars($list_def['edit-label']) : 'Edit');
 				if (isset($list_def['edit-url']) && $list_def['edit-url']) {
-					$out .= '<a href="' . htmlspecialchars($list_def['edit-url'] . $key) . '" target="_blank" role="button" class="button edit-button">Edit</a>';
+					$out .= '<a href="' . htmlspecialchars($list_def['edit-url'] . $key) . '" target="_blank" role="button" class="button edit-button">' . $label . '</a>';
 				} else {
-					$out .= '<button class="edit-button">Edit</button>';
+					$out .= '<button class="edit-button">' . $label . '</button>';
 				}
 			}
 			if (in_array('reorder', $list_def['row-actions'])) {
@@ -169,13 +175,15 @@ function cm_list_row(&$list_def, &$entity) {
 				$out .= '<button class="down-button">&#x2193;</button>';
 			}
 			if (in_array('delete', $list_def['row-actions'])) {
-				$out .= '<button class="delete-button">Delete</button>';
+				$label = (isset($list_def['delete-label']) ? htmlspecialchars($list_def['delete-label']) : 'Delete');
+				$out .= '<button class="delete-button">' . $label . '</button>';
 			}
 			if (in_array('review', $list_def['row-actions'])) {
+				$label = (isset($list_def['review-label']) ? htmlspecialchars($list_def['review-label']) : 'Review');
 				if (isset($list_def['review-url']) && $list_def['review-url']) {
-					$out .= '<a href="' . htmlspecialchars($list_def['review-url'] . $key) . '" target="_blank" role="button" class="button review-button">Review</a>';
+					$out .= '<a href="' . htmlspecialchars($list_def['review-url'] . $key) . '" target="_blank" role="button" class="button review-button">' . $label . '</a>';
 				} else {
-					$out .= '<button class="review-button">Review</button>';
+					$out .= '<button class="review-button">' . $label . '</button>';
 				}
 			}
 		$out .= '</td>';

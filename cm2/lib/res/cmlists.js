@@ -40,14 +40,16 @@
 		return (an < bn) ? -1 : (an > bn) ? 1 : 0;
 	};
 	var sortFunctions = {
-		'text'       : naturalCompare,
-		'url'        : naturalCompare,
-		'url-short'  : naturalCompare,
-		'email'      : naturalCompare,
-		'email-short': naturalCompare,
-		'numeric'    : numericCompare,
-		'quantity'   : numericCompare,
-		'price'      : numericCompare
+		'text'        : naturalCompare,
+		'url'         : naturalCompare,
+		'url-short'   : naturalCompare,
+		'email'       : naturalCompare,
+		'email-short' : naturalCompare,
+		'email-subbed': naturalCompare,
+		'status-label': naturalCompare,
+		'numeric'     : numericCompare,
+		'quantity'    : numericCompare,
+		'price'       : numericCompare
 	};
 	var isSortable = function() {
 		if (listdef['row-actions']) {

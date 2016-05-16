@@ -3,6 +3,28 @@
 $cm_admin_perms = array(
 	array(
 		array(
+			'id' => 'attendees',
+			'name' => 'Attendees',
+			'description' => 'View the list of attendee registration records.'
+		),
+		array(
+			'id' => 'attendees-view',
+			'name' => 'Attendees - View',
+			'description' => 'View individual attendee registration records.'
+		),
+		array(
+			'id' => 'attendees-edit',
+			'name' => 'Attendees - Edit',
+			'description' => 'Modify attendee registration records.'
+		),
+		array(
+			'id' => 'attendees-delete',
+			'name' => 'Attendees - Delete',
+			'description' => 'Delete attendee registration records.'
+		),
+	),
+	array(
+		array(
 			'id' => 'attendee-badge-types',
 			'name' => 'Attendee Badge Types',
 			'description' => 'Create or modify the types of badges available to attendees.'
