@@ -73,8 +73,6 @@ $columns = array_merge($columns, array(
 	),
 ));
 $list_def = array(
-	'prealloc' => 10000,
-	'loader' => 'parallel',
 	'ajax-url' => get_site_url(false) . '/admin/attendee/index.php',
 	'entity-type' => 'attendee',
 	'entity-type-pl' => 'attendees',
@@ -98,16 +96,9 @@ $list_def = array(
 if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
-		case 'get-next-id':
-			$next_id = $atdb->get_next_attendee_id();
-			$response = array('ok' => true, 'next-id' => $next_id);
-			echo json_encode($response);
-			break;
 		case 'list':
-			$start_id = $_POST['cm-list-start-id'];
-			$end_id = $_POST['cm-list-end-id'];
 			$response = array('ok' => true, 'rows' => array());
-			$attendees = $atdb->list_attendees($start_id, $end_id, null, null, $name_map, $fdb);
+			$attendees = $atdb->list_attendees(null, null, null, null, $name_map, $fdb);
 			foreach ($attendees as $attendee) {
 				$response['rows'][] = array(
 					'entity' => $attendee,
