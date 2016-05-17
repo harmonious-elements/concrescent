@@ -1,4 +1,5 @@
 (function($,window,document,cmui,listdef){
+	/* Sorting */
 	var naturalTokenize = function(text) {
 		var tokens = [];
 		var re = /[0-9]+|[^0-9]+/g;
@@ -58,6 +59,7 @@
 		return false;
 	};
 
+	/* Searching */
 	var queryTokenChar = function(ch) {
 		if ('()|:=<>'.indexOf(ch) >= 0) return false;
 		if (ch == '"') return false;
@@ -229,6 +231,23 @@
 		}
 	};
 
+	/* Miscellaneous */
+	var doAjax = function(message, request, done) {
+		cmui.showButterbar(message);
+		$.post(
+			(listdef['ajax-url'] || ''),
+			request,
+			function(response) {
+				if (!response['ok']) {
+					cmui.showButterbarPersistent('An error occurred. Please try again.');
+				} else {
+					done(response);
+					cmui.hideButterbar();
+				}
+			},
+			'json'
+		);
+	};
 	var qrEnabled = function() {
 		if (listdef['qr'] == 'off' || (window.localStorage && window.localStorage.qr == 'off')) return false;
 		if (listdef['qr'] == 'on' || (window.localStorage && window.localStorage.qr == 'on')) return true;
@@ -316,22 +335,6 @@
 			}
 			return -1;
 		};
-		var doAjax = function(message, request, done) {
-			cmui.showButterbar(message);
-			$.post(
-				(listdef['ajax-url'] || ''),
-				request,
-				function(response) {
-					if (!response['ok']) {
-						cmui.showButterbarPersistent('An error occurred. Please try again.');
-					} else {
-						done(response);
-						cmui.hideButterbar();
-					}
-				},
-				'json'
-			);
-		};
 
 		/* Loaders */
 		var makeSimpleLoader = function() {
@@ -349,37 +352,6 @@
 						doFilter();
 						doPage();
 						cmui.hideButterbar();
-					}
-				}, 'json');
-			};
-			return doLoad;
-		};
-		var makeSequentialLoader = function() {
-			var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
-			var message = (entityType ? ('Loading ' + entityType + '...') : 'Loading...');
-			var url = listdef['ajax-url'] || '';
-			var startId = ('start-id' in listdef) ? listdef['start-id'] : 0;
-			var request = {'cm-list-action': 'list', 'cm-list-start-id': startId};
-			var doLoad = function() {
-				cmui.showButterbar(message);
-				$.post(url, request, function(data) {
-					if (!data['ok']) {
-						cmui.showButterbarPersistent('An error occurred. Please reload the page.');
-					} else {
-						var hasRows = (data['rows'] && data['rows'].length);
-						var nextId = data['next-start-id'];
-						if (hasRows) {
-							rows = rows.concat(data['rows']);
-							doFilter();
-							doPage();
-						}
-						if (!hasRows || !nextId) {
-							cmui.hideButterbar();
-						}
-						if (nextId) {
-							request['cm-list-start-id'] = nextId;
-							setTimeout(doLoad, hasRows ? 10 : 5000);
-						}
 					}
 				}, 'json');
 			};
@@ -452,9 +424,8 @@
 		};
 		var doLoad;
 		switch (listdef['loader']) {
-			default          : doLoad = makeSimpleLoader    (); break;
-			case 'sequential': doLoad = makeSequentialLoader(); break;
-			case 'parallel'  : doLoad = makeParallelLoader  (); break;
+			default        : doLoad = makeSimpleLoader    (); break;
+			case 'parallel': doLoad = makeParallelLoader  (); break;
 		}
 
 		/* Search Text Field */
