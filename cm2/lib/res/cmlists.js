@@ -29,7 +29,8 @@
 		return aa.length - bb.length;
 	};
 	var numericCompare = function(a, b) {
-		var an = Number(a), bn = Number(b);
+		var an = Number(a);
+		var bn = Number(b);
 		return (an < bn) ? -1 : (an > bn) ? 1 : 0;
 	};
 	var sortFunctions = {
@@ -357,8 +358,7 @@
 		};
 		var getEntity = function(id) {
 			var index = indexOfEntity(id);
-			var entity = (index >= 0) ? allRows[index]['entity'] : null;
-			return entity;
+			return (index >= 0) ? allRows[index]['entity'] : null;
 		};
 		var appendEntity = function(row) {
 			if (row) allRows.push(row);
@@ -397,6 +397,87 @@
 		};
 	};
 
+	/* Server-Side Loader */
+
+	var makeServerSideLoader = function(setPageCounter, setListHTML) {
+		var entityType = listdef['entity-type-pl'] || listdef['entity-type'];
+		var message = (entityType ? ('Loading ' + entityType + '...') : 'Loading...');
+		var url = listdef['ajax-url'] || '';
+		var request = {'cm-list-action': 'list'};
+		var visibleRows = [];
+
+		var doLoad = function(done) {
+			if (done) done();
+		};
+		var doFilter = function(query) {
+			request['cm-list-search-query'] = JSON.stringify(query);
+		};
+		var doSort = function(sortOrder) {
+			request['cm-list-sort-order'] = JSON.stringify(sortOrder);
+		};
+		var doPage = function(offset, length) {
+			request['cm-list-page-offset'] = offset;
+			request['cm-list-page-length'] = length;
+		};
+		var doRender = function() {
+			cmui.showButterbar(message);
+			$.post(url, request, function(data) {
+				if (!data['ok']) {
+					cmui.showButterbarPersistent('An error occurred. Please reload the page.');
+				} else {
+					visibleRows = data['rows'] || [];
+
+					var offset = request['cm-list-page-offset'];
+					var length = request['cm-list-page-length'];
+					if (length) {
+						setPageCounter(
+							offset + (visibleRows.length ? 1 : 0),
+							offset + visibleRows.length,
+							data['match-count']
+						);
+					} else {
+						setPageCounter(
+							(visibleRows.length ? 1 : 0),
+							visibleRows.length,
+							data['match-count']
+						);
+					}
+
+					var html = '';
+					for (var i = 0, n = visibleRows.length; i < n; ++i) {
+						html += visibleRows[i]['html'];
+					}
+					setListHTML(html);
+
+					cmui.hideButterbar();
+				}
+			}, 'json');
+		};
+
+		var getEntity = function(id) {
+			var rowKey = listdef['row-key'] || 'id';
+			for (var i = 0, n = visibleRows.length; i < n; ++i) {
+				if (visibleRows[i]['entity'][rowKey] == id) {
+					return visibleRows[i]['entity'];
+				}
+			}
+			return null;
+		};
+
+		return {
+			'doLoad': doLoad,
+			'doFilter': doFilter,
+			'doSort': doSort,
+			'doPage': doPage,
+			'doRender': doRender,
+			'getEntity': getEntity,
+			'appendEntity': function(){},
+			'replaceEntity': function(){},
+			'removeEntity': function(){},
+			'reorderEntity': function(){}
+		};
+	};
+
 	/* Page Controller */
 
 	$(document).ready(function() {
@@ -422,7 +503,12 @@
 		};
 		var loader;
 		switch (listdef['loader']) {
-			default: loader = makeSimpleLoader(setPageCounter, setListHTML); break;
+			default:
+				loader = makeSimpleLoader(setPageCounter, setListHTML);
+				break;
+			case 'server-side':
+				loader = makeServerSideLoader(setPageCounter, setListHTML);
+				break;
 		}
 
 		/* Convenience Functions */
@@ -451,6 +537,8 @@
 		};
 
 		/* Search Text Field */
+		var searchDelay = listdef['search-delay'];
+		var searchTimeout = null;
 		var searchField = $('.cm-search-input input');
 		var searchFieldOldVal = searchField.val();
 		var searchFieldChanged = function() {
@@ -459,7 +547,12 @@
 				searchFieldOldVal = searchFieldNewVal;
 				query = queryParse(searchFieldNewVal || '');
 				offset = 0;
-				doFilter();
+				if (searchDelay) {
+					window.clearTimeout(searchTimeout);
+					searchTimeout = window.setTimeout(doFilter, searchDelay);
+				} else {
+					doFilter();
+				}
 			}
 		};
 		searchField.bind('change', searchFieldChanged);
@@ -737,6 +830,11 @@
 		$('body').bind('keydown', function(event) {
 			if (!$('.dialog-cover').hasClass('hidden')) return;
 			switch (event.which) {
+				case 13:
+					if (event.target != searchField[0]) return;
+					window.clearTimeout(searchTimeout);
+					doFilter();
+					break;
 				case 27:
 					searchField.val('');
 					searchFieldChanged();

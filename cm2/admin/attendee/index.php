@@ -73,10 +73,12 @@ $columns = array_merge($columns, array(
 	),
 ));
 $list_def = array(
+	'loader' => 'server-side',
 	'ajax-url' => get_site_url(false) . '/admin/attendee/index.php',
 	'entity-type' => 'attendee',
 	'entity-type-pl' => 'attendees',
 	'search-criteria' => 'name, badge type, contact info, or transaction ID',
+	'search-delay' => 500,
 	'qr' => 'auto',
 	'columns' => $columns,
 	'sort-order' => array(~0),
@@ -97,15 +99,18 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$response = array('ok' => true, 'rows' => array());
-			$attendees = $atdb->list_attendees(null, null, null, null, $name_map, $fdb);
+			$attendees = $atdb->list_attendees(
+				null, null, null, null, $name_map, $fdb
+			);
+			$rows = array();
 			foreach ($attendees as $attendee) {
-				$response['rows'][] = array(
+				$rows[] = array(
 					'entity' => $attendee,
 					'html' => cm_list_row($list_def, $attendee),
 					'search' => $attendee['search-content']
 				);
 			}
+			$response = cm_list_process($list_def, $rows);
 			echo json_encode($response);
 			break;
 		case 'delete':
