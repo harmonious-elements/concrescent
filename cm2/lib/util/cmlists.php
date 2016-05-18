@@ -362,7 +362,7 @@ function cm_list_sort_compare_function($type) {
 	}
 }
 
-function cm_list_sort(&$list_def, &$rows, $sort_order) {
+function cm_list_sort_entities(&$list_def, &$entities, $sort_order) {
 	if ($sort_order) {
 		foreach ($sort_order as $column_index) {
 			$descending = ($column_index < 0);
@@ -370,47 +370,63 @@ function cm_list_sort(&$list_def, &$rows, $sort_order) {
 			$column = $list_def['columns'][$column_index];
 			$compare = cm_list_sort_compare_function($column['type']);
 			$key = $column['key'];
-			usort($rows, function($a, $b) use ($descending, $compare, $key) {
-				$a = $a['entity'][$key];
-				$b = $b['entity'][$key];
-				$c = $compare($a, $b);
-				if ($descending) $c = -$c;
-				return $c;
-			});
+			if ($compare && $key) {
+				usort($entities, function($a, $b) use ($descending, $compare, $key) {
+					$cmp = $compare($a[$key], $b[$key]);
+					return $descending ? -$cmp : $cmp;
+				});
+			}
 		}
 	}
 }
 
-function cm_list_process(&$list_def, &$all_rows) {
-	$query = json_decode($_POST['cm-list-search-query'], true);
-	$sort_order = json_decode($_POST['cm-list-sort-order'], true);
-	$offset = (int)$_POST['cm-list-page-offset'];
-	$length = (int)$_POST['cm-list-page-length'];
+function cm_list_make_row(&$list_def, &$entity) {
+	$search = isset($entity['search-content']) ? $entity['search-content'] : null;
+	return array(
+		'entity' => $entity,
+		'html' => cm_list_row($list_def, $entity),
+		'search' => $search
+	);
+}
 
-	if ($query) {
-		$matched_rows = array();
-		foreach ($all_rows as $row) {
-			if (isset($row['search']) && $row['search'] && isset($row['entity']) && $row['entity']) {
-				if (cm_list_query_matches($query, ':', $row['search'], $row['entity'])) {
-					$matched_rows[] = $row;
+function cm_list_process_entities(&$list_def, &$all_entities) {
+	if (isset($list_def['loader']) && $list_def['loader'] == 'server-side') {
+		$query = json_decode($_POST['cm-list-search-query'], true);
+		$sort_order = json_decode($_POST['cm-list-sort-order'], true);
+		$offset = (int)$_POST['cm-list-page-offset'];
+		$length = (int)$_POST['cm-list-page-length'];
+
+		if ($query) {
+			$matched_entities = array();
+			foreach ($all_entities as $entity) {
+				$search = isset($entity['search-content']) ? $entity['search-content'] : null;
+				if ($search && cm_list_query_matches($query, ':', $search, $entity)) {
+					$matched_entities[] = $entity;
 				}
 			}
+		} else {
+			$matched_entities = $all_entities;
+		}
+
+		cm_list_sort_entities($list_def, $matched_entities, $sort_order);
+
+		if ($length) {
+			$returned_entities = array_slice($matched_entities, $offset, $length);
+		} else {
+			$returned_entities = $matched_entities;
 		}
 	} else {
-		$matched_rows = $all_rows;
+		$matched_entities = $all_entities;
+		$returned_entities = $all_entities;
 	}
 
-	cm_list_sort($list_def, $matched_rows, $sort_order);
-
-	if ($length) {
-		$visible_rows = array_slice($matched_rows, $offset, $length);
-	} else {
-		$visible_rows = $matched_rows;
+	$rows = array();
+	foreach ($returned_entities as $entity) {
+		$rows[] = cm_list_make_row($list_def, $entity);
 	}
-
 	return array(
 		'ok' => true,
-		'rows' => $visible_rows,
-		'match-count' => count($matched_rows)
+		'rows' => $rows,
+		'match-count' => count($matched_entities)
 	);
 }

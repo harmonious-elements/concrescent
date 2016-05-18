@@ -119,15 +119,8 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$response = array('ok' => true, 'rows' => array());
 			$badge_types = $atdb->list_badge_types();
-			foreach ($badge_types as $badge_type) {
-				$response['rows'][] = array(
-					'entity' => $badge_type,
-					'html' => cm_list_row($list_def, $badge_type),
-					'search' => $badge_type['search-content']
-				);
-			}
+			$response = cm_list_process_entities($list_def, $badge_types);
 			echo json_encode($response);
 			break;
 		case 'create':
@@ -137,11 +130,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$badge_type = $atdb->get_badge_type($id);
-				if ($badge_type) $response['row'] = array(
-					'entity' => $badge_type,
-					'html' => cm_list_row($list_def, $badge_type),
-					'search' => $badge_type['search-content']
-				);
+				if ($badge_type) {
+					$response['row'] = cm_list_make_row($list_def, $badge_type);
+				}
 			}
 			echo json_encode($response);
 			break;
@@ -152,11 +143,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$badge_type = $atdb->get_badge_type($badge_type['id']);
-				if ($badge_type) $response['row'] = array(
-					'entity' => $badge_type,
-					'html' => cm_list_row($list_def, $badge_type),
-					'search' => $badge_type['search-content']
-				);
+				if ($badge_type) {
+					$response['row'] = cm_list_make_row($list_def, $badge_type);
+				}
 			}
 			echo json_encode($response);
 			break;
@@ -173,11 +162,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$badge_type = $atdb->get_badge_type($id);
-				if ($badge_type) $response['row'] = array(
-					'entity' => $badge_type,
-					'html' => cm_list_row($list_def, $badge_type),
-					'search' => $badge_type['search-content']
-				);
+				if ($badge_type) {
+					$response['row'] = cm_list_make_row($list_def, $badge_type);
+				}
 			}
 			echo json_encode($response);
 			break;

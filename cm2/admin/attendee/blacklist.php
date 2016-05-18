@@ -87,15 +87,8 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$response = array('ok' => true, 'rows' => array());
 			$blacklist_entries = $atdb->list_blacklist_entries();
-			foreach ($blacklist_entries as $blacklist_entry) {
-				$response['rows'][] = array(
-					'entity' => $blacklist_entry,
-					'html' => cm_list_row($list_def, $blacklist_entry),
-					'search' => $blacklist_entry['search-content']
-				);
-			}
+			$response = cm_list_process_entities($list_def, $blacklist_entries);
 			echo json_encode($response);
 			break;
 		case 'create':
@@ -105,11 +98,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$blacklist_entry = $atdb->get_blacklist_entry($id);
-				if ($blacklist_entry) $response['row'] = array(
-					'entity' => $blacklist_entry,
-					'html' => cm_list_row($list_def, $blacklist_entry),
-					'search' => $blacklist_entry['search-content']
-				);
+				if ($blacklist_entry) {
+					$response['row'] = cm_list_make_row($list_def, $blacklist_entry);
+				}
 			}
 			echo json_encode($response);
 			break;
@@ -120,11 +111,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$blacklist_entry = $atdb->get_blacklist_entry($blacklist_entry['id']);
-				if ($blacklist_entry) $response['row'] = array(
-					'entity' => $blacklist_entry,
-					'html' => cm_list_row($list_def, $blacklist_entry),
-					'search' => $blacklist_entry['search-content']
-				);
+				if ($blacklist_entry) {
+					$response['row'] = cm_list_make_row($list_def, $blacklist_entry);
+				}
 			}
 			echo json_encode($response);
 			break;

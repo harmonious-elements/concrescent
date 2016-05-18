@@ -74,15 +74,8 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$response = array('ok' => true, 'rows' => array());
 			$users = $adb->list_users();
-			foreach ($users as $user) {
-				$response['rows'][] = array(
-					'entity' => $user,
-					'html' => cm_list_row($list_def, $user),
-					'search' => $user['search-content']
-				);
-			}
+			$response = cm_list_process_entities($list_def, $users);
 			echo json_encode($response);
 			break;
 		case 'create':
@@ -91,11 +84,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$user = $adb->get_user($user['username']);
-				if ($user) $response['row'] = array(
-					'entity' => $user,
-					'html' => cm_list_row($list_def, $user),
-					'search' => $user['search-content']
-				);
+				if ($user) {
+					$response['row'] = cm_list_make_row($list_def, $user);
+				}
 			}
 			echo json_encode($response);
 			break;
@@ -109,11 +100,9 @@ if (isset($_POST['cm-list-action'])) {
 					$username = $user['username'];
 				}
 				$user = $adb->get_user($username);
-				if ($user) $response['row'] = array(
-					'entity' => $user,
-					'html' => cm_list_row($list_def, $user),
-					'search' => $user['search-content']
-				);
+				if ($user) {
+					$response['row'] = cm_list_make_row($list_def, $user);
+				}
 			}
 			echo json_encode($response);
 			break;

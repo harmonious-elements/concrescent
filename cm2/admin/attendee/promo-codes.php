@@ -115,15 +115,8 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$response = array('ok' => true, 'rows' => array());
 			$promo_codes = $atdb->list_promo_codes($name_map);
-			foreach ($promo_codes as $promo_code) {
-				$response['rows'][] = array(
-					'entity' => $promo_code,
-					'html' => cm_list_row($list_def, $promo_code),
-					'search' => $promo_code['search-content']
-				);
-			}
+			$response = cm_list_process_entities($list_def, $promo_codes);
 			echo json_encode($response);
 			break;
 		case 'create':
@@ -133,11 +126,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$promo_code = $atdb->get_promo_code($id, false, $name_map);
-				if ($promo_code) $response['row'] = array(
-					'entity' => $promo_code,
-					'html' => cm_list_row($list_def, $promo_code),
-					'search' => $promo_code['search-content']
-				);
+				if ($promo_code) {
+					$response['row'] = cm_list_make_row($list_def, $promo_code);
+				}
 			}
 			echo json_encode($response);
 			break;
@@ -148,11 +139,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$promo_code = $atdb->get_promo_code($promo_code['id'], false, $name_map);
-				if ($promo_code) $response['row'] = array(
-					'entity' => $promo_code,
-					'html' => cm_list_row($list_def, $promo_code),
-					'search' => $promo_code['search-content']
-				);
+				if ($promo_code) {
+					$response['row'] = cm_list_make_row($list_def, $promo_code);
+				}
 			}
 			echo json_encode($response);
 			break;
@@ -169,11 +158,9 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			if ($ok) {
 				$promo_code = $atdb->get_promo_code($id, false, $name_map);
-				if ($promo_code) $response['row'] = array(
-					'entity' => $promo_code,
-					'html' => cm_list_row($list_def, $promo_code),
-					'search' => $promo_code['search-content']
-				);
+				if ($promo_code) {
+					$response['row'] = cm_list_make_row($list_def, $promo_code);
+				}
 			}
 			echo json_encode($response);
 			break;

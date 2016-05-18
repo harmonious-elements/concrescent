@@ -99,18 +99,8 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$attendees = $atdb->list_attendees(
-				null, null, null, null, $name_map, $fdb
-			);
-			$rows = array();
-			foreach ($attendees as $attendee) {
-				$rows[] = array(
-					'entity' => $attendee,
-					'html' => cm_list_row($list_def, $attendee),
-					'search' => $attendee['search-content']
-				);
-			}
-			$response = cm_list_process($list_def, $rows);
+			$attendees = $atdb->list_attendees(null, null, null, null, $name_map, $fdb);
+			$response = cm_list_process_entities($list_def, $attendees);
 			echo json_encode($response);
 			break;
 		case 'delete':
