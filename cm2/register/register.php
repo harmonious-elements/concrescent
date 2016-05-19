@@ -3,11 +3,15 @@
 session_name('PHPSESSID_CMREG');
 session_start();
 
+require_once dirname(__FILE__).'/../config/config.php';
 require_once dirname(__FILE__).'/../lib/database/database.php';
 require_once dirname(__FILE__).'/../lib/database/attendee.php';
 require_once dirname(__FILE__).'/../lib/database/forms.php';
+require_once dirname(__FILE__).'/../lib/database/mail.php';
 require_once dirname(__FILE__).'/../lib/util/res.php';
 require_once dirname(__FILE__).'/../lib/util/util.php';
+
+$event_name = $cm_config['event']['name'];
 
 $db = new cm_db();
 
@@ -16,6 +20,9 @@ $name_list = $atdb->list_badge_type_names();
 
 $fdb = new cm_forms_db($db, 'attendee');
 $questions = $fdb->list_questions();
+
+$mdb = new cm_mail_db($db);
+$contact_address = $mdb->get_contact_address('attendee-paid');
 
 function cm_reg_cart_count() {
 	if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
@@ -72,23 +79,50 @@ function cm_reg_head($title) {
 	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('cmui.js', false)) . '"></script>';
 }
 
-function cm_reg_body($title) {
+function cm_reg_body($title, $show_cart = true) {
 	echo '</head>';
 	echo '<body class="cm-reg">';
 	echo '<header>';
 		echo '<div class="pagename">' . htmlspecialchars($title) . '</div>';
-		echo '<div class="header-items">';
-			echo '<div class="header-item">';
-				$url = get_site_url(false) . '/register/cart.php';
-				$count = cm_reg_cart_count();
-				$count .= ($count == 1) ? ' item' : ' items';
-				echo '<a href="' . htmlspecialchars($url) . '">Shopping Cart: ' . $count . '</a>';
+		if ($show_cart) {
+			echo '<div class="header-items">';
+				echo '<div class="header-item">';
+					$url = get_site_url(false) . '/register/cart.php';
+					$count = cm_reg_cart_count();
+					$count .= ($count == 1) ? ' item' : ' items';
+					echo '<a href="' . htmlspecialchars($url) . '">Shopping Cart: ' . $count . '</a>';
+				echo '</div>';
 			echo '</div>';
-		echo '</div>';
+		}
 	echo '</header>';
 }
 
 function cm_reg_tail() {
 	echo '</body>';
 	echo '</html>';
+}
+
+function cm_reg_closed() {
+	global $event_name;
+	global $contact_address;
+	cm_reg_head('Registration Closed');
+	cm_reg_body('Registration Closed', false);
+	echo '<article>';
+	echo '<div class="card">';
+	echo '<div class="card-content">';
+	echo '<p>';
+	echo 'Registration for <b>';
+	echo htmlspecialchars($event_name);
+	echo '</b> is currently closed.';
+	if ($contact_address) {
+		echo ' Please <b><a href="mailto:';
+		echo htmlspecialchars($contact_address);
+		echo '">contact us</a></b> if you have any questions.';
+	}
+	echo '</p>';
+	echo '</div>';
+	echo '</div>';
+	echo '</article>';
+	cm_reg_tail();
+	exit(0);
 }

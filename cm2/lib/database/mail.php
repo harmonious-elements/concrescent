@@ -49,6 +49,21 @@ class cm_mail_db {
 		}
 	}
 
+	public function get_contact_address($name) {
+		if (!$name) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `contact_address`'.
+			' FROM '.$this->cm_db->table_name('mail_templates').
+			' WHERE `name` = ? LIMIT 1'
+		);
+		$stmt->bind_param('s', $name);
+		$stmt->execute();
+		$stmt->bind_result($contact_address);
+		$result = $stmt->fetch() ? $contact_address : false;
+		$stmt->close();
+		return $result;
+	}
+
 	public function get_mail_template($name) {
 		if (!$name) return false;
 		$stmt = $this->cm_db->connection->prepare(
