@@ -46,7 +46,7 @@ function paragraph_string($s) {
 	return $s;
 }
 
-function safe_html_string($s) {
+function safe_html_string($s, $paragraph = false) {
 	$s1 = '/&lt;a href=&quot;(([^"\'&<>]+|&amp;)*)&quot;&gt;(.*?)&lt;\\/a&gt;/';
 	$r1 = '<a href="$1" target="_blank">$3</a>';
 	$s2 = '/&lt;img src=&quot;(([^"\'&<>]+|&amp;)*)&quot;&gt;/';
@@ -60,6 +60,10 @@ function safe_html_string($s) {
 	while (preg_match($s2, $s)) $s = preg_replace($s2, $r2, $s);
 	while (preg_match($s3, $s)) $s = preg_replace($s3, $r3, $s);
 	while (preg_match($s4, $s)) $s = preg_replace($s4, $r4, $s);
+	if ($paragraph) {
+		$s = preg_replace('/(<br>){2,}/', '</p><p>', $s);
+		$s = '<p>' . $s . '</p>';
+	}
 	return $s;
 }
 
@@ -90,7 +94,7 @@ function email_link_short($e) {
 }
 
 function price_string($price) {
-	return ($price ? ('$' . number_format($price, 2, '.', ',')) : 'FREE');
+	return ((float)$price ? ('$' . number_format($price, 2, '.', ',')) : 'FREE');
 }
 
 function parse_date($x) {

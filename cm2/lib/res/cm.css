@@ -612,3 +612,39 @@ select {
 .cm-form-table.cm-user-editor tbody td hr {
 	margin: 2px 0;
 }
+
+/* Registration Page */
+
+.cm-reg-edit .card-content {
+	position: relative;
+}
+.cm-reg-edit .cm-reg-badge-types {
+	position: absolute;
+	top: 16px;
+	left: 50%;
+	right: 16px;
+	bottom: 16px;
+	overflow: auto;
+	border: solid 1px gray;
+}
+.cm-reg-edit .cm-reg-badge-types h1,
+.cm-reg-edit .cm-reg-badge-types h2,
+.cm-reg-edit .cm-reg-badge-types h3,
+.cm-reg-edit .cm-reg-badge-types p,
+.cm-reg-edit .cm-reg-badge-types ul {
+	margin: 8px;
+}
+.cm-reg-edit .cm-reg-badge-types p,
+.cm-reg-edit .cm-reg-badge-types ul {
+	line-height: 16px;
+}
+.cm-reg-edit .cm-reg-badge-types ul {
+	margin-left: 2em;
+}
+.cm-reg-edit .cm-reg-badge-types label {
+	display: inline-block;
+	width: 120px;
+}
+.cm-reg-edit .cm-reg-badge-types .limited {
+	color: red;
+}
