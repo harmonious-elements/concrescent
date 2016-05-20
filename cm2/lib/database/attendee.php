@@ -7,6 +7,20 @@ require_once dirname(__FILE__).'/forms.php';
 
 class cm_attendee_db {
 
+	public $names_on_badge = array(
+		'Fandom Name Large, Real Name Small',
+		'Real Name Large, Fandom Name Small',
+		'Fandom Name Only',
+		'Real Name Only'
+	);
+	public $payment_statuses = array(
+		'Incomplete',
+		'Cancelled',
+		'Rejected',
+		'Completed',
+		'Refunded'
+	);
+
 	public $event_info;
 	public $cm_db;
 

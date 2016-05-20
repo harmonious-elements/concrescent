@@ -22,12 +22,7 @@ if (isset($_POST['submit'])) {
 
 	$item['fandom-name'] = trim($_POST['fandom-name']);
 	$item['name-on-badge'] = $item['fandom-name'] ? trim($_POST['name-on-badge']) : 'Real Name Only';
-	$valid_names_on_badge = array(
-		'Fandom Name Large, Real Name Small',
-		'Real Name Large, Fandom Name Small',
-		'Fandom Name Only', 'Real Name Only'
-	);
-	if (!in_array($item['name-on-badge'], $valid_names_on_badge)) {
+	if (!in_array($item['name-on-badge'], $atdb->names_on_badge)) {
 		$errors['name-on-badge'] = 'Name on badge is required.';
 	}
 
@@ -39,8 +34,8 @@ if (isset($_POST['submit'])) {
 		if ($badge_type['id'] == $item['badge-type-id']) {
 			$found_badge_type = $badge_type;
 			if ($item['date-of-birth'] && (
-				($badge['min-birthdate'] && $item['date-of-birth'] < $badge['min-birthdate']) ||
-				($badge['max-birthdate'] && $item['date-of-birth'] > $badge['max-birthdate'])
+				($badge_type['min-birthdate'] && $item['date-of-birth'] < $badge_type['min-birthdate']) ||
+				($badge_type['max-birthdate'] && $item['date-of-birth'] > $badge_type['max-birthdate'])
 			)) $errors['badge-type-id'] = 'The badge you selected is not applicable.';
 		}
 	}
@@ -197,14 +192,128 @@ echo '<article>';
 					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
 				echo '</tr>';
 
-				/* TODO */
+				echo '<tr id="name-on-badge-row">';
+					$value = isset($item['name-on-badge']) ? htmlspecialchars($item['name-on-badge']) : '';
+					$error = isset($errors['name-on-badge']) ? htmlspecialchars($errors['name-on-badge']) : '';
+					echo '<th><label for="name-on-badge">Name on Badge</label></th>';
+					echo '<td>';
+						echo '<select id="name-on-badge" name="name-on-badge">';
+							foreach ($atdb->names_on_badge as $nob) {
+								$hnob = htmlspecialchars($nob);
+								echo '<option value="' . $hnob;
+								echo ($value == $hnob) ? '" selected>' : '">';
+								echo $hnob . '</option>';
+							}
+						echo '</select>';
+						if ($error) echo '<span class="error">' . $error . '</span>';
+					echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['date-of-birth']) ? htmlspecialchars($item['date-of-birth']) : '';
+					$error = isset($errors['date-of-birth']) ? htmlspecialchars($errors['date-of-birth']) : '';
+					echo '<th><label for="date-of-birth">Date of Birth</label></th>';
+					echo '<td><input type="date" id="date-of-birth" name="date-of-birth" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>';
+					else if (!ua('Chrome')) echo ' (YYYY-MM-DD)'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['badge-type-id']) ? htmlspecialchars($item['badge-type-id']) : '';
+					$error = isset($errors['badge-type-id']) ? htmlspecialchars($errors['badge-type-id']) : '';
+					echo '<th><label for="badge-type-id">Badge Type</label></th>';
+					echo '<td>';
+						echo '<select id="badge-type-id" name="badge-type-id">';
+							foreach ($sellable_badge_types as $bt) {
+								$btid = htmlspecialchars($bt['id']);
+								$btname = htmlspecialchars($bt['name']);
+								$btprice = htmlspecialchars(price_string($bt['price']));
+								echo '<option value="' . $btid;
+								echo ($value == $btid) ? '" selected>' : '">';
+								echo $btname . ' &mdash; ' . $btprice . '</option>';
+							}
+						echo '</select>';
+						if ($error) echo '<span class="error">' . $error . '</span>';
+					echo '</td>';
+				echo '</tr>';
 
 				echo '<tr><td colspan="2"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';
 				$text = $fdb->get_custom_text('contact');
 				if ($text) echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
 
-				/* TODO */
+				echo '<tr>';
+					$value = isset($item['email-address']) ? htmlspecialchars($item['email-address']) : '';
+					$error = isset($errors['email-address']) ? htmlspecialchars($errors['email-address']) : '';
+					echo '<th><label for="email-address">Email Address</label></th>';
+					echo '<td><input type="email" id="email-address" name="email-address" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+				
+				echo '<tr>';
+					$value = isset($item['subscribed']) ? $item['subscribed'] : true;
+					echo '<th></th><td><label>';
+						echo '<input type="checkbox" name="subscribed" value="1"' . ($value ? ' checked>' : '>');
+						echo 'You may contact me with promotional emails.';
+					echo '</label><br>';
+						echo '(You may <b><a href="unsubscribe.php" target="_blank">unsubscribe</a></b> at any time.)';
+					echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['phone-number']) ? htmlspecialchars($item['phone-number']) : '';
+					$error = isset($errors['phone-number']) ? htmlspecialchars($errors['phone-number']) : '';
+					echo '<th><label for="phone-number">Phone Number</label></th>';
+					echo '<td><input type="text" id="phone-number" name="phone-number" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['address-1']) ? htmlspecialchars($item['address-1']) : '';
+					$error = isset($errors['address-1']) ? htmlspecialchars($errors['address-1']) : '';
+					echo '<th><label for="address-1">Street Address</label></th>';
+					echo '<td><input type="text" id="address-1" name="address-1" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['address-2']) ? htmlspecialchars($item['address-2']) : '';
+					$error = isset($errors['address-2']) ? htmlspecialchars($errors['address-2']) : '';
+					echo '<th></th><td><input type="text" id="address-2" name="address-2" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['city']) ? htmlspecialchars($item['city']) : '';
+					$error = isset($errors['city']) ? htmlspecialchars($errors['city']) : '';
+					echo '<th><label for="city">City</label></th>';
+					echo '<td><input type="text" id="city" name="city" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['state']) ? htmlspecialchars($item['state']) : '';
+					$error = isset($errors['state']) ? htmlspecialchars($errors['state']) : '';
+					echo '<th><label for="state">State or Province</label></th>';
+					echo '<td><input type="text" id="state" name="state" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['zip-code']) ? htmlspecialchars($item['zip-code']) : '';
+					$error = isset($errors['zip-code']) ? htmlspecialchars($errors['zip-code']) : '';
+					echo '<th><label for="zip-code">ZIP or Postal Code</label></th>';
+					echo '<td><input type="text" id="zip-code" name="zip-code" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['country']) ? htmlspecialchars($item['country']) : '';
+					$error = isset($errors['country']) ? htmlspecialchars($errors['country']) : '';
+					echo '<th><label for="country">Country</label></th>';
+					echo '<td><input type="text" id="country" name="country" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
 
 				$first = true;
 				foreach ($questions as $question) {
@@ -229,7 +338,37 @@ echo '<article>';
 				$text = $fdb->get_custom_text('ice');
 				if ($text) echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
 
-				/* TODO */
+				echo '<tr>';
+					$value = isset($item['ice-name']) ? htmlspecialchars($item['ice-name']) : '';
+					$error = isset($errors['ice-name']) ? htmlspecialchars($errors['ice-name']) : '';
+					echo '<th><label for="ice-name">Emergency Contact Name</label></th>';
+					echo '<td><input type="text" id="ice-name" name="ice-name" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['ice-relationship']) ? htmlspecialchars($item['ice-relationship']) : '';
+					$error = isset($errors['ice-relationship']) ? htmlspecialchars($errors['ice-relationship']) : '';
+					echo '<th><label for="ice-relationship">Emergency Contact Relationship</label></th>';
+					echo '<td><input type="text" id="ice-relationship" name="ice-relationship" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['ice-email-address']) ? htmlspecialchars($item['ice-email-address']) : '';
+					$error = isset($errors['ice-email-address']) ? htmlspecialchars($errors['ice-email-address']) : '';
+					echo '<th><label for="ice-email-address">Emergency Contact Email Address</label></th>';
+					echo '<td><input type="email" id="ice-email-address" name="ice-email-address" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
+
+				echo '<tr>';
+					$value = isset($item['ice-phone-number']) ? htmlspecialchars($item['ice-phone-number']) : '';
+					$error = isset($errors['ice-phone-number']) ? htmlspecialchars($errors['ice-phone-number']) : '';
+					echo '<th><label for="ice-phone-number">Emergency Contact Phone Number</label></th>';
+					echo '<td><input type="text" id="ice-phone-number" name="ice-phone-number" value="' . $value . '">';
+					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
+				echo '</tr>';
 
 			echo '</table>';
 		echo '</div>';

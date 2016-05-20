@@ -657,8 +657,11 @@ select {
 	color: red;
 }
 .cm-reg-edit-no-errors table {
-	max-width: 48%;
-	max-width: calc(50% - 24px);
+	width: 48%;
+	width: calc(50% - 24px);
+}
+.cm-reg-edit table th {
+	width: 220px;
 }
 .cm-reg-edit table hr {
 	margin: 12px -40px 12px -20px;
