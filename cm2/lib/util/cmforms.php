@@ -78,6 +78,46 @@ function cm_form_input($id, $type, $values, $answer, $required = false, $disable
 	}
 }
 
+function cm_form_row($question, $answer) {
+	$classes = array('cm-question-row');
+	foreach ($question['visible'] as $subcontext) {
+		$classes[] = 'cm-question-row-' . (($subcontext == '*') ? 'all' : $subcontext);
+	}
+	$out = '<tr class="' . implode(' ', $classes) . '">';
+	switch ($question['type']) {
+		case 'h1':
+		case 'h2':
+		case 'h3':
+		case 'p':
+			$out .= '<td colspan="2">';
+			$out .= '<' . $question['type'] . '>';
+			$out .= safe_html_string($question['text']);
+			$out .= '</' . $question['type'] . '>';
+			$out .= '</td>';
+			break;
+		case 'hr':
+			$out .= '<td colspan="2"><hr></td>';
+			break;
+		default:
+			$out .= '<th>';
+			$out .= cm_form_label(
+				(isset($question['question-id']) ? $question['question-id'] : ''),
+				(isset($question['text']) ? $question['text'] : '')
+			);
+			$out .= '</th>';
+			$out .= '<td>';
+			$out .= cm_form_input(
+				(isset($question['question-id']) ? $question['question-id'] : ''),
+				(isset($question['type']) ? $question['type'] : ''),
+				(isset($question['values']) ? $question['values'] : ''),
+				$answer, false, false
+			);
+			$out .= '</td>';
+			
+	}
+	return $out . '</tr>';
+}
+
 function cm_form_posted_answer($id, $type) {
 	$htmlid = 'cm-question-' . $id;
 	switch ($type) {

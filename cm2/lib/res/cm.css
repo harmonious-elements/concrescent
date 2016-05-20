@@ -264,6 +264,13 @@ select {
 	line-height: 16px;
 }
 
+/* Form Validation */
+
+.error {
+	font-weight: bold;
+	color: red;
+}
+
 /* List Pages */
 
 .cm-search-box {
@@ -617,6 +624,7 @@ select {
 
 .cm-reg-edit .card-content {
 	position: relative;
+	overflow: hidden;
 }
 .cm-reg-edit .cm-reg-badge-types {
 	position: absolute;
@@ -625,7 +633,6 @@ select {
 	right: 16px;
 	bottom: 16px;
 	overflow: auto;
-	border: solid 1px gray;
 }
 .cm-reg-edit .cm-reg-badge-types h1,
 .cm-reg-edit .cm-reg-badge-types h2,
@@ -646,5 +653,16 @@ select {
 	width: 120px;
 }
 .cm-reg-edit .cm-reg-badge-types .limited {
+	font-weight: bold;
 	color: red;
+}
+.cm-reg-edit-no-errors table {
+	max-width: 48%;
+	max-width: calc(50% - 24px);
+}
+.cm-reg-edit table hr {
+	margin: 12px -40px 12px -20px;
+}
+.cm-reg-edit table .error {
+	padding-left: 1em;
 }
