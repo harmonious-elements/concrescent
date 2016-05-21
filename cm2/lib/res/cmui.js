@@ -79,8 +79,8 @@ cmui = (function($,window,document){
 	};
 	var safeHtmlString = function(s) {
 		s = paragraphString(s);
-		s = s.replace(/&lt;a href=&quot;(([^"'&<>]+|&amp;)*)&quot;&gt;(.*?)&lt;\/a&gt;/g, '<a href="$1" target="_blank">$3</a>');
-		s = s.replace(/&lt;img src=&quot;(([^"'&<>]+|&amp;)*)&quot;&gt;/g, '<img src="$1">');
+		s = s.replace(/&lt;a href=&quot;(([^"'&<>]|&amp;)*?)&quot;( target=&quot;(([^"'&<>]|&amp;)*?)&quot;)?&gt;(.*?)&lt;\/a&gt;/g, '<a href="$1" target="_blank">$6</a>');
+		s = s.replace(/&lt;img src=&quot;(([^"'&<>]|&amp;)*?)&quot;&gt;/g, '<img src="$1">');
 		s = s.replace(/&lt;(b|i|u|s|q|tt|em|strong|sup|sub|big|small|ins|del|abbr|cite|code|dfn|kbd|samp|var)&gt;(.*?)&lt;\/\1&gt;/g, '<$1>$2</$1>');
 		s = s.replace(/&lt;(br|wbr)&gt;/g, '<$1>');
 		return s;

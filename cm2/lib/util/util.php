@@ -47,9 +47,9 @@ function paragraph_string($s) {
 }
 
 function safe_html_string($s, $paragraph = false) {
-	$s1 = '/&lt;a href=&quot;(([^"\'&<>]+|&amp;)*)&quot;&gt;(.*?)&lt;\\/a&gt;/';
-	$r1 = '<a href="$1" target="_blank">$3</a>';
-	$s2 = '/&lt;img src=&quot;(([^"\'&<>]+|&amp;)*)&quot;&gt;/';
+	$s1 = '/&lt;a href=&quot;(([^"\'&<>]|&amp;)*?)&quot;( target=&quot;(([^"\'&<>]|&amp;)*?)&quot;)?&gt;(.*?)&lt;\\/a&gt;/';
+	$r1 = '<a href="$1" target="_blank">$6</a>';
+	$s2 = '/&lt;img src=&quot;(([^"\'&<>]|&amp;)*?)&quot;&gt;/';
 	$r2 = '<img src="$1">';
 	$s3 = '/&lt;(b|i|u|s|q|tt|em|strong|sup|sub|big|small|ins|del|abbr|cite|code|dfn|kbd|samp|var)&gt;(.*?)&lt;\\/\\1&gt;/';
 	$r3 = '<$1>$2</$1>';

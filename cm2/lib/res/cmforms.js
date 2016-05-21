@@ -269,7 +269,9 @@
 			var editContent = function() {
 				self.addClass('editing');
 				self.find('.edit-row').removeClass('hidden');
-				self.find('.edit-row textarea').focus();
+				var textarea = self.find('.edit-row textarea');
+				if (!textarea.val()) textarea.val(defaultHtml);
+				textarea.focus();
 			};
 			var previewContent = function() {
 				var text = self.find('.edit-row textarea').val();
@@ -283,7 +285,9 @@
 				self.find('.edit-row textarea').val(currentText);
 			};
 			var saveContent = function() {
-				var text = self.find('.edit-row textarea').val();
+				var textarea = self.find('.edit-row textarea');
+				var text = textarea.val();
+				if (text == defaultHtml) textarea.val((text = ''));
 				var html = cmui.safeHtmlString(text);
 				self.find('.view-row .view-area').html(html || defaultHtml);
 				doAjax('Saving...', {
