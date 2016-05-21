@@ -656,6 +656,13 @@ select {
 	font-weight: bold;
 	color: red;
 }
+.cm-reg-edit .cm-reg-badge-type-unavailable,
+.cm-reg-edit .cm-reg-badge-type-selected {
+	padding-top: 1px;
+	padding-bottom: 1px;
+	margin-top: -1px;
+	margin-bottom: -1px;
+}
 .cm-reg-edit-no-errors table {
 	width: 48%;
 	width: calc(50% - 24px);
@@ -665,6 +672,10 @@ select {
 }
 .cm-reg-edit table hr {
 	margin: 12px -40px 12px -20px;
+}
+.cm-reg-edit table ul {
+	line-height: 16px;
+	margin-left: 2em;
 }
 .cm-reg-edit table .error {
 	padding-left: 1em;

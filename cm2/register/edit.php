@@ -90,6 +90,8 @@ if (isset($_POST['submit'])) {
 }
 
 cm_reg_head($new ? 'Add Badge' : 'Edit Badge');
+echo '<script type="text/javascript">cm_badge_type_info = ('.json_encode($sellable_badge_types).');</script>';
+echo '<script type="text/javascript" src="edit.js"></script>';
 cm_reg_body(($new ? 'Add Badge' : 'Edit Badge'), true);
 
 echo '<article>';
@@ -115,7 +117,11 @@ echo '<article>';
 					echo '<hr>';
 					foreach ($active_badge_types as $badge) {
 						$sellable = (is_null($badge['quantity-remaining']) || $badge['quantity-remaining'] > 0);
-						echo $sellable ? ('<div class="cm-reg-badge-type" id="cm-reg-badge-type-' . (int)$badge['id'] . '">') : '<div>';
+						echo (
+							$sellable
+							? ('<div class="cm-reg-badge-type" id="cm-reg-badge-type-' . (int)$badge['id'] . '">')
+							: '<div class="cm-reg-badge-type-unavailable">'
+						);
 						echo '<h2>' . htmlspecialchars($badge['name']) . '</h2>';
 						if ($badge['start-date'] || $badge['end-date']) {
 							echo '<p><label><b>Dates Available:</b></label> ';
@@ -236,6 +242,29 @@ echo '<article>';
 						if ($error) echo '<span class="error">' . $error . '</span>';
 					echo '</td>';
 				echo '</tr>';
+
+				foreach ($sellable_badge_types as $bt) {
+					echo '<tr class="cm-reg-inline-badge-type hidden"';
+					echo ' id="cm-reg-inline-badge-type-' . (int)$bt['id'] . '">';
+						echo '<th></th>';
+						echo '<td>';
+							if ($bt['description']) {
+								echo '<p>' . safe_html_string($bt['description']) . '</p>';
+							}
+							if ($bt['description'] && $bt['rewards']) {
+								echo '<p><br></p>';
+							}
+							if ($bt['rewards']) {
+								echo '<p><b>Rewards:</b></p>';
+								echo '<ul>';
+								foreach ($bt['rewards'] as $reward) {
+									echo '<li>' . safe_html_string($reward) . '</li>';
+								}
+								echo '</ul>';
+							}
+						echo '</td>';
+					echo '</tr>';
+				}
 
 				echo '<tr><td colspan="2"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';

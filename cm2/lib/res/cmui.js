@@ -85,6 +85,32 @@ cmui = (function($,window,document){
 		s = s.replace(/&lt;(br|wbr)&gt;/g, '<$1>');
 		return s;
 	};
+	var priceString = function(price) {
+		price = Number(price);
+		if (!price) return 'FREE';
+		price = String(price).split('.');
+		price[1] = ((price[1] || '') + '00').substring(0, 2);
+		for (var i = price[0].length - 3; i > 0; i -= 3) {
+			price[0] = price[0].substring(0, i) + ',' + price[0].substring(i);
+		}
+		return '$' + price[0] + '.' + price[1];
+	};
+	var formatDate = function(date) {
+		if (!date) return null;
+		var year = date.getFullYear();
+		if (!isFinite(year)) return null;
+		var month = ('00' + (date.getMonth() + 1)).substr(-2);
+		var day = ('00' + date.getDate()).substr(-2);
+		return year + '-' + month + '-' + day;
+	};
+	var parseDate = function(s) {
+		if (isFinite(Date.parse(s))) return new Date(s);
+		s = s.replace(/ /g, '');
+		if (isFinite(Date.parse(s))) return new Date(s);
+		s = s.replace(/-/g, '/');
+		if (isFinite(Date.parse(s))) return new Date(s);
+		return null;
+	};
 
 	return {
 		showButterbar: showButterbar,
@@ -94,6 +120,9 @@ cmui = (function($,window,document){
 		hideDialog: hideDialog,
 		htmlSpecialChars: htmlSpecialChars,
 		paragraphString: paragraphString,
-		safeHtmlString: safeHtmlString
+		safeHtmlString: safeHtmlString,
+		priceString: priceString,
+		formatDate: formatDate,
+		parseDate: parseDate
 	};
 })(jQuery,window,document);

@@ -206,3 +206,9 @@ article {
 	background: white;
 	border: solid 1px #ccc;
 }
+.cm-reg-edit .cm-reg-badge-type-unavailable {
+	background: rgba(0, 0, 0, 0.05);
+}
+.cm-reg-edit .cm-reg-badge-type-selected {
+	background: rgba(0, 0, 255, 0.1);
+}
