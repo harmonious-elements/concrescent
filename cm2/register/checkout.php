@@ -129,9 +129,24 @@ if (!$_GET) {
 			$txn
 		);
 		$url = $paypal->get_payment_approval_url($payment);
+		if (!$url) {
+			cm_reg_message(
+				'Communication Failure',
+				'communication-failure',
+				'Failed to communicate with PayPal.<br><br>'.
+				'If you are the site administrator, check the '.
+				'config file and/or your version of OpenSSL.<br><br>'.
+				'If you are not the site administrator, please '.
+				'<b><a href="mailto:[[contact-address]]">contact us</a></b> '.
+				'and report this error.'
+			);
+			exit(0);
+		}
 
+		$_SESSION['group_uuid'] = $group_uuid;
 		$_SESSION['attendee_ids'] = $attendee_ids;
 		$_SESSION['paypal_token'] = $token;
+		$_SESSION['payment_id'] = $payment['id'];
 		cm_reg_cart_set_state('approval');
 		header('Location: ' . $url);
 		exit(0);
@@ -141,3 +156,81 @@ if (!$_GET) {
 	exit(0);
 }
 
+if (isset($_GET['return'])) {
+	if (!cm_reg_cart_check_state('approval')) {
+		header('Location: index.php');
+		exit(0);
+	}
+
+	$group_uuid = $_SESSION['group_uuid'];
+	$attendee_ids = $_SESSION['attendee_ids'];
+	$token = $_SESSION['paypal_token'];
+	$paypal = new cm_paypal($token);
+
+	$payment_id = $_SESSION['payment_id'];
+	$payer_id = isset($_GET['PayerID']) ? $_GET['PayerID'] : null;
+	$sale = $paypal->execute_payment($payment_id, $payer_id);
+	$transaction_id = $paypal->get_transaction_id($sale);
+	$details = json_encode($sale);
+
+	if ($transaction_id) {
+		foreach ($attendee_ids as $id) {
+			$atdb->update_payment_status($id, 'Completed', 'PayPal', $transaction_id, $details);
+			$attendee = $atdb->get_attendee($id, false, $name_map, $fdb);
+			$template = $mdb->get_mail_template('attendee-paid');
+			$mdb->send_mail($attendee['email-address'], $template, $attendee);
+		}
+		cm_reg_cart_destroy();
+
+		cm_reg_message(
+			'Payment Complete',
+			'payment-complete',
+			'Your payment has been accepted.<br><br>'.
+			'You can <b><a href="[[review-link]]">review your order</a></b> at any time.',
+			$attendee
+		);
+		exit(0);
+	} else {
+		foreach ($attendee_ids as $id) {
+			$atdb->update_payment_status($id, 'Rejected', 'PayPal', $group_uuid, $details);
+			$attendee = $atdb->get_attendee($id, false, $name_map, $fdb);
+		}
+		cm_reg_cart_destroy();
+
+		cm_reg_message(
+			'Payment Refused',
+			'payment-refused',
+			'PayPal has refused this transaction.<br><br>'.
+			'PayPal says: [[payment-txn-msg]]<br><br>'.
+			'Unfortunately, that is all we know. Please try again later.',
+			array_merge($attendee, array('payment-txn-msg' => $sale['message']))
+		);
+		exit(0);
+	}
+}
+
+if (isset($_GET['cancel'])) {
+	if (!cm_reg_cart_check_state('approval')) {
+		header('Location: index.php');
+		exit(0);
+	}
+
+	$group_uuid = $_SESSION['group_uuid'];
+	$attendee_ids = $_SESSION['attendee_ids'];
+
+	foreach ($attendee_ids as $id) {
+		$atdb->update_payment_status($id, 'Cancelled', 'PayPal', $group_uuid, 'Cancelled');
+		$attendee = $atdb->get_attendee($id, false, $name_map, $fdb);
+	}
+	cm_reg_cart_destroy();
+
+	cm_reg_message(
+		'Payment Cancelled',
+		'payment-cancelled',
+		'You have cancelled your payment.',
+		$attendee
+	);
+	exit(0);
+}
+
+header('Location: index.php');

@@ -125,11 +125,16 @@ class cm_paypal {
 	}
 
 	public function get_payment_link($payment, $rel) {
-		foreach ($payment['links'] as $link) {
-			if ($link['rel'] == $rel) {
-				return $link['href'];
+		if ($payment && isset($payment['links'])) {
+			foreach ($payment['links'] as $link) {
+				if ($link && isset($link['rel'])) {
+					if ($link['rel'] == $rel) {
+						return $link['href'];
+					}
+				}
 			}
 		}
+		return null;
 	}
 
 	public function get_payment_approval_url($payment) {
@@ -144,6 +149,13 @@ class cm_paypal {
 	}
 
 	public function get_transaction_id($sale) {
+		if (!$sale) return null;
+		if (!isset($sale['transactions'])) return null;
+		if (!isset($sale['transactions'][0])) return null;
+		if (!isset($sale['transactions'][0]['related_resources'])) return null;
+		if (!isset($sale['transactions'][0]['related_resources'][0])) return null;
+		if (!isset($sale['transactions'][0]['related_resources'][0]['sale'])) return null;
+		if (!isset($sale['transactions'][0]['related_resources'][0]['sale']['id'])) return null;
 		return $sale['transactions'][0]['related_resources'][0]['sale']['id'];
 	}
 
