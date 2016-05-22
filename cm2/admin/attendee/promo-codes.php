@@ -125,7 +125,7 @@ if (isset($_POST['cm-list-action'])) {
 			$ok = ($id !== false);
 			$response = array('ok' => $ok);
 			if ($ok) {
-				$promo_code = $atdb->get_promo_code($id, false, $name_map);
+				$promo_code = $atdb->get_promo_code($id, false, false, $name_map);
 				if ($promo_code) {
 					$response['row'] = cm_list_make_row($list_def, $promo_code);
 				}
@@ -138,7 +138,7 @@ if (isset($_POST['cm-list-action'])) {
 			$ok = $atdb->update_promo_code($promo_code);
 			$response = array('ok' => $ok);
 			if ($ok) {
-				$promo_code = $atdb->get_promo_code($promo_code['id'], false, $name_map);
+				$promo_code = $atdb->get_promo_code($promo_code['id'], false, false, $name_map);
 				if ($promo_code) {
 					$response['row'] = cm_list_make_row($list_def, $promo_code);
 				}
@@ -157,7 +157,7 @@ if (isset($_POST['cm-list-action'])) {
 			$ok = $atdb->activate_promo_code($id, $_POST['cm-list-action'] == 'activate');
 			$response = array('ok' => $ok);
 			if ($ok) {
-				$promo_code = $atdb->get_promo_code($id, false, $name_map);
+				$promo_code = $atdb->get_promo_code($id, false, false, $name_map);
 				if ($promo_code) {
 					$response['row'] = cm_list_make_row($list_def, $promo_code);
 				}

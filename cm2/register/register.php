@@ -16,7 +16,7 @@ $event_name = $cm_config['event']['name'];
 $db = new cm_db();
 
 $atdb = new cm_attendee_db($db);
-$name_list = $atdb->list_badge_type_names();
+$name_map = $atdb->get_badge_type_name_map();
 
 $fdb = new cm_forms_db($db, 'attendee');
 $questions = $fdb->list_questions();
@@ -57,6 +57,22 @@ function cm_reg_cart_reset_promo_code() {
 		$_SESSION['cart'][$index]['payment-promo-code'] = null;
 		$_SESSION['cart'][$index]['payment-promo-price'] = $item['payment-badge-price'];
 	}
+}
+
+function cm_reg_cart_set_state($state) {
+	if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
+	$_SESSION['cart_hash'] = md5(serialize($_SESSION['cart']));
+	$_SESSION['cart_state'] = $state;
+}
+
+function cm_reg_cart_check_state($expected_state) {
+	if (!isset($_SESSION['cart'])) return false;
+	if (!isset($_SESSION['cart_hash'])) return false;
+	if (!isset($_SESSION['cart_state'])) return false;
+	$expected_hash = md5(serialize($_SESSION['cart']));
+	if ($_SESSION['cart_hash'] != $expected_hash) return false;
+	if ($_SESSION['cart_state'] != $expected_state) return false;
+	return true;
 }
 
 function cm_reg_cart_destroy() {

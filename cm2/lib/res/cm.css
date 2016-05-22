@@ -109,11 +109,12 @@ nav + article {
 	/* break margin collapse */
 	overflow: auto;
 }
-.card .card-content > p,
-.card .card-content > table,
 .card .card-content > h1,
 .card .card-content > h2,
 .card .card-content > h3,
+.card .card-content > p,
+.card .card-content > table,
+.card .card-content > div.spacing,
 .card .card-content > .cm-error-box,
 .card .card-content > .cm-warning-box,
 .card .card-content > .cm-success-box,
@@ -317,19 +318,31 @@ select {
 	white-space: nowrap;
 	text-align: right;
 }
+.cm-list-table table .td-actions form {
+	display: inline;
+}
 .cm-list-table table .td-actions button:last-child,
-.cm-list-table table .td-actions a.button:last-child {
+.cm-list-table table .td-actions a.button:last-child,
+.cm-list-table table .td-actions input[type=submit]:last-child,
+.cm-list-table table .td-actions input[type=reset]:last-child {
 	margin-right: 0;
 }
 .cm-list-table table thead th {
 	padding-top: 6px;
 	padding-bottom: 6px;
 }
-.cm-list-table table tfoot th {
+.cm-list-table table tfoot th:last-child {
+	width: 1px;
+	white-space: nowrap;
 	text-align: right;
 }
-.cm-list-table table tfoot th button:last-child,
-.cm-list-table table tfoot th a.button:last-child {
+.cm-list-table table tfoot th:last-child form {
+	display: inline;
+}
+.cm-list-table table tfoot th:last-child button:last-child,
+.cm-list-table table tfoot th:last-child a.button:last-child,
+.cm-list-table table tfoot th:last-child input[type=submit]:last-child,
+.cm-list-table table tfoot th:last-child input[type=reset]:last-child {
 	margin-right: 0;
 }
 .cm-list-table table .th-sortable {
@@ -541,11 +554,12 @@ select {
 	/* break margin collapse */
 	overflow: hidden;
 }
-.dialog .dialog-content > p,
-.dialog .dialog-content > table,
 .dialog .dialog-content > h1,
 .dialog .dialog-content > h2,
-.dialog .dialog-content > h3 {
+.dialog .dialog-content > h3,
+.dialog .dialog-content > p,
+.dialog .dialog-content > table,
+.dialog .dialog-content > div.spacing {
 	margin: 16px;
 	line-height: 16px;
 }

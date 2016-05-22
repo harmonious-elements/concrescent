@@ -437,20 +437,66 @@ class cm_attendee_db {
 		));
 	}
 
-	public function get_promo_code($id, $is_code = false, $name_map = null) {
+	public function apply_promo_code_to_item($promo_code, &$item, $count) {
+		if (
+			$promo_code &&
+			(is_null($promo_code['limit-per-customer']) ||
+			 $count < $promo_code['limit-per-customer']) &&
+			$this->promo_code_applies($promo_code, $item['badge-type-id'])
+		) {
+			$badge_price = (float)$item['payment-badge-price'];
+			$promo_price = (float)$promo_code['price'];
+			$final_price = (
+				$promo_code['percentage']
+				? ($badge_price * (100.0 - $promo_price) / 100.0)
+				: ($badge_price - $promo_price)
+			);
+			if ($final_price < 0) $final_price = 0;
+			if ($final_price > $badge_price) $final_price = $badge_price;
+			$item['payment-promo-code'] = $promo_code['code'];
+			$item['payment-promo-price'] = $final_price;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function apply_promo_code_to_items($promo_code, &$items) {
+		$count = 0;
+		for ($i = 0, $n = count($items); $i < $n; $i++) {
+			if ($this->apply_promo_code_to_item($promo_code, $items[$i], $count)) {
+				$count++;
+			}
+		}
+		return $count;
+	}
+
+	public function get_promo_code($id, $is_code = false, $active_only = false, $name_map = null) {
 		if (!$id) return false;
 		if ($is_code) $id = $this->promo_code_normalize($id);
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
-		$stmt = $this->cm_db->connection->prepare(
+		$query = (
 			'SELECT p.`id`, p.`code`, p.`description`, p.`price`,'.
 			' p.`percentage`, p.`active`, p.`badge_type_ids`,'.
 			' p.`limit_per_customer`, p.`start_date`, p.`end_date`,'.
 			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('attendees').' a'.
 			' WHERE a.`payment_promo_code` = p.`code`'.
 			' AND a.`payment_status` = \'Completed\') c'.
-			' FROM '.$this->cm_db->table_name('attendee_promo_codes').' p'.
-			' WHERE p.`'.($is_code ? 'code' : 'id').'` = ? LIMIT 1'
+			' FROM '.$this->cm_db->table_name('attendee_promo_codes').' p'
 		);
+		if ($active_only) {
+			$query .= (
+				' WHERE p.`active`'.
+				' AND (p.`start_date` IS NULL OR p.`start_date` <= CURDATE())'.
+				' AND (p.`end_date` IS NULL OR p.`end_date` >= CURDATE())'.
+				' AND p.`'.($is_code ? 'code' : 'id').'` = ? LIMIT 1'
+			);
+		} else {
+			$query .= (
+				' WHERE p.`'.($is_code ? 'code' : 'id').'` = ? LIMIT 1'
+			);
+		}
+		$stmt = $this->cm_db->connection->prepare($query);
 		$stmt->bind_param(($is_code ? 's' : 'i'), $id);
 		$stmt->execute();
 		$stmt->bind_result(
