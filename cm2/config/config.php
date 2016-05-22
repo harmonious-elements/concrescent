@@ -60,8 +60,33 @@ $cm_config = array(
 		/* Slack notification hooks. */
 		'hook_url' => array(
 
-			/* Notification hook for staff application submission and approval. */
-			'staff' => '',
+			/* Notification hook for blacklisted attendee registrations. */
+			'attendee-blacklisted' => '',
+
+			/* Notification hooks for application submission. */
+			'application-submitted' => array(
+				/* Vendors */ 'B' => '',
+				/* Panels  */ 'E' => '',
+				/* Guests  */ 'G' => '',
+				/* Press   */ 'M' => '',
+			),
+
+			/* Notification hooks for application approval. */
+			'application-accepted' => array(
+				/* Vendors */ 'B' => '',
+				/* Panels  */ 'E' => '',
+				/* Guests  */ 'G' => '',
+				/* Press   */ 'M' => '',
+			),
+
+			/* Notification hook for blacklisted staff applications. */
+			'staff-blacklisted' => '',
+
+			/* Notification hook for staff application submission. */
+			'staff-submitted' => '',
+
+			/* Notification hook for staff application approval. */
+			'staff-accepted' => '',
 
 		),
 
