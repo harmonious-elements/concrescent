@@ -176,7 +176,7 @@ function mail_merge($text, $fields) {
 	$r = array();
 	foreach ($fields as $k => $v) {
 		$s[] = '[[' . $k . ']]';
-		$r[] = $v;
+		$r[] = (is_array($v) ? print_r($v, true) : $v);
 	}
 	return str_replace($s, $r, $text);
 }
@@ -186,7 +186,7 @@ function mail_merge_html($text, $fields) {
 	$r = array();
 	foreach ($fields as $k => $v) {
 		$s[] = '[[' . htmlspecialchars($k) . ']]';
-		$r[] = htmlspecialchars($v);
+		$r[] = htmlspecialchars(is_array($v) ? print_r($v, true) : $v);
 	}
 	return str_replace($s, $r, $text);
 }

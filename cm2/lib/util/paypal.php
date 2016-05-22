@@ -11,7 +11,7 @@ class cm_paypal {
 	private $currency;
 	private $token;
 
-	public function __construct() {
+	public function __construct($token = null) {
 		$config = $GLOBALS['cm_config']['event'];
 		$this->event_name = $config['name'];
 		$config = $GLOBALS['cm_config']['paypal'];
@@ -19,10 +19,11 @@ class cm_paypal {
 		$this->client_id = $config['client_id'];
 		$this->secret = $config['secret'];
 		$this->currency = $config['currency'];
-		$this->token = null;
+		$this->token = $token;
 	}
 
 	public function get_token() {
+		if ($this->token) return $this->token;
 		$curl = curl_init('https://' . $this->api_url . '/v1/oauth2/token');
 		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -38,7 +39,7 @@ class cm_paypal {
 		));
 		$result = curl_exec($curl);
 		curl_close($curl);
-		$this->token = json_decode($result, true);
+		return ($this->token = json_decode($result, true));
 	}
 
 	public function api($method, $data) {

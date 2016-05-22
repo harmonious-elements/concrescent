@@ -1475,6 +1475,20 @@ class cm_attendee_db {
 		return $success;
 	}
 
+	public function update_payment_status($id, $status, $type, $txn, $details) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendees').' SET '.
+			'`payment_status` = ?, `payment_type` = ?, '.
+			'`payment_txn_id` = ?, `payment_details` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('ssssi', $status, $type, $txn, $details, $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
 	public function attendee_printed($id) {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(

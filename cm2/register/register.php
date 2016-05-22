@@ -59,6 +59,15 @@ function cm_reg_cart_reset_promo_code() {
 	}
 }
 
+function cm_reg_cart_total() {
+	if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
+	$total = 0;
+	foreach ($_SESSION['cart'] as $item) {
+		$total += (float)$item['payment-promo-price'];
+	}
+	return $total;
+}
+
 function cm_reg_cart_set_state($state) {
 	if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
 	$_SESSION['cart_hash'] = md5(serialize($_SESSION['cart']));
@@ -119,8 +128,7 @@ function cm_reg_tail() {
 }
 
 function cm_reg_closed() {
-	global $event_name;
-	global $contact_address;
+	global $event_name, $contact_address;
 	cm_reg_head('Registration Closed');
 	cm_reg_body('Registration Closed', false);
 	echo '<article>';
@@ -136,6 +144,44 @@ function cm_reg_closed() {
 		echo '">contact us</a></b> if you have any questions.';
 	}
 	echo '</p>';
+	echo '</div>';
+	echo '</div>';
+	echo '</article>';
+	cm_reg_tail();
+	exit(0);
+}
+
+function cm_reg_message($title, $custom_text_name, $default_text, $fields = null) {
+	global $event_name, $fdb, $contact_address;
+	cm_reg_head($title);
+	cm_reg_body($title, false);
+	echo '<article>';
+	echo '<div class="card">';
+	echo '<div class="card-title">';
+	echo htmlspecialchars($title);
+	echo '</div>';
+	echo '<div class="card-content">';
+	$text = $fdb->get_custom_text($custom_text_name);
+	if (!$text) $text = $default_text;
+	$text = safe_html_string($text, true);
+	$merge_fields = array(
+		'event-name' => $event_name,
+		'event_name' => $event_name,
+		'contact-address' => $contact_address,
+		'contact_address' => $contact_address
+	);
+	if ($fields) {
+		foreach ($fields as $k => $v) {
+			$merge_fields[strtolower(str_replace('_', '-', $k))] = $v;
+			$merge_fields[strtolower(str_replace('-', '_', $k))] = $v;
+		}
+	}
+	echo mail_merge_html($text, $merge_fields);
+	echo '</div>';
+	echo '<div class="card-buttons">';
+	echo '<a href="index.php" role="button" class="button register-button">';
+	echo 'Start a New Registration';
+	echo '</a>';
 	echo '</div>';
 	echo '</div>';
 	echo '</article>';
