@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__).'/../lib/database/attendee.php';
+require_once dirname(__FILE__).'/../lib/util/slack.php';
 require_once dirname(__FILE__).'/admin.php';
 
 cm_admin_check_permission('debug', '*');
@@ -628,6 +629,7 @@ cm_admin_body('Debug');
 cm_admin_nav('debug');
 
 echo '<article>';
+
 if (isset($_POST['generate-randoms'])) {
 	$n = (int)$_POST['generate-randoms'];
 	for ($i = 0; $i < $n; $i++) {
@@ -643,6 +645,17 @@ echo '<form action="debug.php" method="post">';
 echo '<p><label>Generate random attendees:</label> <input type="number" name="generate-randoms" value="'.$n.'"></p>';
 echo '<p><input type="submit" name="submit" value="Submit"></p>';
 echo '</form>';
+
+if (isset($_POST['slack-path']) && isset($_POST['slack-message'])) {
+	$slack = new cm_slack();
+	$slack->post_message($_POST['slack-path'], $_POST['slack-message']);
+}
+echo '<form action="debug.php" method="post">';
+echo '<p><label>Slack Config Path:</label> <input type="text" name="slack-path"></p>';
+echo '<p><label>Slack Message:</label> <input type="text" name="slack-message"></p>';
+echo '<p><input type="submit" name="submit" value="Submit"></p>';
+echo '</form>';
+
 echo '</article>';
 
 cm_admin_dialogs();
