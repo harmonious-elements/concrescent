@@ -2,6 +2,7 @@
 
 require_once dirname(__FILE__).'/../../lib/database/attendee.php';
 require_once dirname(__FILE__).'/../../lib/database/forms.php';
+require_once dirname(__FILE__).'/../../lib/database/mail.php';
 require_once dirname(__FILE__).'/../../lib/util/util.php';
 require_once dirname(__FILE__).'/../../lib/util/cmforms.php';
 require_once dirname(__FILE__).'/../admin.php';
@@ -98,7 +99,6 @@ if ($submitted) {
 $name = isset($item['display-name']) ? $item['display-name'] : null;
 cm_admin_head($new ? 'Add Attendee' : ($name ? ('Edit Attendee - ' . $name) : 'Edit Attendee'));
 echo '<script type="text/javascript" src="edit.js"></script>';
-
 cm_admin_body($new ? 'Add Attendee' : 'Edit Attendee');
 cm_admin_nav('attendees');
 
