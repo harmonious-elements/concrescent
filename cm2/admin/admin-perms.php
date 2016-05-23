@@ -49,6 +49,11 @@ $cm_admin_perms = array(
 			'name' => 'Attendee Form Letters',
 			'description' => 'Write form letters to be emailed to attendees.'
 		),
+		array(
+			'id' => 'attendee-csv',
+			'name' => 'Attendee CSV',
+			'description' => 'Download a CSV file of attendee registration records.'
+		),
 	),
 	array(
 		array(

@@ -53,6 +53,13 @@ $cm_admin_nav = array(
 			'description' => 'Write form letters to be emailed to attendees.',
 			'permission' => 'attendee-mail'
 		),
+		array(
+			'id' => 'attendee-csv',
+			'href' => '/admin/attendee/csv.php',
+			'name' => 'Attendee CSV',
+			'description' => 'Download a CSV file of attendee registration records.',
+			'permission' => 'attendee-csv'
+		),
 	),
 	array(
 		array(
