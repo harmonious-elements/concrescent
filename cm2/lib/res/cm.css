@@ -17,6 +17,13 @@ h2 {
 h3 {
 	font-size: 14px;
 }
+p {
+	line-height: 16px;
+}
+ul {
+	line-height: 16px;
+	margin-left: 24px;
+}
 .hidden {
 	display: none !important;
 }
@@ -120,7 +127,6 @@ nav + article {
 .card .card-content > .cm-success-box,
 .card .card-content > .cm-note-box {
 	margin: 16px;
-	line-height: 16px;
 }
 .card .card-buttons {
 	padding: 8px;
@@ -561,7 +567,6 @@ select {
 .dialog .dialog-content > table,
 .dialog .dialog-content > div.spacing {
 	margin: 16px;
-	line-height: 16px;
 }
 .dialog .dialog-buttons {
 	padding: 8px;
@@ -655,12 +660,8 @@ select {
 .cm-reg-edit .cm-reg-badge-types ul {
 	margin: 8px;
 }
-.cm-reg-edit .cm-reg-badge-types p,
 .cm-reg-edit .cm-reg-badge-types ul {
-	line-height: 16px;
-}
-.cm-reg-edit .cm-reg-badge-types ul {
-	margin-left: 2em;
+	margin-left: 32px;
 }
 .cm-reg-edit .cm-reg-badge-types label {
 	display: inline-block;
@@ -677,6 +678,9 @@ select {
 	margin-top: -1px;
 	margin-bottom: -1px;
 }
+.cm-reg-edit table {
+	width: 100%;
+}
 .cm-reg-edit-no-errors table {
 	width: 48%;
 	width: calc(50% - 24px);
@@ -686,10 +690,6 @@ select {
 }
 .cm-reg-edit table hr {
 	margin: 12px -40px 12px -20px;
-}
-.cm-reg-edit table ul {
-	line-height: 16px;
-	margin-left: 2em;
 }
 .cm-reg-edit table .error {
 	padding-left: 1em;
