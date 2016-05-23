@@ -1039,7 +1039,7 @@ class cm_attendee_db {
 			}
 			$age = calculate_age($this->event_info['start_date'], $date_of_birth);
 			$email_address_subscribed = ($subscribed ? $email_address : null);
-			$unsubscribe_link = ($subscribed ? ($reg_url . '/unsubscribe.php?email=' . $email_address) : null);
+			$unsubscribe_link = $reg_url . '/unsubscribe.php?email=' . $email_address;
 			$address = trim(trim($address_1) . "\n" . trim($address_2));
 			$csz = trim(trim(trim($city) . ' ' . trim($state)) . ' ' . trim($zip_code));
 			$address_full = trim(trim(trim($address) . "\n" . trim($csz)) . "\n" . trim($country));
@@ -1234,7 +1234,7 @@ class cm_attendee_db {
 			}
 			$age = calculate_age($this->event_info['start_date'], $date_of_birth);
 			$email_address_subscribed = ($subscribed ? $email_address : null);
-			$unsubscribe_link = ($subscribed ? ($reg_url . '/unsubscribe.php?email=' . $email_address) : null);
+			$unsubscribe_link = $reg_url . '/unsubscribe.php?email=' . $email_address;
 			$address = trim(trim($address_1) . "\n" . trim($address_2));
 			$csz = trim(trim(trim($city) . ' ' . trim($state)) . ' ' . trim($zip_code));
 			$address_full = trim(trim(trim($address) . "\n" . trim($csz)) . "\n" . trim($country));
@@ -1487,6 +1487,18 @@ class cm_attendee_db {
 		$success = $stmt->execute();
 		$stmt->close();
 		return $success;
+	}
+
+	public function unsubscribe_email_address($email) {
+		if (!$email) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendees').' SET '.
+			'`subscribed` = FALSE WHERE LCASE(`email_address`) = LCASE(?)'
+		);
+		$stmt->bind_param('s', $email);
+		$count = $stmt->execute() ? $this->cm_db->connection->affected_rows : false;
+		$stmt->close();
+		return $count;
 	}
 
 	public function attendee_printed($id) {
