@@ -8,7 +8,7 @@ require_once dirname(__FILE__).'/../../lib/util/cmforms.php';
 require_once dirname(__FILE__).'/../admin.php';
 
 cm_admin_check_permission('attendees', array('||', 'attendees-view', 'attendees-edit'));
-$can_edit = $adb->user_has_permission($admin_user, 'attendees-edit');
+$can_edit = $adb->user_has_permission($admin_user, 'attendees-edit') && !isset($_GET['ro']);
 
 $atdb = new cm_attendee_db($db);
 $name_map = $atdb->get_badge_type_name_map();
@@ -190,14 +190,16 @@ echo '<article>';
 					echo '</td>';
 				echo '</tr>';
 
-				echo '<tr class="cm-add-to-blacklist">';
-					echo '<th></th>';
-					echo '<td><label><input type="checkbox" name="add-to-blacklist" value="1">Add to Blacklist</label></td>';
-				echo '</tr>';
-				echo '<tr class="cm-add-to-blacklist-added-by hidden">';
-					echo '<th>Added/Approved By</th>';
-					echo '<td><input type="text" id="add-to-blacklist-added-by" name="add-to-blacklist-added-by"></td>';
-				echo '</tr>';
+				if ($can_edit && !$new && !$blacklisted) {
+					echo '<tr class="cm-add-to-blacklist">';
+						echo '<th></th>';
+						echo '<td><label><input type="checkbox" name="add-to-blacklist" value="1">Add to Blacklist</label></td>';
+					echo '</tr>';
+					echo '<tr class="cm-add-to-blacklist-added-by hidden">';
+						echo '<th>Added/Approved By</th>';
+						echo '<td><input type="text" id="add-to-blacklist-added-by" name="add-to-blacklist-added-by"></td>';
+					echo '</tr>';
+				}
 
 				echo '<tr><td colspan="2"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';
@@ -394,10 +396,14 @@ echo '<article>';
 					echo '</tr>';
 				}
 
-				echo '<tr>';
-					echo '<th></th>';
-					echo '<td><label><input type="checkbox" name="resend-email" value="1">Resend Registration Completed Email</label></td>';
-				echo '</tr>';
+				if ($can_edit) {
+					echo '<tr>';
+						echo '<th></th>';
+						echo '<td><label><input type="checkbox" name="resend-email" value="1">';
+						echo ($new ? 'Send' : 'Resend') . ' Registration Completed Email';
+						echo '</label></td>';
+					echo '</tr>';
+				}
 
 				echo '<tr><td colspan="2"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Record Information</h2></td></tr>';
@@ -443,10 +449,12 @@ echo '<article>';
 				}
 
 				if ($new) {
-					echo '<tr>';
-						echo '<th></th>';
-						echo '<td><label><input type="checkbox" name="print" value="1">Mark Printed</label></td>';
-					echo '</tr>';
+					if ($can_edit) {
+						echo '<tr>';
+							echo '<th></th>';
+							echo '<td><label><input type="checkbox" name="print" value="1">Mark Printed</label></td>';
+						echo '</tr>';
+					}
 				} else {
 					$count = isset($item['print-count']) ? htmlspecialchars($item['print-count']) : '';
 					$first = isset($item['print-first-time']) ? htmlspecialchars($item['print-first-time']) : '';
@@ -461,17 +469,21 @@ echo '<article>';
 							} else {
 								echo 'never';
 							}
-							echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-							echo '<label><input type="checkbox" name="print" value="1">Mark Printed</label>';
+							if ($can_edit) {
+								echo '&nbsp;&nbsp;&nbsp;&nbsp;';
+								echo '<label><input type="checkbox" name="print" value="1">Mark Printed</label>';
+							}
 						echo '</td>';
 					echo '</tr>';
 				}
 
 				if ($new) {
-					echo '<tr>';
-						echo '<th></th>';
-						echo '<td><label><input type="checkbox" name="checkin" value="1">Mark Checked In</label></td>';
-					echo '</tr>';
+					if ($can_edit) {
+						echo '<tr>';
+							echo '<th></th>';
+							echo '<td><label><input type="checkbox" name="checkin" value="1">Mark Checked In</label></td>';
+						echo '</tr>';
+					}
 				} else {
 					$count = isset($item['checkin-count']) ? htmlspecialchars($item['checkin-count']) : '';
 					$first = isset($item['checkin-first-time']) ? htmlspecialchars($item['checkin-first-time']) : '';
@@ -486,8 +498,10 @@ echo '<article>';
 							} else {
 								echo 'never';
 							}
-							echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-							echo '<label><input type="checkbox" name="checkin" value="1">Mark Checked In</label>';
+							if ($can_edit) {
+								echo '&nbsp;&nbsp;&nbsp;&nbsp;';
+								echo '<label><input type="checkbox" name="checkin" value="1">Mark Checked In</label>';
+							}
 						echo '</td>';
 					echo '</tr>';
 				}
