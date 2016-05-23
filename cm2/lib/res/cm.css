@@ -694,6 +694,9 @@ select {
 .cm-reg-edit table .error {
 	padding-left: 1em;
 }
+
+/* Shopping Cart Page */
+
 table.cm-cart th,
 table.cm-cart td {
 	white-space: nowrap;
@@ -701,4 +704,11 @@ table.cm-cart td {
 table.cm-cart td:not(.td-actions) {
 	padding-top: 8px;
 	padding-bottom: 8px;
+}
+
+/* Entity Edit Page */
+
+.cm-add-to-blacklist {
+	font-weight: bold;
+	color: red;
 }

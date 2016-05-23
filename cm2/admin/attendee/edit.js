@@ -1,5 +1,13 @@
 (function($,window,document){
 	$(document).ready(function() {
+		var addToBlacklistAddedBy = $('.cm-add-to-blacklist-added-by');
+		var addToBlacklist = $('input[type=checkbox][name=add-to-blacklist]');
+		addToBlacklist.bind('click', function() {
+			var checked = addToBlacklist.is(':checked');
+			if (checked) addToBlacklistAddedBy.removeClass('hidden');
+			else addToBlacklistAddedBy.addClass('hidden');
+		});
+
 		var resendEmail = $('input[type=checkbox][name=resend-email]');
 		var paymentStatus = $('#payment-status');
 		var paymentStatusOldVal = paymentStatus.val();

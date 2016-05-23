@@ -88,6 +88,11 @@ if ($submitted) {
 		if (isset($_POST['print']) && $_POST['print']) $atdb->attendee_printed($id);
 		if (isset($_POST['checkin']) && $_POST['checkin']) $atdb->attendee_checked_in($id);
 		$item = $atdb->get_attendee($id, false, $name_map, $fdb);
+		if (isset($_POST['add-to-blacklist']) && $_POST['add-to-blacklist']) {
+			$blacklist_entry = $item;
+			$blacklist_entry['added-by'] = trim($_POST['add-to-blacklist-added-by']);
+			$atdb->create_blacklist_entry($blacklist_entry);
+		}
 		if (isset($_POST['resend-email']) && $_POST['resend-email']) {
 			$mdb = new cm_mail_db($db);
 			$template = $mdb->get_mail_template('attendee-paid');
@@ -183,6 +188,15 @@ echo '<article>';
 							}
 						echo '</select>';
 					echo '</td>';
+				echo '</tr>';
+
+				echo '<tr class="cm-add-to-blacklist">';
+					echo '<th></th>';
+					echo '<td><label><input type="checkbox" name="add-to-blacklist" value="1">Add to Blacklist</label></td>';
+				echo '</tr>';
+				echo '<tr class="cm-add-to-blacklist-added-by hidden">';
+					echo '<th>Added/Approved By</th>';
+					echo '<td><input type="text" id="add-to-blacklist-added-by" name="add-to-blacklist-added-by"></td>';
 				echo '</tr>';
 
 				echo '<tr><td colspan="2"><hr></td></tr>';
