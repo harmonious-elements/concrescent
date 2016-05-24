@@ -712,3 +712,19 @@ table.cm-cart td:not(.td-actions) {
 	font-weight: bold;
 	color: red;
 }
+
+/* Statistics Page */
+
+.cm-statistics .cm-stat-corner,
+.cm-statistics .cm-stat-row {
+	width: 200px;
+	cursor: pointer;
+}
+.cm-statistics .cm-stat-col,
+.cm-statistics .cm-stat {
+	width: 80px;
+	cursor: pointer;
+}
+.cm-statistics .td-numeric {
+	text-align: right;
+}

@@ -1531,4 +1531,92 @@ class cm_attendee_db {
 		return $success;
 	}
 
+	public function get_attendee_statistics($granularity = 300, $name_map = null) {
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		$timestamps = array();
+		$counters = array();
+		$timelines = array();
+		foreach ($name_map as $k => $v) {
+			$counters[$k] = array(0, 0, 0, 0);
+			$timelines[$k] = array(array(), array(), array(), array());
+		}
+		$counters['*'] = array(0, 0, 0, 0);
+		$timelines['*'] = array(array(), array(), array(), array());
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(`date_created`), `badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('attendees').
+			' ORDER BY `date_created`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][0][$timestamp] = ++$counters[$btid][0];
+			$timelines['*'][0][$timestamp] = ++$counters['*'][0];
+		}
+		$stmt->close();
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(`payment_date`), `badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('attendees').
+			' WHERE `payment_status` = \'Completed\''.
+			' AND `payment_date` IS NOT NULL'.
+			' ORDER BY `payment_date`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][1][$timestamp] = ++$counters[$btid][1];
+			$timelines['*'][1][$timestamp] = ++$counters['*'][1];
+		}
+		$stmt->close();
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(`print_first_time`), `badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('attendees').
+			' WHERE `print_first_time` IS NOT NULL'.
+			' ORDER BY `print_first_time`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][2][$timestamp] = ++$counters[$btid][2];
+			$timelines['*'][2][$timestamp] = ++$counters['*'][2];
+		}
+		$stmt->close();
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(`checkin_first_time`), `badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('attendees').
+			' WHERE `checkin_first_time` IS NOT NULL'.
+			' ORDER BY `checkin_first_time`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][3][$timestamp] = ++$counters[$btid][3];
+			$timelines['*'][3][$timestamp] = ++$counters['*'][3];
+		}
+		$stmt->close();
+
+		ksort($timestamps);
+		return array(
+			'timestamps' => $timestamps,
+			'counters' => $counters,
+			'timelines' => $timelines
+		);
+	}
+
 }

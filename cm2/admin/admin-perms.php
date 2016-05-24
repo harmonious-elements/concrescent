@@ -3,6 +3,13 @@
 $cm_admin_perms = array(
 	array(
 		array(
+			'id' => 'statistics',
+			'name' => 'Statistics',
+			'description' => 'Get a statistical overview of people registered and checked in.'
+		),
+	),
+	array(
+		array(
 			'id' => 'attendees',
 			'name' => 'Attendees',
 			'description' => 'View the list of attendee registration records.'

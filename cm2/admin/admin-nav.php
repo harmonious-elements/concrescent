@@ -9,6 +9,13 @@ $cm_admin_nav = array(
 			'description' => '',
 			'permission' => ''
 		),
+		array(
+			'id' => 'statistics',
+			'href' => '/admin/statistics.php',
+			'name' => 'Statistics',
+			'description' => 'Get a statistical overview of people registered and checked in.',
+			'permission' => 'statistics'
+		),
 	),
 	array(
 		array(
