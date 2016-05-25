@@ -1134,7 +1134,7 @@ class cm_attendee_db {
 		return false;
 	}
 
-	public function list_attendees($start_id = null, $end_id = null, $gid = null, $tid = null, $name_map = null, $fdb = null) {
+	public function list_attendees($gid = null, $tid = null, $name_map = null, $fdb = null) {
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
 		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'attendee');
 		$attendees = array();
@@ -1157,18 +1157,6 @@ class cm_attendee_db {
 		);
 		$first = true;
 		$bind = array('');
-		if ($start_id) {
-			$query .= ($first ? ' WHERE' : ' AND') . ' `id` >= ?';
-			$first = false;
-			$bind[0] .= 'i';
-			$bind[] = &$start_id;
-		}
-		if ($end_id) {
-			$query .= ($first ? ' WHERE' : ' AND') . ' `id` < ?';
-			$first = false;
-			$bind[0] .= 'i';
-			$bind[] = &$end_id;
-		}
 		if ($gid) {
 			$query .= ($first ? ' WHERE' : ' AND') . ' `payment_group_uuid` = ?';
 			$first = false;

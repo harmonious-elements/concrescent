@@ -9,7 +9,7 @@ if (!$gid || !$tid) {
 	header('Location: index.php');
 	exit(0);
 }
-$items = $atdb->list_attendees(null, null, $gid, $tid, $name_map, $fdb);
+$items = $atdb->list_attendees($gid, $tid, $name_map, $fdb);
 if (!$items) {
 	header('Location: index.php');
 	exit(0);

@@ -99,7 +99,7 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$attendees = $atdb->list_attendees(null, null, null, null, $name_map, $fdb);
+			$attendees = $atdb->list_attendees(null, null, $name_map, $fdb);
 			$response = cm_list_process_entities($list_def, $attendees);
 			echo json_encode($response);
 			break;

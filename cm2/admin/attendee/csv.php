@@ -77,7 +77,7 @@ if (isset($_POST['download-attendees'])) {
 			array('key' => 'notes',                    'name' => 'Notes',                           'type' => 'text' ),
 		)
 	);
-	$entities = $atdb->list_attendees(null, null, null, null, $name_map, $fdb);
+	$entities = $atdb->list_attendees(null, null, $name_map, $fdb);
 	cm_output_csv($columns, $entities, 'attendees.csv');
 }
 
