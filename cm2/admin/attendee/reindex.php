@@ -124,7 +124,7 @@ cm_admin_head('Rebuild Attendee Search Index');
 		reindexDrop = function() {
 			setStatus(true, 'Dropping...', false);
 			doAjax({'action': 'drop'}, function(response) {
-				reindexIndex(0, 100);
+				reindexIndex(0, 50);
 			});
 		};
 		reindexIndex = function(offset, length) {
