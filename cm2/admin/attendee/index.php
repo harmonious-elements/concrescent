@@ -100,7 +100,7 @@ if (isset($_POST['cm-list-action'])) {
 	switch ($_POST['cm-list-action']) {
 		case 'list':
 			$attendees = $atdb->list_attendees(null, null, $name_map, $fdb);
-			$response = cm_list_process_entities($list_def, $attendees);
+			$response = cm_list_process_entities($list_def, $attendees, true);
 			echo json_encode($response);
 			break;
 		case 'delete':

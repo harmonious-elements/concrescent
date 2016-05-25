@@ -389,8 +389,8 @@ function cm_list_make_row(&$list_def, &$entity) {
 	);
 }
 
-function cm_list_process_entities(&$list_def, &$all_entities) {
-	if (isset($list_def['loader']) && $list_def['loader'] == 'server-side') {
+function cm_list_process_entities(&$list_def, &$all_entities, $filter = false) {
+	if ($filter) {
 		$query = json_decode($_POST['cm-list-search-query'], true);
 		$sort_order = json_decode($_POST['cm-list-sort-order'], true);
 		$offset = (int)$_POST['cm-list-page-offset'];
