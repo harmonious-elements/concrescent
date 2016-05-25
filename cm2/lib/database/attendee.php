@@ -1566,11 +1566,6 @@ class cm_attendee_db {
 		return $success;
 	}
 
-	public function rebuild_index($name_map = null, $fdb = null) {
-		$attendees = $this->list_attendees(null, null, $name_map, $fdb);
-		$this->cm_ldb->rebuild_index($attendees);
-	}
-
 	public function get_attendee_statistics($granularity = 300, $name_map = null) {
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
 		$timestamps = array();

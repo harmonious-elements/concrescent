@@ -72,14 +72,11 @@ class cm_lists_db {
 		$stmt->close();
 	}
 
-	public function rebuild_index(&$entities) {
+	public function drop_index() {
 		$this->cm_db->connection->query(
 			'TRUNCATE TABLE '.
 			$this->cm_db->table_name($this->index_table_name)
 		);
-		foreach ($entities as $entity) {
-			$this->add_entity($entity);
-		}
 	}
 
 	public function list_query_op_to_sql($key, $op, $value) {
