@@ -78,7 +78,7 @@ $list_def = array(
 	'entity-type' => 'attendee',
 	'entity-type-pl' => 'attendees',
 	'search-criteria' => 'name, badge type, contact info, or transaction ID',
-	'search-delay' => 500,
+	'search-delay' => 250,
 	'qr' => 'auto',
 	'columns' => $columns,
 	'sort-order' => array(~0),
@@ -99,8 +99,14 @@ if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
 	switch ($_POST['cm-list-action']) {
 		case 'list':
-			$attendees = $atdb->list_attendees(null, null, $name_map, $fdb);
-			$response = cm_list_process_entities($list_def, $attendees, true);
+			$time = microtime(true);
+			$response = $atdb->cm_ldb->list_indexes($list_def);
+			$response['rows'] = array();
+			foreach ($response['ids'] as $id) {
+				$attendee = $atdb->get_attendee($id, false, $name_map, $fdb);
+				$response['rows'][] = cm_list_make_row($list_def, $attendee);
+			}
+			$response['time'] = microtime(true) - $time;
 			echo json_encode($response);
 			break;
 		case 'delete':

@@ -3,6 +3,7 @@
 require_once dirname(__FILE__).'/../../config/config.php';
 require_once dirname(__FILE__).'/../util/util.php';
 require_once dirname(__FILE__).'/database.php';
+require_once dirname(__FILE__).'/lists.php';
 require_once dirname(__FILE__).'/forms.php';
 
 class cm_attendee_db {
@@ -23,6 +24,7 @@ class cm_attendee_db {
 
 	public $event_info;
 	public $cm_db;
+	public $cm_ldb;
 
 	public function __construct($cm_db) {
 		$this->event_info = $GLOBALS['cm_config']['event'];
@@ -126,6 +128,7 @@ class cm_attendee_db {
 			'`payment_date` DATETIME NULL,'.
 			'`payment_details` TEXT NULL'
 		));
+		$this->cm_ldb = new cm_lists_db($this->cm_db, 'attendee_search_index');
 	}
 
 	public function get_badge_type($id) {
@@ -1380,6 +1383,10 @@ class cm_attendee_db {
 		);
 		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
 		$stmt->close();
+		if ($id !== false) {
+			$attendee = $this->get_attendee($id);
+			$this->cm_ldb->add_entity($attendee);
+		}
 		return $id;
 	}
 
@@ -1448,6 +1455,11 @@ class cm_attendee_db {
 		);
 		$success = $stmt->execute();
 		$stmt->close();
+		if ($success) {
+			$attendee = $this->get_attendee($attendee['id']);
+			$this->cm_ldb->remove_entity($attendee['id']);
+			$this->cm_ldb->add_entity($attendee);
+		}
 		return $success;
 	}
 
@@ -1460,6 +1472,9 @@ class cm_attendee_db {
 		$stmt->bind_param('i', $id);
 		$success = $stmt->execute();
 		$stmt->close();
+		if ($success) {
+			$this->cm_ldb->remove_entity($id);
+		}
 		return $success;
 	}
 
@@ -1474,6 +1489,11 @@ class cm_attendee_db {
 		$stmt->bind_param('ssssi', $status, $type, $txn, $details, $id);
 		$success = $stmt->execute();
 		$stmt->close();
+		if ($success) {
+			$attendee = $this->get_attendee($id);
+			$this->cm_ldb->remove_entity($id);
+			$this->cm_ldb->add_entity($attendee);
+		}
 		return $success;
 	}
 
@@ -1486,6 +1506,23 @@ class cm_attendee_db {
 		$stmt->bind_param('s', $email);
 		$count = $stmt->execute() ? $this->cm_db->connection->affected_rows : false;
 		$stmt->close();
+		if ($count) {
+			$ids = array();
+			$stmt = $this->cm_db->connection->prepare(
+				'SELECT `id` FROM '.$this->cm_db->table_name('attendees').
+				' WHERE LCASE(`email_address`) = LCASE(?)'
+			);
+			$stmt->bind_param('s', $email);
+			$stmt->execute();
+			$stmt->bind_result($id);
+			while ($stmt->fetch()) $ids[] = $id;
+			$stmt->close();
+			foreach ($ids as $id) {
+				$attendee = $this->get_attendee($id);
+				$this->cm_ldb->remove_entity($id);
+				$this->cm_ldb->add_entity($attendee);
+			}
+		}
 		return $count;
 	}
 
@@ -1501,6 +1538,11 @@ class cm_attendee_db {
 		$stmt->bind_param('i', $id);
 		$success = $stmt->execute();
 		$stmt->close();
+		if ($success) {
+			$attendee = $this->get_attendee($id);
+			$this->cm_ldb->remove_entity($id);
+			$this->cm_ldb->add_entity($attendee);
+		}
 		return $success;
 	}
 
@@ -1516,7 +1558,17 @@ class cm_attendee_db {
 		$stmt->bind_param('i', $id);
 		$success = $stmt->execute();
 		$stmt->close();
+		if ($success) {
+			$attendee = $this->get_attendee($id);
+			$this->cm_ldb->remove_entity($id);
+			$this->cm_ldb->add_entity($attendee);
+		}
 		return $success;
+	}
+
+	public function rebuild_index($name_map = null, $fdb = null) {
+		$attendees = $this->list_attendees(null, null, $name_map, $fdb);
+		$this->cm_ldb->rebuild_index($attendees);
 	}
 
 	public function get_attendee_statistics($granularity = 300, $name_map = null) {

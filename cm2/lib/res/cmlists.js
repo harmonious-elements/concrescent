@@ -279,14 +279,16 @@
 				setPageCounter(
 					offset + (visibleRows.length ? 1 : 0),
 					offset + visibleRows.length,
-					matchedRows.length
+					matchedRows.length,
+					0
 				);
 			} else {
 				visibleRows = matchedRows.slice();
 				setPageCounter(
 					(visibleRows.length ? 1 : 0),
 					visibleRows.length,
-					matchedRows.length
+					matchedRows.length,
+					0
 				);
 			}
 		};
@@ -433,13 +435,15 @@
 						setPageCounter(
 							offset + (visibleRows.length ? 1 : 0),
 							offset + visibleRows.length,
-							data['match-count']
+							data['match-count'],
+							data['time']
 						);
 					} else {
 						setPageCounter(
 							(visibleRows.length ? 1 : 0),
 							visibleRows.length,
-							data['match-count']
+							data['match-count'],
+							data['time']
 						);
 					}
 
@@ -491,11 +495,15 @@
 		var htmlInit;
 
 		/* Loader */
-		var setPageCounter = function(start, end, total) {
+		var setPageCounter = function(start, end, total, time) {
 			$('.cm-search-vis-start').text(start);
 			$('.cm-search-vis-end').text(end);
 			$('.cm-search-vis-total').text(total);
 			resultCount = (1 * total);
+			if (time > 0) {
+				time = (Math.round(time * 1000) / 1000);
+				$('.cm-search-vis-total').attr('title', 'in ' + time + ' seconds');
+			}
 		};
 		var setListHTML = function(html) {
 			$('.cm-list-table tbody').html(html);
