@@ -358,6 +358,19 @@ class cm_forms_db {
 		return $success;
 	}
 
+	public function set_answers($context_id, $answers) {
+		if (!$context_id) return false;
+		if (!$answers) return true;
+		foreach ($answers as $question_id => $answer) {
+			if ($answer) {
+				if (!$this->set_answer($context_id, $question_id, $answer)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public function clear_answer($context_id, $question_id) {
 		if (!$context_id || !$question_id) return false;
 		$stmt = $this->cm_db->connection->prepare(
@@ -365,6 +378,18 @@ class cm_forms_db {
 			' WHERE `question_id` = ? AND `context` = ? AND `context_id` = ? LIMIT 1'
 		);
 		$stmt->bind_param('isi', $question_id, $this->context, $context_id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function clear_answers($context_id) {
+		if (!$context_id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('form_answers').
+			' WHERE `context` = ? AND `context_id` = ?'
+		);
+		$stmt->bind_param('si', $this->context, $context_id);
 		$success = $stmt->execute();
 		$stmt->close();
 		return $success;

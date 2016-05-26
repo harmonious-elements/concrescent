@@ -24,11 +24,7 @@ if (!$_GET) {
 		$item['payment-txn-id'] = $group_uuid;
 		$item['payment-txn-amt'] = $total_price;
 		$item['payment-date'] = $payment_date;
-		$id = $atdb->create_attendee($item);
-		foreach ($item['form-answers'] as $qid => $answer) {
-			if ($answer) $fdb->set_answer($id, $qid, $answer);
-		}
-		$attendee_ids[] = $id;
+		$attendee_ids[] = $atdb->create_attendee($item, $fdb);
 		if ($atdb->is_blacklisted($item)) $blacklisted = true;
 	}
 

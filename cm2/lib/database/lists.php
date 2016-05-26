@@ -27,6 +27,10 @@ class cm_lists_db {
 		}
 	}
 
+	public function normalize_key($key) {
+		return strtolower(str_replace('_', '-', $key));
+	}
+
 	public function normalize_value($value) {
 		return preg_replace_callback(
 			'/[0-9]+/',
@@ -43,7 +47,7 @@ class cm_lists_db {
 				$this->add_value($id, ($key ? ($key.':'.$k) : $k), $v);
 			}
 		} else {
-			$key = strtolower($key);
+			$key = $this->normalize_key($key);
 			$value = $this->normalize_value($value);
 			$stmt = $this->cm_db->connection->prepare(
 				'INSERT INTO '.
@@ -80,7 +84,7 @@ class cm_lists_db {
 	}
 
 	public function list_query_op_to_sql($key, $op, $value) {
-		$key = strtolower($key);
+		$key = $this->normalize_key($key);
 		$value = $this->normalize_value($value);
 		switch ($op) {
 			case ':':

@@ -336,6 +336,7 @@ select {
 .cm-list-table table thead th {
 	padding-top: 6px;
 	padding-bottom: 6px;
+	white-space: nowrap;
 }
 .cm-list-table table tfoot th:last-child {
 	width: 1px;

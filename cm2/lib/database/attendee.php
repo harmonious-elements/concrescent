@@ -1320,7 +1320,7 @@ class cm_attendee_db {
 		return $attendees;
 	}
 
-	public function create_attendee($attendee) {
+	public function create_attendee($attendee, $fdb = null) {
 		if (!$attendee) return false;
 		$badge_type_id = (isset($attendee['badge-type-id']) ? $attendee['badge-type-id'] : null);
 		$notes = (isset($attendee['notes']) ? $attendee['notes'] : null);
@@ -1384,13 +1384,16 @@ class cm_attendee_db {
 		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
 		$stmt->close();
 		if ($id !== false) {
+			if ($fdb && isset($attendee['form-answers'])) {
+				$fdb->set_answers($id, $attendee['form-answers']);
+			}
 			$attendee = $this->get_attendee($id);
 			$this->cm_ldb->add_entity($attendee);
 		}
 		return $id;
 	}
 
-	public function update_attendee($attendee) {
+	public function update_attendee($attendee, $fdb = null) {
 		if (!$attendee || !isset($attendee['id']) || !$attendee['id']) return false;
 		$badge_type_id = (isset($attendee['badge-type-id']) ? $attendee['badge-type-id'] : null);
 		$notes = (isset($attendee['notes']) ? $attendee['notes'] : null);
@@ -1456,6 +1459,10 @@ class cm_attendee_db {
 		$success = $stmt->execute();
 		$stmt->close();
 		if ($success) {
+			if ($fdb && isset($attendee['form-answers'])) {
+				$fdb->clear_answers($attendee['id']);
+				$fdb->set_answers($attendee['id'], $attendee['form-answers']);
+			}
 			$attendee = $this->get_attendee($attendee['id']);
 			$this->cm_ldb->remove_entity($attendee['id']);
 			$this->cm_ldb->add_entity($attendee);

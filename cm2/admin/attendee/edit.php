@@ -44,6 +44,7 @@ if ($submitted) {
 	$item['ice-email-address'] = trim($_POST['ice-email-address']);
 	$item['ice-phone-number'] = trim($_POST['ice-phone-number']);
 	$item['notes'] = $_POST['notes'];
+
 	/* Payment Information */
 	if (
 		$new
@@ -67,6 +68,7 @@ if ($submitted) {
 		$item['payment-group-uuid'] = $db->uuid();
 		$item['payment-date'] = $db->now();
 	}
+
 	/* Custom Questions */
 	$item['form-answers'] = array();
 	foreach ($questions as $question) {
@@ -75,16 +77,16 @@ if ($submitted) {
 			$item['form-answers'][$question['question-id']] = $answer;
 		}
 	}
+
 	/* Write Changes */
 	if ($new) {
-		$id = $atdb->create_attendee($item);
+		$id = $atdb->create_attendee($item, $fdb);
 		$new = ($id === false);
 		$changed = ($id !== false);
 	} else {
-		$changed = $atdb->update_attendee($item);
+		$changed = $atdb->update_attendee($item, $fdb);
 	}
 	if ($changed) {
-		foreach ($item['form-answers'] as $qid => $answer) $fdb->set_answer($id, $qid, $answer);
 		if (isset($_POST['print']) && $_POST['print']) $atdb->attendee_printed($id);
 		if (isset($_POST['checkin']) && $_POST['checkin']) $atdb->attendee_checked_in($id);
 		$item = $atdb->get_attendee($id, false, $name_map, $fdb);
