@@ -177,6 +177,7 @@ class cm_lists_db {
 				$bindvalue[] = $key;
 				$orderby[] = 'o'.$i.($descending ? ' DESC' : ' ASC');
 			}
+			$orderby = array_reverse($orderby);
 		}
 		return array($select, $bindtype, $bindvalue, $orderby);
 	}
