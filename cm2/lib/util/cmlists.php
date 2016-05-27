@@ -102,7 +102,7 @@ function cm_list_table(&$list_def) {
 		if (isset($list_def['table-actions']) && $list_def['table-actions']) {
 			echo '<tfoot>';
 				echo '<tr>';
-					echo '<th colspan="' . $column_count . '">';
+					echo '<th colspan="' . $column_count . '" class="td-actions">';
 						if (in_array('add', $list_def['table-actions'])) {
 							$label = (isset($list_def['add-label']) ? htmlspecialchars($list_def['add-label']) : 'Add');
 							if (isset($list_def['add-url']) && $list_def['add-url']) {
@@ -143,10 +143,10 @@ function cm_list_row(&$list_def, &$entity) {
 				case 'array-short' : $out .= '<td>' . htmlspecialchars(cm_array_string_short($value)) . '</td>'; break;
 				case 'email-subbed': $out .= '<td>' . cm_email_subbed($subscribed, $value)            . '</td>'; break;
 				case 'status-label': $out .= '<td>' . cm_status_label($value)                         . '</td>'; break;
-				case 'html-numeric': $out .= '<td class="td-numeric">' . $value                                                   . '</td>'; break;
-				case 'numeric'     : $out .= '<td class="td-numeric">' . htmlspecialchars($value)                                 . '</td>'; break;
-				case 'quantity'    : $out .= '<td class="td-numeric">' . htmlspecialchars(is_null($value) ? 'unlimited' : $value) . '</td>'; break;
-				case 'price'       : $out .= '<td class="td-numeric">' . htmlspecialchars(price_string($value))                   . '</td>'; break;
+				case 'html-numeric': $out .= '<td class="td-numeric">' . $value                                    . '</td>'; break;
+				case 'numeric'     : $out .= '<td class="td-numeric">' . htmlspecialchars($value)                  . '</td>'; break;
+				case 'quantity'    : $out .= '<td class="td-numeric">' . htmlspecialchars(quantity_string($value)) . '</td>'; break;
+				case 'price'       : $out .= '<td class="td-numeric">' . htmlspecialchars(price_string($value))    . '</td>'; break;
 				default            : $out .= '<td>?</td>'; break;
 			}
 		}

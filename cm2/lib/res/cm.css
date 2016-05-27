@@ -159,10 +159,9 @@ nav + article {
 	padding: 12px;
 	color: black;
 }
-.cm-error-box   > h1, .cm-error-box   > h2, .cm-error-box   > h3,
-.cm-warning-box > h1, .cm-warning-box > h2, .cm-warning-box > h3,
-.cm-success-box > h1, .cm-success-box > h2, .cm-success-box > h3,
-.cm-note-box    > h1, .cm-note-box    > h2, .cm-note-box    > h3 {
+.cm-error-box > h1, .cm-warning-box > h1, .cm-success-box > h1, .cm-note-box > h1,
+.cm-error-box > h2, .cm-warning-box > h2, .cm-success-box > h2, .cm-note-box > h2,
+.cm-error-box > h3, .cm-warning-box > h3, .cm-success-box > h3, .cm-note-box > h3 {
 	margin-bottom: 12px;
 }
 
@@ -171,6 +170,17 @@ nav + article {
 th, td {
 	padding: 4px 1em 4px 4px;
 	text-align: left;
+}
+.td-numeric {
+	text-align: right;
+}
+.td-actions {
+	width: 1px;
+	white-space: nowrap;
+	text-align: right;
+}
+.td-actions form {
+	display: inline;
 }
 .cm-form-table tbody th {
 	text-align: right;
@@ -252,6 +262,12 @@ a.button:visited {
 	text-decoration: none;
 	cursor: default;
 }
+.td-actions button:last-child,
+.td-actions a.button:last-child,
+.td-actions input[type=submit]:last-child,
+.td-actions input[type=reset]:last-child {
+	margin-right: 0;
+}
 label {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -316,41 +332,10 @@ select {
 .cm-list-table table td:first-child {
 	padding-left: 1em;
 }
-.cm-list-table table .td-numeric {
-	text-align: right;
-}
-.cm-list-table table .td-actions {
-	width: 1px;
-	white-space: nowrap;
-	text-align: right;
-}
-.cm-list-table table .td-actions form {
-	display: inline;
-}
-.cm-list-table table .td-actions button:last-child,
-.cm-list-table table .td-actions a.button:last-child,
-.cm-list-table table .td-actions input[type=submit]:last-child,
-.cm-list-table table .td-actions input[type=reset]:last-child {
-	margin-right: 0;
-}
 .cm-list-table table thead th {
 	padding-top: 6px;
 	padding-bottom: 6px;
 	white-space: nowrap;
-}
-.cm-list-table table tfoot th:last-child {
-	width: 1px;
-	white-space: nowrap;
-	text-align: right;
-}
-.cm-list-table table tfoot th:last-child form {
-	display: inline;
-}
-.cm-list-table table tfoot th:last-child button:last-child,
-.cm-list-table table tfoot th:last-child a.button:last-child,
-.cm-list-table table tfoot th:last-child input[type=submit]:last-child,
-.cm-list-table table tfoot th:last-child input[type=reset]:last-child {
-	margin-right: 0;
 }
 .cm-list-table table .th-sortable {
 	-webkit-touch-callout: none;
@@ -461,11 +446,6 @@ select {
 .cm-form-editor table th:last-child,
 .cm-form-editor table td:last-child {
 	padding-right: 4px;
-}
-.cm-form-editor table .td-actions {
-	width: 1px;
-	white-space: nowrap;
-	text-align: right;
 }
 .cm-form-editor table .cm-form-editor-custom-text-section .view-row {
 	cursor: pointer;
@@ -725,7 +705,4 @@ table.cm-cart td:not(.td-actions) {
 .cm-statistics .cm-stat {
 	width: 80px;
 	cursor: pointer;
-}
-.cm-statistics .td-numeric {
-	text-align: right;
 }

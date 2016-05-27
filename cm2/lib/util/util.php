@@ -93,6 +93,10 @@ function email_link_short($e) {
 	return '<a href="mailto:' . $e . '">link</a>';
 }
 
+function quantity_string($quantity) {
+	return ((is_null($quantity) || $quantity === '') ? 'unlimited' : number_format($quantity));
+}
+
 function price_string($price) {
 	return ((float)$price ? ('$' . number_format($price, 2, '.', ',')) : 'FREE');
 }
