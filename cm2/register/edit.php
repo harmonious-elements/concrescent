@@ -151,7 +151,9 @@ echo '<article>';
 							echo safe_html_string($badge['description'], true);
 						}
 						if ($badge['rewards']) {
-							echo '<p><label><b>Rewards:</b></label></p>';
+							if (substr(trim($badge['description']), -1) != ':') {
+								echo '<p><label><b>Rewards:</b></label></p>';
+							}
 							echo '<ul>';
 							foreach ($badge['rewards'] as $reward) {
 								echo '<li>' . safe_html_string($reward) . '</li>';
@@ -255,7 +257,9 @@ echo '<article>';
 								echo '<p><br></p>';
 							}
 							if ($bt['rewards']) {
-								echo '<p><b>Rewards:</b></p>';
+								if (substr(trim($bt['description']), -1) != ':') {
+									echo '<p><b>Rewards:</b></p>';
+								}
 								echo '<ul>';
 								foreach ($bt['rewards'] as $reward) {
 									echo '<li>' . safe_html_string($reward) . '</li>';

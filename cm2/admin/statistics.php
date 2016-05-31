@@ -72,10 +72,10 @@ echo '<article>';
 						echo '<tr>';
 							$td = ($btid == '*') ? 'th' : 'td';
 							echo '<'.$td.' class="cm-stat-row" id="cm-stat-row-' . ($index + 1) . '">' . htmlspecialchars($name_map[$btid]) . '</'.$td.'>';
-							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . $count[0] . '</'.$td.'>';
-							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . $count[1] . '</'.$td.'>';
-							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . $count[2] . '</'.$td.'>';
-							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . $count[3] . '</'.$td.'>';
+							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . number_format($count[0]) . '</'.$td.'>';
+							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . number_format($count[1]) . '</'.$td.'>';
+							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . number_format($count[2]) . '</'.$td.'>';
+							echo '<'.$td.' class="td-numeric cm-stat" id="cm-stat-' . (++$index) . '">' . number_format($count[3]) . '</'.$td.'>';
 						echo '</tr>';
 					echo '</'.$tbody.'>';
 				}

@@ -33,8 +33,14 @@ class cm_lists_db {
 
 	public function normalize_value($value) {
 		return preg_replace_callback(
-			'/[0-9]+/',
-			function($m) { return substr('00000000000000000000'.$m[0], -20); },
+			'/([.]?)([0-9]+)/',
+			function($m) {
+				if ($m[1]) {
+					return substr($m[0].'00000000000000000000', 0, 21);
+				} else {
+					return substr('00000000000000000000'.$m[0], -20);
+				}
+			},
 			strtolower($value)
 		);
 	}
