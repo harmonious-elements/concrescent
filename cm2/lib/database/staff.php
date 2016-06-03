@@ -357,6 +357,17 @@ class cm_staff_db {
 		$this->cm_db->connection->autocommit(false);
 
 		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `parent_id`'.
+			' FROM '.$this->cm_db->table_name('staff_departments').
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->bind_result($parent_id);
+		if (!$stmt->fetch()) $parent_id = null;
+		$stmt->close();
+
+		$stmt = $this->cm_db->connection->prepare(
 			'DELETE FROM '.$this->cm_db->table_name('staff_departments').
 			' WHERE `id` = ? LIMIT 1'
 		);
@@ -365,6 +376,15 @@ class cm_staff_db {
 		$stmt->close();
 
 		if ($success) {
+			$stmt = $this->cm_db->connection->prepare(
+				'UPDATE '.$this->cm_db->table_name('staff_departments').
+				' SET `parent_id` = ?'.
+				' WHERE `parent_id` = ?'
+			);
+			$stmt->bind_param('ii', $parent_id, $id);
+			$stmt->execute();
+			$stmt->close();
+
 			$stmt = $this->cm_db->connection->prepare(
 				'DELETE FROM '.$this->cm_db->table_name('staff_positions').
 				' WHERE `parent_id` = ?'
