@@ -70,6 +70,15 @@ $cm_admin_nav = array(
 	),
 	array(
 		array(
+			'id' => 'staff-departments',
+			'href' => '/admin/staff/departments.php',
+			'name' => 'Departments',
+			'description' => 'Organize the departments and positions that make up the event staff hierarchy.',
+			'permission' => 'staff-departments'
+		),
+	),
+	array(
+		array(
 			'id' => 'admin-users',
 			'href' => '/admin/users.php',
 			'name' => 'Admin Users',

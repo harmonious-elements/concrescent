@@ -175,6 +175,14 @@ function calculate_age($today, $birthdate) {
 	return $interval->y;
 }
 
+function array_keys_values($array, $key = 'key', $value = 'value') {
+	$result = array();
+	foreach ($array as $k => $v) {
+		$result[] = array($key => $k, $value => $v);
+	}
+	return $result;
+}
+
 function mail_merge($text, $fields) {
 	$s = array();
 	$r = array();

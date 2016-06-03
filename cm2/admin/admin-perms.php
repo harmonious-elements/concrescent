@@ -64,6 +64,13 @@ $cm_admin_perms = array(
 	),
 	array(
 		array(
+			'id' => 'staff-departments',
+			'name' => 'Departments',
+			'description' => 'Organize the departments and positions that make up the event staff hierarchy.'
+		),
+	),
+	array(
+		array(
 			'id' => 'admin-users',
 			'name' => 'Admin Users',
 			'description' => 'Manage CONcrescent administrators and their permissions.'
