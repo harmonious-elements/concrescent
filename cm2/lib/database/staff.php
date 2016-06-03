@@ -38,6 +38,40 @@ class cm_staff_db {
 			'`executive` BOOLEAN NOT NULL,'.
 			'`active` BOOLEAN NOT NULL'
 		));
+		if (
+			$this->cm_db->table_is_empty('staff_departments') &&
+			$this->cm_db->table_is_empty('staff_positions')
+		) {
+			$this->create_department(array(
+				'name' => 'Board',
+				'description' => (
+					'A default department automatically created '.
+					'by CONcrescent during installation. Feel free '.
+					'to modify or delete according to your needs.'
+				),
+				'mail-alias-1' => ('board@' . $_SERVER['SERVER_NAME']),
+				'mail-depth' => 'Staff',
+				'positions' => array(
+					array('name' => 'President', 'executive' => true),
+					array('name' => 'Vice President', 'executive' => true)
+				)
+			));
+			$this->create_department(array(
+				'name' => 'Chair',
+				'description' => (
+					'A default department automatically created '.
+					'by CONcrescent during installation. Feel free '.
+					'to modify or delete according to your needs.'
+				),
+				'mail-alias-1' => ('chair@' . $_SERVER['SERVER_NAME']),
+				'mail-alias-2' => ('chairs@' . $_SERVER['SERVER_NAME']),
+				'mail-depth' => 'Staff',
+				'positions' => array(
+					array('name' => 'Chair', 'executive' => true),
+					array('name' => 'Vice Chair', 'executive' => true)
+				)
+			));
+		}
 	}
 
 	public function get_department($id) {
