@@ -79,6 +79,36 @@ $cm_admin_nav = array(
 	),
 	array(
 		array(
+			'id' => 'staff-badge-types',
+			'href' => '/admin/staff/badge-types.php',
+			'name' => 'Staff Badge Types',
+			'description' => 'Create or modify the types of badges available for staff members.',
+			'permission' => 'staff-badge-types'
+		),
+		array(
+			'id' => 'staff-questions',
+			'href' => '/admin/staff/questions.php',
+			'name' => 'Staff Questions',
+			'description' => 'Add explanatory text and questions to the staff application form.',
+			'permission' => 'staff-questions'
+		),
+		array(
+			'id' => 'staff-blacklist',
+			'href' => '/admin/staff/blacklist.php',
+			'name' => 'Staff Blacklist',
+			'description' => 'Inform people reviewing staff applications of certain people who should not be accepted.',
+			'permission' => 'staff-blacklist'
+		),
+		array(
+			'id' => 'staff-mail',
+			'href' => '/admin/staff/mail.php',
+			'name' => 'Staff Form Letters',
+			'description' => 'Write form letters to be emailed to staff members.',
+			'permission' => 'staff-mail'
+		),
+	),
+	array(
+		array(
 			'id' => 'admin-users',
 			'href' => '/admin/users.php',
 			'name' => 'Admin Users',

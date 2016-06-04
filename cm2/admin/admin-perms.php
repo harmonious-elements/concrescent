@@ -71,6 +71,28 @@ $cm_admin_perms = array(
 	),
 	array(
 		array(
+			'id' => 'staff-badge-types',
+			'name' => 'Staff Badge Types',
+			'description' => 'Create or modify the types of badges available for staff members.'
+		),
+		array(
+			'id' => 'staff-questions',
+			'name' => 'Staff Questions',
+			'description' => 'Add explanatory text and questions to the staff application form.'
+		),
+		array(
+			'id' => 'staff-blacklist',
+			'name' => 'Staff Blacklist',
+			'description' => 'Inform people reviewing staff applications of certain people who should not be accepted.'
+		),
+		array(
+			'id' => 'staff-mail',
+			'name' => 'Staff Form Letters',
+			'description' => 'Write form letters to be emailed to staff members.'
+		),
+	),
+	array(
+		array(
 			'id' => 'admin-users',
 			'name' => 'Admin Users',
 			'description' => 'Manage CONcrescent administrators and their permissions.'
