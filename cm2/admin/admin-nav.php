@@ -106,6 +106,13 @@ $cm_admin_nav = array(
 			'description' => 'Write form letters to be emailed to staff members.',
 			'permission' => 'staff-mail'
 		),
+		array(
+			'id' => 'staff-csv',
+			'href' => '/admin/staff/csv.php',
+			'name' => 'Staff CSV',
+			'description' => 'Download a CSV file of staff application records.',
+			'permission' => 'staff-csv'
+		),
 	),
 	array(
 		array(

@@ -90,6 +90,11 @@ $cm_admin_perms = array(
 			'name' => 'Staff Form Letters',
 			'description' => 'Write form letters to be emailed to staff members.'
 		),
+		array(
+			'id' => 'staff-csv',
+			'name' => 'Staff CSV',
+			'description' => 'Download a CSV file of staff application records.'
+		),
 	),
 	array(
 		array(

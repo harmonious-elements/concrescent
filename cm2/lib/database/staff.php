@@ -1235,7 +1235,7 @@ class cm_staff_db {
 			$payment_date, $payment_details
 		);
 		if ($stmt->fetch()) {
-			$reg_url = get_site_url(true) . '/register';
+			$reg_url = get_site_url(true) . '/staff';
 			$id_string = 'S' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' . $qr_data;
@@ -1388,6 +1388,10 @@ class cm_staff_db {
 				$result['assigned-department-name'] = $assigned_positions[0]['department-name'];
 				$result['assigned-position-id'] = $assigned_positions[0]['position-id'];
 				$result['assigned-position-name'] = $assigned_positions[0]['position-name'];
+				$result['assigned-department-ids'] = array_column_simple($assigned_positions, 'department-id');
+				$result['assigned-department-names'] = array_column_simple($assigned_positions, 'department-name');
+				$result['assigned-position-ids'] = array_column_simple($assigned_positions, 'position-id');
+				$result['assigned-position-names'] = array_column_simple($assigned_positions, 'position-name');
 				$result['assigned-positions'] = $assigned_positions;
 			}
 			$stmt->close();
@@ -1467,7 +1471,7 @@ class cm_staff_db {
 			$payment_txn_id, $payment_txn_amt,
 			$payment_date, $payment_details
 		);
-		$reg_url = get_site_url(true) . '/register';
+		$reg_url = get_site_url(true) . '/staff';
 		while ($stmt->fetch()) {
 			$id_string = 'S' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
@@ -1622,6 +1626,10 @@ class cm_staff_db {
 				$staff_members[$i]['assigned-department-name'] = $assigned_positions[0]['department-name'];
 				$staff_members[$i]['assigned-position-id'] = $assigned_positions[0]['position-id'];
 				$staff_members[$i]['assigned-position-name'] = $assigned_positions[0]['position-name'];
+				$staff_members[$i]['assigned-department-ids'] = array_column_simple($assigned_positions, 'department-id');
+				$staff_members[$i]['assigned-department-names'] = array_column_simple($assigned_positions, 'department-name');
+				$staff_members[$i]['assigned-position-ids'] = array_column_simple($assigned_positions, 'position-id');
+				$staff_members[$i]['assigned-position-names'] = array_column_simple($assigned_positions, 'position-name');
 				$staff_members[$i]['assigned-positions'] = $assigned_positions;
 			}
 			$stmt->close();

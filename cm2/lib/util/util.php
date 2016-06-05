@@ -183,6 +183,14 @@ function array_keys_values($array, $key = 'key', $value = 'value') {
 	return $result;
 }
 
+function array_column_simple($array, $column) {
+	$result = array();
+	foreach ($array as $row) {
+		$result[] = $row[$column];
+	}
+	return $result;
+}
+
 function mail_merge($text, $fields) {
 	$s = array();
 	$r = array();
