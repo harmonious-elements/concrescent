@@ -1035,7 +1035,6 @@ class cm_staff_db {
 		);
 		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
 		$stmt->close();
-		$this->cm_db->connection->autocommit(true);
 		return $id;
 	}
 
@@ -1165,18 +1164,6 @@ class cm_staff_db {
 		$success = $stmt->fetch();
 		$stmt->close();
 		return $success ? $this->get_blacklist_entry($id) : false;
-	}
-
-	public function get_next_staff_member_id() {
-		$stmt = $this->cm_db->connection->prepare(
-			'SELECT IFNULL(MAX(`id`),0)+1 FROM '.
-			$this->cm_db->table_name('staff')
-		);
-		$stmt->execute();
-		$stmt->bind_result($id);
-		if (!$stmt->fetch()) $id = 0;
-		$stmt->close();
-		return $id;
 	}
 
 	public function get_staff_member($id, $uuid = null, $name_map = null, $dept_map = null, $pos_map = null, $fdb = null) {
@@ -1450,8 +1437,7 @@ class cm_staff_db {
 			$bind[0] .= 's';
 			$bind[] = &$tid;
 		}
-		$query .= ' ORDER BY `id`';
-		$stmt = $this->cm_db->connection->prepare($query);
+		$stmt = $this->cm_db->connection->prepare($query . ' ORDER BY `id`');
 		if (!$first) call_user_func_array(array($stmt, 'bind_param'), $bind);
 		$stmt->execute();
 		$stmt->bind_result(

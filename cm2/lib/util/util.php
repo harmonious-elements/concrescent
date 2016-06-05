@@ -20,20 +20,6 @@ function get_site_url($full) {
 	return get_domain_url() . $uriroot;
 }
 
-function get_page_url($full) {
-	if (!$full) return $_SERVER['REQUEST_URI'];
-	return get_domain_url() . $_SERVER['REQUEST_URI'];
-}
-
-function get_page_filename() {
-	$url = $_SERVER['REQUEST_URI'];
-	$o = strpos($url, '?');
-	if ($o !== FALSE) $url = substr($url, 0, $o);
-	$o = strrpos($url, '/');
-	if ($o !== FALSE) $url = substr($url, $o + 1);
-	return $url ? $url : 'index.php';
-}
-
 function ua($x) {
 	return (strpos($_SERVER['HTTP_USER_AGENT'], $x) !== FALSE);
 }

@@ -257,129 +257,6 @@ function cm_list_dialogs(&$list_def) {
 	echo '</div>';
 }
 
-function cm_list_query_op($a, $op, $b) {
-	switch ($op) {
-		case '<':
-			$numeric = is_numeric($a) && is_numeric($b);
-			if ($numeric) return (float)$a < (float)$b;
-			return strnatcasecmp($a, $b) < 0;
-		case '>':
-			$numeric = is_numeric($a) && is_numeric($b);
-			if ($numeric) return (float)$a > (float)$b;
-			return strnatcasecmp($a, $b) > 0;
-		case '<=':
-			$numeric = is_numeric($a) && is_numeric($b);
-			if ($numeric) return (float)$a <= (float)$b;
-			return strnatcasecmp($a, $b) <= 0;
-		case '>=':
-			$numeric = is_numeric($a) && is_numeric($b);
-			if ($numeric) return (float)$a >= (float)$b;
-			return strnatcasecmp($a, $b) >= 0;
-		case '=':
-			$a = strtolower($a);
-			$b = strtolower($b);
-			return $a == $b;
-		default:
-			$a = strtolower($a);
-			$b = strtolower($b);
-			return strpos($a, $b) !== false;
-	}
-}
-
-function cm_list_query_matches($query, $operation, $search_content, $entity) {
-	if (!$query) {
-		return true;
-	} else if ($query[0] == '"') {
-		foreach ($search_content as $s) {
-			if (cm_list_query_op($s, $operation, $query[1])) {
-				return true;
-			}
-		}
-		return false;
-	} else if ($query[0] == '-') {
-		return !cm_list_query_matches($query[1], $operation, $search_content, $entity);
-	} else if ($query[0] == '&') {
-		foreach ($query as $i => $q) {
-			if ($i && !cm_list_query_matches($q, $operation, $search_content, $entity)) {
-				return false;
-			}
-		}
-		return true;
-	} else if ($query[0] == '|') {
-		foreach ($query as $i => $q) {
-			if ($i && cm_list_query_matches($q, $operation, $search_content, $entity)) {
-				return true;
-			}
-		}
-		return false;
-	} else {
-		$newOperation = $query[0];
-		$newEntity = (is_array($entity) && isset($entity[$query[1]])) ? $entity[$query[1]] : null;
-		$newQuery = $query[2];
-		if ($newEntity === null) {
-			return false;
-		} else if (is_array($newEntity) && array_keys($newEntity) !== range(0, count($newEntity) - 1)) {
-			$newSearchContent = isset($newEntity['search-content']) ? $newEntity['search-content'] : null;
-			if ($newSearchContent === null) {
-				return cm_list_query_matches($newQuery, $newOperation, array(print_r($newEntity, true)), $newEntity);
-			} else if (is_array($newSearchContent)) {
-				return cm_list_query_matches($newQuery, $newOperation, $newSearchContent, $newEntity);
-			} else {
-				return cm_list_query_matches($newQuery, $newOperation, array($newSearchContent), $newEntity);
-			}
-		} else if (is_array($newEntity)) {
-			return cm_list_query_matches($newQuery, $newOperation, $newEntity, $newEntity);
-		} else {
-			return cm_list_query_matches($newQuery, $newOperation, array($newEntity), $newEntity);
-		}
-	}
-}
-
-function cm_list_sort_compare_numeric($a, $b) {
-	$a = (float)$a;
-	$b = (float)$b;
-	if ($a < $b) return -1;
-	if ($a > $b) return +1;
-	return 0;
-}
-
-function cm_list_sort_compare_function($type) {
-	switch ($type) {
-		case 'text':
-		case 'url':
-		case 'url-short':
-		case 'email':
-		case 'email-short':
-		case 'email-subbed':
-		case 'status-label':
-			return 'strnatcasecmp';
-		case 'numeric':
-		case 'quantity':
-		case 'price':
-			return 'cm_list_sort_compare_numeric';
-		default:
-			return null;
-	}
-}
-
-function cm_list_sort_entities(&$list_def, &$entities, $sort_order) {
-	if ($sort_order) {
-		foreach ($sort_order as $column_index) {
-			$descending = ($column_index < 0);
-			if ($descending) $column_index = ~$column_index;
-			$column = $list_def['columns'][$column_index];
-			$compare = cm_list_sort_compare_function($column['type']);
-			$key = $column['key'];
-			if ($compare && $key) {
-				usort($entities, function($a, $b) use ($descending, $compare, $key) {
-					$cmp = $compare($a[$key], $b[$key]);
-					return $descending ? -$cmp : $cmp;
-				});
-			}
-		}
-	}
-}
-
 function cm_list_make_row(&$list_def, &$entity) {
 	$search = isset($entity['search-content']) ? $entity['search-content'] : null;
 	return array(
@@ -389,44 +266,13 @@ function cm_list_make_row(&$list_def, &$entity) {
 	);
 }
 
-function cm_list_process_entities(&$list_def, &$all_entities, $filter = false) {
-	if ($filter) {
-		$query = json_decode($_POST['cm-list-search-query'], true);
-		$sort_order = json_decode($_POST['cm-list-sort-order'], true);
-		$offset = (int)$_POST['cm-list-page-offset'];
-		$length = (int)$_POST['cm-list-page-length'];
-
-		if ($query) {
-			$matched_entities = array();
-			foreach ($all_entities as $entity) {
-				$search = isset($entity['search-content']) ? $entity['search-content'] : null;
-				if ($search && cm_list_query_matches($query, ':', $search, $entity)) {
-					$matched_entities[] = $entity;
-				}
-			}
-		} else {
-			$matched_entities = $all_entities;
-		}
-
-		cm_list_sort_entities($list_def, $matched_entities, $sort_order);
-
-		if ($length) {
-			$returned_entities = array_slice($matched_entities, $offset, $length);
-		} else {
-			$returned_entities = $matched_entities;
-		}
-	} else {
-		$matched_entities = $all_entities;
-		$returned_entities = $all_entities;
-	}
-
+function cm_list_process_entities(&$list_def, &$entities) {
 	$rows = array();
-	foreach ($returned_entities as $entity) {
+	foreach ($entities as $entity) {
 		$rows[] = cm_list_make_row($list_def, $entity);
 	}
 	return array(
 		'ok' => true,
-		'rows' => $rows,
-		'match-count' => count($matched_entities)
+		'rows' => $rows
 	);
 }
