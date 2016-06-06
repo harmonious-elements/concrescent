@@ -71,6 +71,33 @@ $cm_admin_perms = array(
 	),
 	array(
 		array(
+			'id' => 'staff',
+			'name' => 'Staff',
+			'description' => 'View the list of staff applications.'
+		),
+		array(
+			'id' => 'staff-view',
+			'name' => 'Staff - View',
+			'description' => 'View individual staff applications.'
+		),
+		array(
+			'id' => 'staff-review',
+			'name' => 'Staff - Review',
+			'description' => 'Review and approve staff applications.'
+		),
+		array(
+			'id' => 'staff-edit',
+			'name' => 'Staff - Edit',
+			'description' => 'Modify staff applications.'
+		),
+		array(
+			'id' => 'staff-delete',
+			'name' => 'Staff - Delete',
+			'description' => 'Delete staff applications.'
+		),
+	),
+	array(
+		array(
 			'id' => 'staff-badge-types',
 			'name' => 'Staff Badge Types',
 			'description' => 'Create or modify the types of badges available for staff members.'
