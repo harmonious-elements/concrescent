@@ -427,7 +427,8 @@ select {
 .email-subbed .subscribed.subscribed-false {
 	color: red;
 }
-.cm-status-label.cm-status-incomplete {
+.cm-status-label.cm-status-incomplete,
+.cm-status-label.cm-status-submitted {
 	color: blue;
 }
 .cm-status-label.cm-status-cancelled {
@@ -436,10 +437,12 @@ select {
 .cm-status-label.cm-status-rejected {
 	color: red;
 }
-.cm-status-label.cm-status-completed {
+.cm-status-label.cm-status-completed,
+.cm-status-label.cm-status-accepted {
 	color: green;
 }
-.cm-status-label.cm-status-refunded {
+.cm-status-label.cm-status-refunded,
+.cm-status-label.cm-status-waitlisted {
 	color: orange;
 }
 
@@ -717,4 +720,25 @@ table.cm-cart td:not(.td-actions) {
 .cm-statistics .cm-stat {
 	width: 80px;
 	cursor: pointer;
+}
+
+/* Reindex Pages */
+
+.progress-track {
+	display: inline-block;
+	position: relative;
+	width: 200px;
+	height: 12px;
+	background: #ccf;
+	border: solid 1px black;
+	margin: -3px 2em -3px 2em;
+}
+.progress-bar {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 0;
+	bottom: 0;
+	background: #444;
 }
