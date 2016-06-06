@@ -3,6 +3,28 @@
 require_once dirname(__FILE__).'/res.php';
 require_once dirname(__FILE__).'/util.php';
 
+function cm_form_questions_to_list_columns($questions) {
+	$columns = array();
+	$ignored_question_types = array('h1', 'h2', 'h3', 'p', 'q', 'hr');
+	foreach ($questions as $question) {
+		if (
+			$question['active'] && $question['listed'] &&
+			!in_array($question['type'], $ignored_question_types)
+		) {
+			$is_array_type = ($question['type'] == 'checkbox');
+			$key_prefix = 'form-answer-' . ($is_array_type ? 'array' : 'string');
+			$column_key = $key_prefix . '-' . $question['question-id'];
+			$column_type = ($is_array_type ? 'array-short' : 'text');
+			$columns[] = array(
+				'name' => $question['title'],
+				'key' => $column_key,
+				'type' => $column_type
+			);
+		}
+	}
+	return $columns;
+}
+
 function cm_list_head(&$list_def) {
 	echo '<script type="text/javascript">';
 		$function_names = array(

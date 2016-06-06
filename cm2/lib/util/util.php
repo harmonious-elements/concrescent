@@ -47,8 +47,8 @@ function safe_html_string($s, $paragraph = false) {
 	while (preg_match($s3, $s)) $s = preg_replace($s3, $r3, $s);
 	while (preg_match($s4, $s)) $s = preg_replace($s4, $r4, $s);
 	if ($paragraph) {
-		$s = preg_replace('/(<br>){2,}/', '</p><p>', $s);
-		$s = '<p>' . $s . '</p>';
+		$ptag = (($paragraph === true) ? '<p>' : ('<p class="'.$paragraph.'">'));
+		$s = $ptag . preg_replace('/(<br>){2,}/', '</p>'.$ptag, $s) . '</p>';
 	}
 	return $s;
 }

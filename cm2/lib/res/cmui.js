@@ -77,12 +77,16 @@ cmui = (function($,window,document){
 		s = s.replace(/\n/g, '<br>');
 		return s;
 	};
-	var safeHtmlString = function(s) {
+	var safeHtmlString = function(s, paragraph) {
 		s = paragraphString(s);
 		s = s.replace(/&lt;a href=&quot;(([^"'&<>]|&amp;)*?)&quot;( target=&quot;(([^"'&<>]|&amp;)*?)&quot;)?&gt;(.*?)&lt;\/a&gt;/g, '<a href="$1" target="_blank">$6</a>');
 		s = s.replace(/&lt;img src=&quot;(([^"'&<>]|&amp;)*?)&quot;&gt;/g, '<img src="$1">');
 		s = s.replace(/&lt;(b|i|u|s|q|tt|em|strong|sup|sub|big|small|ins|del|abbr|cite|code|dfn|kbd|samp|var)&gt;(.*?)&lt;\/\1&gt;/g, '<$1>$2</$1>');
 		s = s.replace(/&lt;(br|wbr)&gt;/g, '<$1>');
+		if (paragraph) {
+			var ptag = ((paragraph === true) ? '<p>' : ('<p class="' + paragraph + '">'));
+			s = ptag + s.replace(/(<br>){2,}/g, '</p>' + ptag) + '</p>';
+		}
 		return s;
 	};
 	var priceString = function(price) {

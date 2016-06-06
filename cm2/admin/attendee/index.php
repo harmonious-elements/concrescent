@@ -17,61 +17,53 @@ $name_map = $atdb->get_badge_type_name_map();
 $fdb = new cm_forms_db($db, 'attendee');
 $questions = $fdb->list_questions();
 
-$columns = array(
+$columns = array_merge(
 	array(
-		'name' => 'ID',
-		'key' => 'id-string',
-		'type' => 'text'
+		array(
+			'name' => 'ID',
+			'key' => 'id-string',
+			'type' => 'text'
+		),
+		array(
+			'name' => 'Real Name',
+			'key' => 'real-name',
+			'type' => 'text'
+		),
+		array(
+			'name' => 'Fandom Name',
+			'key' => 'fandom-name',
+			'type' => 'text'
+		),
+		array(
+			'name' => 'Badge Type',
+			'key' => 'badge-type-name',
+			'type' => 'text'
+		),
+		array(
+			'name' => 'Email Address',
+			'key' => 'email-address',
+			'type' => 'email-subbed'
+		),
 	),
+	cm_form_questions_to_list_columns($questions),
 	array(
-		'name' => 'Real Name',
-		'key' => 'real-name',
-		'type' => 'text'
-	),
-	array(
-		'name' => 'Fandom Name',
-		'key' => 'fandom-name',
-		'type' => 'text'
-	),
-	array(
-		'name' => 'Badge Type',
-		'key' => 'badge-type-name',
-		'type' => 'text'
-	),
-	array(
-		'name' => 'Email Address',
-		'key' => 'email-address',
-		'type' => 'email-subbed'
-	),
+		array(
+			'name' => 'Payment Status',
+			'key' => 'payment-status',
+			'type' => 'status-label'
+		),
+		array(
+			'name' => 'Promo Code',
+			'key' => 'payment-promo-code',
+			'type' => 'text'
+		),
+		array(
+			'name' => 'Payment Date',
+			'key' => 'payment-date',
+			'type' => 'text'
+		),
+	)
 );
-foreach ($questions as $question) {
-	if (!$question['active'] || !$question['listed']) continue;
-	$is_array_type = ($question['type'] == 'checkbox');
-	$key_prefix = 'form-answer-' . ($is_array_type ? 'array' : 'string') . '-';
-	$column_type = ($is_array_type ? 'array-short' : 'text');
-	$columns[] = array(
-		'name' => $question['text'],
-		'key' => $key_prefix . $question['question-id'],
-		'type' => $column_type
-	);
-}
-$columns = array_merge($columns, array(
-	array(
-		'name' => 'Payment Status',
-		'key' => 'payment-status',
-		'type' => 'status-label'
-	),
-	array(
-		'name' => 'Promo Code',
-		'key' => 'payment-promo-code',
-		'type' => 'text'
-	),
-	array(
-		'name' => 'Payment Date',
-		'key' => 'payment-date',
-		'type' => 'text'
-	),
-));
 $list_def = array(
 	'loader' => 'server-side',
 	'ajax-url' => get_site_url(false) . '/admin/attendee/index.php',

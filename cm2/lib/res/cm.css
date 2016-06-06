@@ -182,6 +182,9 @@ th, td {
 .td-actions form {
 	display: inline;
 }
+
+/* Forms */
+
 .cm-form-table tbody th {
 	text-align: right;
 }
@@ -191,6 +194,17 @@ th, td {
 }
 .cm-form-table tbody th label {
 	white-space: nowrap;
+}
+.cm-form-table tbody td h1 + p,
+.cm-form-table tbody td h2 + p {
+	margin-top: 4px;
+}
+.cm-form-table tbody td h3 + p,
+.cm-form-table tbody td p + p {
+	margin-top: 6px;
+}
+.cm-form-table tbody td p.cm-question-title {
+	font-weight: bold;
 }
 
 /* Form Elements */
@@ -462,14 +476,12 @@ select {
 .cm-form-editor table .cm-form-editor-dynamic-row * {
 	cursor: pointer;
 }
-.cm-form-editor table .cm-form-editor-dynamic-row h1:empty:after,
-.cm-form-editor table .cm-form-editor-dynamic-row h2:empty:after,
-.cm-form-editor table .cm-form-editor-dynamic-row h3:empty:after {
+.cm-form-editor table .cm-form-editor-dynamic-row .cm-question-title:empty:after {
 	content: "Untitled Title";
 	color: gray;
 	font-style: italic;
 }
-.cm-form-editor table .cm-form-editor-dynamic-row p:empty:after {
+.cm-form-editor table .cm-form-editor-dynamic-row .cm-question-text:empty:after {
 	content: "Untitled explanatory text.";
 	color: gray;
 	font-style: italic;

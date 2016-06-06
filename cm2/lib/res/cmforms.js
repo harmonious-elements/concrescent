@@ -15,33 +15,24 @@
 		else e.removeClass(c);
 	};
 	var typeTakesTitle = function(type) {
-		return (type == 'h1' || type == 'h2' || type == 'h3');
+		return (type != 'hr');
 	};
-	var typeTakesShortText = function(type) {
-		return !(type == 'p' || type == 'hr');
-	};
-	var typeTakesLongText = function(type) {
-		return (type == 'p');
+	var typeTakesText = function(type) {
+		return (type != 'hr');
 	};
 	var typeTakesValues = function(type) {
 		return (type == 'radio' || type == 'checkbox' || type == 'select');
 	};
 	var pushToEditor = function(editor, question) {
-		/* Type */
+		/* Type, Title, Text, Values, Active, Listed */
 		var type = (question['type'] || 'text');
-		editor.find('.ea-type').val(type);
-		editor.filter('.ear-text-short').find('label').text(typeTakesTitle(type) ? 'Title' : 'Label');
-		setClass(editor.filter('.ear-text-short'), 'hidden', !typeTakesShortText(type));
-		setClass(editor.filter('.ear-text-long'), 'hidden', !typeTakesLongText(type));
+		setClass(editor.filter('.ear-title'), 'hidden', !typeTakesTitle(type));
+		setClass(editor.filter('.ear-text'), 'hidden', !typeTakesText(type));
 		setClass(editor.filter('.ear-values'), 'hidden', !typeTakesValues(type));
-		/* Text */
-		var text = (question['text'] || '');
-		editor.find('.ea-text-short').val(text);
-		editor.find('.ea-text-long').val(text);
-		/* Values */
-		var values = (question['values'] || []).join('\n');
-		editor.find('.ea-values').val(values);
-		/* Active & Listed */
+		editor.find('.ea-type').val(type);
+		editor.find('.ea-title').val(question['title'] || '');
+		editor.find('.ea-text').val(question['text'] || '');
+		editor.find('.ea-values').val((question['values'] || []).join('\n'));
 		editor.find('.ea-active').prop('checked', !!question['active']);
 		editor.find('.ea-listed').prop('checked', !!question['listed']);
 		/* Visible */
@@ -78,17 +69,18 @@
 		}
 	};
 	var pullFromEditor = function(editor, question) {
-		/* Type, Text, Values, Active, Listed */
+		/* Type, Title, Text, Values, Active, Listed */
 		if (!question) question = {};
 		var type = (editor.find('.ea-type').val() || 'text');
-		var text = typeTakesShortText(type) ? (editor.find('.ea-text-short').val() || '') :
-		           typeTakesLongText(type) ? (editor.find('.ea-text-long').val() || '') : '';
-		var values = typeTakesValues(type) ? (editor.find('.ea-values').val() || '') : '';
+		var title = (typeTakesTitle(type) ? (editor.find('.ea-title').val() || '') : '');
+		var text = (typeTakesText(type) ? (editor.find('.ea-text').val() || '') : '');
+		var values = (typeTakesValues(type) ? (editor.find('.ea-values').val() || '') : '');
 		values = values.replace(/\r\n/g, '\n');
 		values = values.replace(/\r/g, '\n');
 		values = values.replace(/\n+/g, '\n').trim();
 		values = values ? values.split('\n') : [];
 		question['type'] = type;
+		question['title'] = title;
 		question['text'] = text;
 		question['values'] = values;
 		question['active'] = editor.find('.ea-active').is(':checked');
@@ -125,9 +117,8 @@
 			var typeNewVal = typeField.val();
 			if (typeNewVal != typeOldVal) {
 				typeOldVal = typeNewVal;
-				editor.filter('.ear-text-short').find('label').text(typeTakesTitle(typeNewVal) ? 'Title' : 'Label');
-				setClass(editor.filter('.ear-text-short'), 'hidden', !typeTakesShortText(typeNewVal));
-				setClass(editor.filter('.ear-text-long'), 'hidden', !typeTakesLongText(typeNewVal));
+				setClass(editor.filter('.ear-title'), 'hidden', !typeTakesTitle(typeNewVal));
+				setClass(editor.filter('.ear-text'), 'hidden', !typeTakesText(typeNewVal));
 				setClass(editor.filter('.ear-values'), 'hidden', !typeTakesValues(typeNewVal));
 				if (onChange) onChange(editor, 'type', typeNewVal);
 			}
@@ -137,34 +128,32 @@
 		typeField.bind('keyup', typeChanged);
 		typeField.bind('mousedown', typeChanged);
 		typeField.bind('mouseup', typeChanged);
-		/* Short Text */
-		var shortTextField = editor.find('.ea-text-short');
-		var shortTextFieldOldVal = shortTextField.val();
-		var shortTextFieldChanged = function() {
-			var shortTextFieldNewVal = shortTextField.val();
-			if (shortTextFieldNewVal != shortTextFieldOldVal) {
-				shortTextFieldOldVal = shortTextFieldNewVal;
-				editor.find('.ea-text-long').val(shortTextFieldNewVal);
-				if (onChange) onChange(editor, 'text', shortTextFieldNewVal);
+		/* Title */
+		var titleField = editor.find('.ea-title');
+		var titleFieldOldVal = titleField.val();
+		var titleFieldChanged = function() {
+			var titleFieldNewVal = titleField.val();
+			if (titleFieldNewVal != titleFieldOldVal) {
+				titleFieldOldVal = titleFieldNewVal;
+				if (onChange) onChange(editor, 'title', titleFieldNewVal);
 			}
 		};
-		shortTextField.bind('change', shortTextFieldChanged);
-		shortTextField.bind('keydown', shortTextFieldChanged);
-		shortTextField.bind('keyup', shortTextFieldChanged);
-		/* Long Text */
-		var longTextField = editor.find('.ea-text-long');
-		var longTextFieldOldVal = longTextField.val();
-		var longTextFieldChanged = function() {
-			var longTextFieldNewVal = longTextField.val();
-			if (longTextFieldNewVal != longTextFieldOldVal) {
-				longTextFieldOldVal = longTextFieldNewVal;
-				editor.find('.ea-text-short').val(longTextFieldNewVal);
-				if (onChange) onChange(editor, 'text', longTextFieldNewVal);
+		titleField.bind('change', titleFieldChanged);
+		titleField.bind('keydown', titleFieldChanged);
+		titleField.bind('keyup', titleFieldChanged);
+		/* Text */
+		var textField = editor.find('.ea-text');
+		var textFieldOldVal = textField.val();
+		var textFieldChanged = function() {
+			var textFieldNewVal = textField.val();
+			if (textFieldNewVal != textFieldOldVal) {
+				textFieldOldVal = textFieldNewVal;
+				if (onChange) onChange(editor, 'text', textFieldNewVal);
 			}
 		};
-		longTextField.bind('change', longTextFieldChanged);
-		longTextField.bind('keydown', longTextFieldChanged);
-		longTextField.bind('keyup', longTextFieldChanged);
+		textField.bind('change', textFieldChanged);
+		textField.bind('keydown', textFieldChanged);
+		textField.bind('keyup', textFieldChanged);
 		/* Values */
 		var valuesField = editor.find('.ea-values');
 		var valuesFieldOldVal = valuesField.val();
@@ -333,6 +322,7 @@
 				editor.addClass('editorid-' + question['question-id']);
 				tr.after(editor);
 				tr.addClass('editing');
+				var oldQuic = ((question['title']?1:2) | (question['text']?4:8));
 				pushToEditor(editor, question);
 				prepEditor(editor, function(e, what, value) {
 					switch (what) {
@@ -343,13 +333,21 @@
 								tr.html($(html).html());
 							});
 							break;
+						case 'title':
 						case 'text':
-							var html = cmui.safeHtmlString(value);
-							tr.find('td > h1').html(html);
-							tr.find('td > h2').html(html);
-							tr.find('td > h3').html(html);
-							tr.find('td > p').html(html);
-							tr.find('th > label').text(value);
+							var newQuic = ((editor.find('.ea-title').val()?1:2) | (editor.find('.ea-text').val()?4:8));
+							if (newQuic != oldQuic) {
+								var newQuestion = pullFromEditor(editor, {});
+								renderQuestion(newQuestion, function(html) {
+									tr.html($(html).html());
+									oldQuic = newQuic;
+								});
+							} else {
+								var html = cmui.safeHtmlString(value, 'cm-question-' + what);
+								tr.find('.cm-question-' + what).not(':eq(0)').remove();
+								tr.find('.cm-question-' + what).replaceWith($(html));
+								tr.find('th > label').text(value);
+							}
 							break;
 						case 'active':
 							setClass(tr, 'inactive', !value);
@@ -435,7 +433,7 @@
 					cmui.showDialog('delete');
 				});
 				$('*').blur();
-				editor.find('.ea-text-short').focus();
+				editor.find('.ea-title').focus();
 			});
 		};
 		var doLoad = function() {

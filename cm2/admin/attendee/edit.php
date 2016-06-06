@@ -271,7 +271,7 @@ echo '<article>';
 
 				$first = true;
 				foreach ($questions as $question) {
-					if ($question['active'] && $question['type'] != 'p') {
+					if ($question['active']) {
 						if ($first) {
 							echo '<tr><td colspan="2"><hr></td></tr>';
 							echo '<tr><td colspan="2"><h2>Additional Information</h2></td></tr>';

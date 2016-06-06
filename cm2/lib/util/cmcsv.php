@@ -2,12 +2,12 @@
 
 function cm_form_questions_to_csv_columns($questions) {
 	$columns = array();
-	$ignored_question_types = array('h1', 'h2', 'h3', 'p', 'hr');
+	$ignored_question_types = array('h1', 'h2', 'h3', 'p', 'q', 'hr');
 	foreach ($questions as $question) {
 		if ($question['active'] && !in_array($question['type'], $ignored_question_types)) {
 			$columns[] = array(
 				'key' => 'form-answer-array-' . $question['question-id'],
-				'name' => $question['text'],
+				'name' => $question['title'],
 				'type' => 'array'
 			);
 		}

@@ -78,42 +78,57 @@ function cm_form_input($id, $type, $values, $answer, $required = false, $disable
 	}
 }
 
-function cm_form_row($question, $answer) {
-	$classes = array('cm-question-row');
-	foreach ($question['visible'] as $subcontext) {
-		$classes[] = 'cm-question-row-' . (($subcontext == '*') ? 'all' : $subcontext);
+function cm_form_row($question, $answer, $for_editor = false) {
+	if ($for_editor) {
+		$out = '<tr>';
+	} else {
+		$classes = array('cm-question-row');
+		if (isset($question['visible']) && $question['visible']) {
+			foreach ($question['visible'] as $subcontext) {
+				$classes[] = 'cm-question-row-' . (($subcontext == '*') ? 'all' : $subcontext);
+			}
+		}
+		$out = '<tr class="' . implode(' ', $classes) . '">';
 	}
-	$out = '<tr class="' . implode(' ', $classes) . '">';
-	switch ($question['type']) {
+	$id = isset($question['question-id']) ? $question['question-id'] : '';
+	$title = isset($question['title']) ? $question['title'] : '';
+	$text = isset($question['text']) ? $question['text'] : '';
+	$type = isset($question['type']) ? $question['type'] : '';
+	$values = isset($question['values']) ? $question['values'] : array();
+	switch ($type) {
 		case 'h1':
 		case 'h2':
 		case 'h3':
-		case 'p':
 			$out .= '<td colspan="2">';
-			$out .= '<' . $question['type'] . '>';
-			$out .= safe_html_string($question['text']);
-			$out .= '</' . $question['type'] . '>';
+			if ($title) $out .= '<'.$type.' class="cm-question-title">' . safe_html_string($title) . '</'.$type.'>';
+			if ($text) $out .= safe_html_string($text, 'cm-question-text');
+			if ($for_editor && !$title && !$text) $out .= '<'.$type.' class="cm-question-title"></'.$type.'>';
+			$out .= '</td>';
+			break;
+		case 'p':
+		case 'q':
+			$out .= (($type == 'p') ? '<td colspan="2">' : '<th></th><td>');
+			if ($title) $out .= safe_html_string($title, 'cm-question-title');
+			if ($text) $out .= safe_html_string($text, 'cm-question-text');
+			if ($for_editor && !$title && !$text) $out .= '<p class="cm-question-text"></p>';
 			$out .= '</td>';
 			break;
 		case 'hr':
 			$out .= '<td colspan="2"><hr></td>';
 			break;
 		default:
-			$out .= '<th>';
-			$out .= cm_form_label(
-				(isset($question['question-id']) ? $question['question-id'] : ''),
-				(isset($question['text']) ? $question['text'] : '')
-			);
-			$out .= '</th>';
-			$out .= '<td>';
-			$out .= cm_form_input(
-				(isset($question['question-id']) ? $question['question-id'] : ''),
-				(isset($question['type']) ? $question['type'] : ''),
-				(isset($question['values']) ? $question['values'] : ''),
-				$answer, false, false
-			);
-			$out .= '</td>';
-			
+			if ($title && $text) {
+				$out .= '<th></th>';
+				$out .= '<td>';
+				$out .= safe_html_string($title, 'cm-question-title');
+				$out .= safe_html_string($text, 'cm-question-text');
+				$out .= '<p>' . cm_form_input($id, $type, $values, $answer, false, $for_editor) . '</p>';
+				$out .= '</td>';
+			} else {
+				$out .= '<th>' . cm_form_label($id, ($title ? $title : ($text ? $text : ''))) . '</th>';
+				$out .= '<td>' . cm_form_input($id, $type, $values, $answer, false, $for_editor) . '</td>';
+			}
+			break;
 	}
 	return $out . '</tr>';
 }
@@ -152,9 +167,7 @@ function cm_form_posted_answer($id, $type) {
 /* Form Editor */
 
 function cm_form_edit_head(&$form_def) {
-	echo '<script type="text/javascript">';
-		echo 'cm_form_def = (' . json_encode($form_def) . ');';
-	echo '</script>';
+	echo '<script type="text/javascript">cm_form_def = (' . json_encode($form_def) . ');</script>';
 	echo '<script type="text/javascript" src="' . htmlspecialchars(resource_file_url('cmforms.js', false)) . '"></script>';
 }
 
@@ -163,42 +176,10 @@ function cm_form_edit_start() {
 	echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 }
 
-function cm_form_edit_row($question, $answer) {
-	switch ($question['type']) {
-		case 'h1':
-		case 'h2':
-		case 'h3':
-		case 'p':
-			$out = '<tr><td colspan="2">';
-			$out .= '<' . $question['type'] . '>';
-			$out .= safe_html_string($question['text']);
-			$out .= '</' . $question['type'] . '>';
-			$out .= '</td></tr>';
-			return $out;
-		case 'hr':
-			return '<tr><td colspan="2"><hr></td></tr>';
-		default:
-			$out = '<tr><th>';
-			$out .= cm_form_label(
-				(isset($question['question-id']) ? $question['question-id'] : ''),
-				(isset($question['text']) ? $question['text'] : '')
-			);
-			$out .= '</th><td>';
-			$out .= cm_form_input(
-				(isset($question['question-id']) ? $question['question-id'] : ''),
-				(isset($question['type']) ? $question['type'] : ''),
-				(isset($question['values']) ? $question['values'] : ''),
-				$answer, false, true
-			);
-			$out .= '</td></tr>';
-			return $out;
-	}
-}
-
 function cm_form_edit_static_section(&$questions) {
 	echo '<tbody class="cm-form-editor-static-section">';
 	foreach ($questions as $question) {
-		echo cm_form_edit_row($question, array('Question provided by system'));
+		echo cm_form_row($question, array('Question provided by system'), true);
 	}
 	echo '</tbody>';
 }
@@ -237,50 +218,83 @@ function cm_form_edit_dynamic_section(&$form_def) {
 		echo '</tr>';
 	echo '</tbody>';
 	echo '<tbody class="cm-form-editor-dynamic-section-editor hidden">';
-		echo '<tr class="cm-form-editor-row-editor-row"><th><label>Type</label></th><td>';
-			echo '<select class="ea-type">';
-				echo '<option value="h1">Large Title</option>';
-				echo '<option value="h2">Medium Title</option>';
-				echo '<option value="h3">Small Title</option>';
-				echo '<option value="p">Explanatory Text</option>';
-				echo '<option value="hr">Section Break</option>';
-				echo '<option value="text" selected>Short Answer</option>';
-				echo '<option value="textarea">Long Answer</option>';
-				echo '<option value="url">URL</option>';
-				echo '<option value="email">Email Address</option>';
-				echo '<option value="radio">Multiple Choice</option>';
-				echo '<option value="checkbox">Checkboxes</option>';
-				echo '<option value="select">Choose from a List</option>';
-			echo '</select>';
-		echo '</td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row ear-text-short"><th><label>Label</label></th><td><input type="text" class="ea-text-short"></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row ear-text-long hidden"><th><label>Text</label></th><td><textarea class="ea-text-long"></textarea></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row ear-values hidden"><th><label>Values</label></th><td><textarea class="ea-values"></textarea></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row"><th><label>Active</label></th><td><label><input type="checkbox" checked class="ea-active">Question and answer appear on Review and Edit detail pages.</label></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row"><th><label>In List</label></th><td><label><input type="checkbox" class="ea-listed">Answers appear in a column on Review and Edit list pages.</label></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row"><th><label>Visible</label></th><td><label><input type="checkbox" checked class="ea-visible">Question appears on Register and Apply pages.</label> <a href="#" class="ea-visible-advanced">Advanced...</a></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row ear-visible-advanced hidden"><th></th><td>';
-			if (isset($form_def['subcontext'])) {
-				foreach ($form_def['subcontext'] as $subcontext) {
-					echo '<label><input type="checkbox" checked class="ea-visible-' . htmlspecialchars($subcontext['id']) . '">' . htmlspecialchars($subcontext['name']) . '</label>';
+		echo '<tr class="cm-form-editor-row-editor-row">';
+			echo '<th><label>Type</label></th>';
+			echo '<td>';
+				echo '<select class="ea-type">';
+					echo '<option value="h1">Large Title</option>';
+					echo '<option value="h2">Medium Title</option>';
+					echo '<option value="h3">Small Title</option>';
+					echo '<option value="p">Explanatory Text</option>';
+					echo '<option value="q">Indented Text</option>';
+					echo '<option value="hr">Section Break</option>';
+					echo '<option value="text" selected>Short Answer</option>';
+					echo '<option value="textarea">Long Answer</option>';
+					echo '<option value="url">URL</option>';
+					echo '<option value="email">Email Address</option>';
+					echo '<option value="radio">Multiple Choice</option>';
+					echo '<option value="checkbox">Checkboxes</option>';
+					echo '<option value="select">Choose from a List</option>';
+				echo '</select>';
+			echo '</td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row ear-title">';
+			echo '<th><label>Title</label></th>';
+			echo '<td><input type="text" class="ea-title"></td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row ear-text">';
+			echo '<th><label>Text</label></th>';
+			echo '<td><textarea class="ea-text"></textarea></td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row ear-values hidden">';
+			echo '<th><label>Values</label></th>';
+			echo '<td><textarea class="ea-values"></textarea></td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row">';
+			echo '<th><label>Active</label></th>';
+			echo '<td><label><input type="checkbox" checked class="ea-active">Question and answer appear on Review and Edit detail pages.</label></td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row">';
+			echo '<th><label>In List</label></th>';
+			echo '<td><label><input type="checkbox" class="ea-listed">Answers appear in a column on Review and Edit list pages.</label></td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row">';
+			echo '<th><label>Visible</label></th>';
+			echo '<td><label><input type="checkbox" checked class="ea-visible">Question appears on Register and Apply pages.</label> <a href="#" class="ea-visible-advanced">Advanced...</a></td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row ear-visible-advanced hidden">';
+			echo '<th></th>';
+			echo '<td>';
+				if (isset($form_def['subcontext'])) {
+					foreach ($form_def['subcontext'] as $subcontext) {
+						echo '<label><input type="checkbox" checked class="ea-visible-' . htmlspecialchars($subcontext['id']) . '">' . htmlspecialchars($subcontext['name']) . '</label>';
+					}
 				}
-			}
-		echo '</td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row"><th><label>Required</label></th><td><label><input type="checkbox" class="ea-required">Question must be answered in order to submit.</label> <a href="#" class="ea-required-advanced">Advanced...</a></td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row ear-required-advanced hidden"><th></th><td>';
-			if (isset($form_def['subcontext'])) {
-				foreach ($form_def['subcontext'] as $subcontext) {
-					echo '<label><input type="checkbox" class="ea-required-' . htmlspecialchars($subcontext['id']) . '">' . htmlspecialchars($subcontext['name']) . '</label>';
+			echo '</td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row">';
+			echo '<th><label>Required</label></th>';
+			echo '<td><label><input type="checkbox" class="ea-required">Question must be answered in order to submit.</label> <a href="#" class="ea-required-advanced">Advanced...</a></td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row ear-required-advanced hidden">';
+			echo '<th></th>';
+			echo '<td>';
+				if (isset($form_def['subcontext'])) {
+					foreach ($form_def['subcontext'] as $subcontext) {
+						echo '<label><input type="checkbox" class="ea-required-' . htmlspecialchars($subcontext['id']) . '">' . htmlspecialchars($subcontext['name']) . '</label>';
+					}
 				}
-			}
-		echo '</td></tr>';
-		echo '<tr class="cm-form-editor-row-editor-row"><td colspan="2" class="td-actions">';
-			echo '<button class="delete-button">Delete</button>';
-			echo '<button class="up-button">&#x2191;</button>';
-			echo '<button class="down-button">&#x2193;</button>';
-			echo '<button class="cancel-edit-button">Cancel</button>';
-			echo '<button class="confirm-edit-button">Save</button>';
-		echo '</td></tr>';
+			echo '</td>';
+		echo '</tr>';
+		echo '<tr class="cm-form-editor-row-editor-row">';
+			echo '<td colspan="2" class="td-actions">';
+				echo '<button class="delete-button">Delete</button>';
+				echo '<button class="up-button">&#x2191;</button>';
+				echo '<button class="down-button">&#x2193;</button>';
+				echo '<button class="cancel-edit-button">Cancel</button>';
+				echo '<button class="confirm-edit-button">Save</button>';
+			echo '</td>';
+		echo '</tr>';
 	echo '</tbody>';
 }
 
@@ -295,7 +309,7 @@ function cm_form_edit_body(&$form_def, $questions) {
 	foreach ($questions as $question) {
 		if ($question['type'] == 'custom-text') {
 			if ($section) cm_form_edit_static_section($section);
-			$name = $question['name'];
+			$name = (isset($question['name']) ? $question['name'] : '');
 			$default = (isset($question['default']) ? $question['default'] : '');
 			cm_form_edit_custom_text_section($name, $default);
 			$section = array();
@@ -369,7 +383,7 @@ function cm_form_edit_process_requests($db) {
 			case 'render-dynamic-row':
 				$question = json_decode($_POST['cm-form-question'], true);
 				$answer = array('Answer provided by user');
-				echo cm_form_edit_row($question, $answer);
+				echo cm_form_row($question, $answer, true);
 				break;
 			case 'get-question':
 				$id = $_POST['cm-form-question-id'];
@@ -379,7 +393,7 @@ function cm_form_edit_process_requests($db) {
 				if ($ok) {
 					$response['question'] = $question;
 					$answer = array('Answer provided by user');
-					$response['html'] = cm_form_edit_row($question, $answer);
+					$response['html'] = cm_form_row($question, $answer, true);
 				}
 				echo json_encode($response);
 				break;
@@ -392,7 +406,7 @@ function cm_form_edit_process_requests($db) {
 					$answer = array('Answer provided by user');
 					$response['html'] = array();
 					foreach ($questions as $question) {
-						$response['html'][] = cm_form_edit_row($question, $answer);
+						$response['html'][] = cm_form_row($question, $answer, true);
 					}
 				}
 				echo json_encode($response);
@@ -408,7 +422,7 @@ function cm_form_edit_process_requests($db) {
 					if ($question !== false) {
 						$response['question'] = $question;
 						$answer = array('Answer provided by user');
-						$response['html'] = cm_form_edit_row($question, $answer);
+						$response['html'] = cm_form_row($question, $answer, true);
 					}
 				}
 				echo json_encode($response);
@@ -424,7 +438,7 @@ function cm_form_edit_process_requests($db) {
 					if ($question !== false) {
 						$response['question'] = $question;
 						$answer = array('Answer provided by user');
-						$response['html'] = cm_form_edit_row($question, $answer);
+						$response['html'] = cm_form_row($question, $answer, true);
 					}
 				}
 				echo json_encode($response);

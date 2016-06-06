@@ -28,53 +28,53 @@ cm_admin_nav('staff-questions');
 
 echo '<article>';
 cm_form_edit_body($form_def, array(
-	array('type' => 'h1', 'text' => 'Staff Application for ' . $cm_config['event']['name']),
+	array('type' => 'h1', 'title' => 'Staff Application for ' . $cm_config['event']['name']),
 	array('type' => 'custom-text', 'name' => 'main'),
 	array('type' => 'hr'),
-	array('type' => 'h2', 'text' => 'Personal Information'),
+	array('type' => 'h2', 'title' => 'Personal Information'),
 	array('type' => 'custom-text', 'name' => 'personal'),
-	array('type' => 'text', 'text' => 'First Name'),
-	array('type' => 'text', 'text' => 'Last Name'),
-	array('type' => 'text', 'text' => 'Fandom Name'),
-	array('type' => 'select', 'text' => 'Name on Badge', 'values' => array('Fandom Name Large, Real Name Small')),
-	array('type' => 'text', 'text' => 'Date of Birth'),
-	array('type' => 'select', 'text' => 'Badge Type', 'values' => array($name_list ? $name_list[0]['name'] : '')),
+	array('type' => 'text', 'title' => 'First Name'),
+	array('type' => 'text', 'title' => 'Last Name'),
+	array('type' => 'text', 'title' => 'Fandom Name'),
+	array('type' => 'select', 'title' => 'Name on Badge', 'values' => array('Fandom Name Large, Real Name Small')),
+	array('type' => 'text', 'title' => 'Date of Birth'),
+	array('type' => 'select', 'title' => 'Badge Type', 'values' => array($name_list ? $name_list[0]['name'] : '')),
 	array('type' => 'hr'),
-	array('type' => 'h2', 'text' => 'Contact Information'),
+	array('type' => 'h2', 'title' => 'Contact Information'),
 	array('type' => 'custom-text', 'name' => 'contact'),
-	array('type' => 'text', 'text' => 'Email Address'),
-	array('type' => 'text', 'text' => 'Phone Number'),
-	array('type' => 'text', 'text' => 'Street Address'),
-	array('type' => 'text', 'text' => 'City'),
-	array('type' => 'text', 'text' => 'State or Province'),
-	array('type' => 'text', 'text' => 'ZIP or Postal Code'),
-	array('type' => 'text', 'text' => 'Country'),
+	array('type' => 'text', 'title' => 'Email Address'),
+	array('type' => 'text', 'title' => 'Phone Number'),
+	array('type' => 'text', 'title' => 'Street Address'),
+	array('type' => 'text', 'title' => 'City'),
+	array('type' => 'text', 'title' => 'State or Province'),
+	array('type' => 'text', 'title' => 'ZIP or Postal Code'),
+	array('type' => 'text', 'title' => 'Country'),
 	array('type' => 'hr'),
-	array('type' => 'h2', 'text' => 'Staff Information'),
+	array('type' => 'h2', 'title' => 'Staff Information'),
 	array('type' => 'custom-questions'),
 	array('type' => 'hr'),
-	array('type' => 'h2', 'text' => 'Emergency Contact Information'),
+	array('type' => 'h2', 'title' => 'Emergency Contact Information'),
 	array('type' => 'custom-text', 'name' => 'ice'),
-	array('type' => 'text', 'text' => 'Emergency Contact Name'),
-	array('type' => 'text', 'text' => 'Emergency Contact Relationship'),
-	array('type' => 'text', 'text' => 'Emergency Contact Email Address'),
-	array('type' => 'text', 'text' => 'Emergency Contact Phone Number'),
+	array('type' => 'text', 'title' => 'Emergency Contact Name'),
+	array('type' => 'text', 'title' => 'Emergency Contact Relationship'),
+	array('type' => 'text', 'title' => 'Emergency Contact Email Address'),
+	array('type' => 'text', 'title' => 'Emergency Contact Phone Number'),
 ));
 cm_form_edit_body($form_def, array(
-	array('type' => 'h1', 'text' => 'Application Submitted'),
+	array('type' => 'h1', 'title' => 'Application Submitted'),
 	array('type' => 'custom-text', 'name' => 'application-submitted', 'default' =>
 		'Your staff application has been submitted.'
 	),
 ));
 cm_form_edit_body($form_def, array(
-	array('type' => 'h1', 'text' => 'Payment Complete <i>(Staff member successfully paid online.)</i>'),
+	array('type' => 'h1', 'title' => 'Payment Complete <i>(Staff member successfully paid online.)</i>'),
 	array('type' => 'custom-text', 'name' => 'payment-complete', 'default' =>
 		'Your staff application has been confirmed and your payment, if required, has been accepted.<br><br>'.
 		'You can <b><a href="[[review-link]]">review your order</a></b> at any time.'
 	),
 ));
 cm_form_edit_body($form_def, array(
-	array('type' => 'h1', 'text' => 'Payment Refused <i>(Payment did not go through.)</i>'),
+	array('type' => 'h1', 'title' => 'Payment Refused <i>(Payment did not go through.)</i>'),
 	array('type' => 'custom-text', 'name' => 'payment-refused', 'default' =>
 		'PayPal has refused this transaction.<br><br>'.
 		'PayPal says: [[payment-txn-msg]]<br><br>'.
@@ -82,7 +82,7 @@ cm_form_edit_body($form_def, array(
 	),
 ));
 cm_form_edit_body($form_def, array(
-	array('type' => 'h1', 'text' => 'Payment Cancelled <i>(Staff member cancelled payment.)</i>'),
+	array('type' => 'h1', 'title' => 'Payment Cancelled <i>(Staff member cancelled payment.)</i>'),
 	array('type' => 'custom-text', 'name' => 'payment-cancelled', 'default' =>
 		'You have cancelled your payment.'
 	),
