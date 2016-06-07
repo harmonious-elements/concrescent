@@ -87,8 +87,8 @@ if ($submitted) {
 		$changed = $atdb->update_attendee($item, $fdb);
 	}
 	if ($changed) {
-		if (isset($_POST['print']) && $_POST['print']) $atdb->attendee_printed($id);
-		if (isset($_POST['checkin']) && $_POST['checkin']) $atdb->attendee_checked_in($id);
+		if (isset($_POST['print']) && $_POST['print']) $atdb->attendee_printed($id, $_POST['print'] === 'reset');
+		if (isset($_POST['checkin']) && $_POST['checkin']) $atdb->attendee_checked_in($id, $_POST['checkin'] === 'reset');
 		$item = $atdb->get_attendee($id, false, $name_map, $fdb);
 		if (isset($_POST['add-to-blacklist']) && $_POST['add-to-blacklist']) {
 			$blacklist_entry = $item;
@@ -110,10 +110,14 @@ cm_admin_body($new ? 'Add Attendee' : 'Edit Attendee');
 cm_admin_nav('attendees');
 
 echo '<article>';
-	$url = $new ? 'edit.php' : ('edit.php?id=' . $id);
-	echo '<form action="' . $url . '" method="post" class="card cm-reg-edit">';
+	if ($can_edit) {
+		$url = $new ? 'edit.php' : ('edit.php?id=' . $id);
+		echo '<form action="' . $url . '" method="post" class="card cm-reg-edit">';
+	} else {
+		echo '<div class="card cm-reg-edit">';
+	}
 		echo '<div class="card-content">';
-			if ($submitted) {
+			if ($can_edit && $submitted) {
 				if ($changed) {
 					echo '<p class="cm-success-box">Changes saved.</p>';
 				} else {
@@ -135,66 +139,91 @@ echo '<article>';
 				echo '<tr><td colspan="2"><h2>Personal Information</h2></td></tr>';
 
 				echo '<tr>';
-					$value = isset($item['first-name']) ? htmlspecialchars($item['first-name']) : '';
 					echo '<th><label for="first-name">First Name</label></th>';
-					echo '<td><input type="text" id="first-name" name="first-name" value="' . $value . '"></td>';
+					$value = isset($item['first-name']) ? htmlspecialchars($item['first-name']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="first-name" name="first-name" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['last-name']) ? htmlspecialchars($item['last-name']) : '';
 					echo '<th><label for="last-name">Last Name</label></th>';
-					echo '<td><input type="text" id="last-name" name="last-name" value="' . $value . '"></td>';
+					$value = isset($item['last-name']) ? htmlspecialchars($item['last-name']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="last-name" name="last-name" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['fandom-name']) ? htmlspecialchars($item['fandom-name']) : '';
 					echo '<th><label for="fandom-name">Fandom Name</label></th>';
-					echo '<td><input type="text" id="fandom-name" name="fandom-name" value="' . $value . '"></td>';
+					$value = isset($item['fandom-name']) ? htmlspecialchars($item['fandom-name']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="fandom-name" name="fandom-name" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['name-on-badge']) ? htmlspecialchars($item['name-on-badge']) : '';
 					echo '<th><label for="name-on-badge">Name on Badge</label></th>';
-					echo '<td>';
-						echo '<select id="name-on-badge" name="name-on-badge">';
-							foreach ($atdb->names_on_badge as $nob) {
-								$hnob = htmlspecialchars($nob);
-								echo '<option value="' . $hnob;
-								echo ($value == $hnob) ? '" selected>' : '">';
-								echo $hnob . '</option>';
-							}
-						echo '</select>';
-					echo '</td>';
+					$value = isset($item['name-on-badge']) ? htmlspecialchars($item['name-on-badge']) : '';
+					if ($can_edit) {
+						echo '<td>';
+							echo '<select id="name-on-badge" name="name-on-badge">';
+								foreach ($atdb->names_on_badge as $nob) {
+									$hnob = htmlspecialchars($nob);
+									echo '<option value="' . $hnob;
+									echo ($value == $hnob) ? '" selected>' : '">';
+									echo $hnob . '</option>';
+								}
+							echo '</select>';
+						echo '</td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['date-of-birth']) ? htmlspecialchars($item['date-of-birth']) : '';
 					echo '<th><label for="date-of-birth">Date of Birth</label></th>';
-					echo '<td><input type="date" id="date-of-birth" name="date-of-birth" value="' . $value . '">';
-					if (!ua('Chrome')) echo ' (YYYY-MM-DD)'; echo '</td>';
+					$value = isset($item['date-of-birth']) ? htmlspecialchars($item['date-of-birth']) : '';
+					if ($can_edit) {
+						echo '<td><input type="date" id="date-of-birth" name="date-of-birth" value="' . $value . '">';
+						if (!ua('Chrome')) echo ' (YYYY-MM-DD)'; echo '</td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['badge-type-id']) ? htmlspecialchars($item['badge-type-id']) : '';
 					echo '<th><label for="badge-type-id">Badge Type</label></th>';
-					echo '<td>';
-						echo '<select id="badge-type-id" name="badge-type-id">';
-							$badge_types = $atdb->list_badge_types();
-							foreach ($badge_types as $bt) {
-								$btid = htmlspecialchars($bt['id']);
-								$btname = htmlspecialchars($bt['name']);
-								$btprice = htmlspecialchars(price_string($bt['price']));
-								echo '<option value="' . $btid;
-								echo ($value == $btid) ? '" selected>' : '">';
-								echo $btname . ' &mdash; ' . $btprice . '</option>';
-							}
-						echo '</select>';
-					echo '</td>';
+					if ($can_edit) {
+						$value = isset($item['badge-type-id']) ? htmlspecialchars($item['badge-type-id']) : '';
+						echo '<td>';
+							echo '<select id="badge-type-id" name="badge-type-id">';
+								$badge_types = $atdb->list_badge_types();
+								foreach ($badge_types as $bt) {
+									$btid = htmlspecialchars($bt['id']);
+									$btname = htmlspecialchars($bt['name']);
+									$btprice = htmlspecialchars(price_string($bt['price']));
+									echo '<option value="' . $btid;
+									echo ($value == $btid) ? '" selected>' : '">';
+									echo $btname . ' &mdash; ' . $btprice . '</option>';
+								}
+							echo '</select>';
+						echo '</td>';
+					} else {
+						$value = isset($item['badge-type-name']) ? htmlspecialchars($item['badge-type-name']) : '';
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				if ($can_edit && !$new && !$blacklisted) {
 					echo '<tr class="cm-add-to-blacklist">';
-						echo '<th></th>';
+						echo '<th>&nbsp;</th>';
 						echo '<td><label><input type="checkbox" name="add-to-blacklist" value="1">Add to Blacklist</label></td>';
 					echo '</tr>';
 					echo '<tr class="cm-add-to-blacklist-added-by hidden">';
@@ -207,17 +236,26 @@ echo '<article>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';
 
 				echo '<tr>';
-					$value = isset($item['email-address']) ? htmlspecialchars($item['email-address']) : '';
 					echo '<th><label for="email-address">Email Address</label></th>';
-					echo '<td><input type="email" id="email-address" name="email-address" value="' . $value . '"></td>';
+					$value = isset($item['email-address']) ? htmlspecialchars($item['email-address']) : '';
+					if ($can_edit) {
+						echo '<td><input type="email" id="email-address" name="email-address" value="' . $value . '"></td>';
+					} else {
+						echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';
+					}
 				echo '</tr>';
 				
 				echo '<tr>';
+					echo '<th>&nbsp;</th>';
 					$value = isset($item['subscribed']) ? $item['subscribed'] : true;
-					echo '<th></th><td><label>';
-						echo '<input type="checkbox" name="subscribed" value="1"' . ($value ? ' checked>' : '>');
-						echo 'You may contact me with promotional emails.';
-					echo '</label></td>';
+					if ($can_edit) {
+						echo '<td><label>';
+							echo '<input type="checkbox" name="subscribed" value="1"' . ($value ? ' checked>' : '>');
+							echo 'You may contact me with promotional emails.';
+						echo '</label></td>';
+					} else {
+						echo '<td>' . ($value ? 'You may contact me with promotional emails.' : 'You <b>MAY NOT</b> contact me with promotional emails.') . '</td>';
+					}
 				echo '</tr>';
 
 				$value = isset($item['unsubscribe-link']) ? htmlspecialchars($item['unsubscribe-link']) : '';
@@ -229,49 +267,96 @@ echo '<article>';
 				}
 
 				echo '<tr>';
-					$value = isset($item['phone-number']) ? htmlspecialchars($item['phone-number']) : '';
 					echo '<th><label for="phone-number">Phone Number</label></th>';
-					echo '<td><input type="text" id="phone-number" name="phone-number" value="' . $value . '"></td>';
+					$value = isset($item['phone-number']) ? htmlspecialchars($item['phone-number']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="phone-number" name="phone-number" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['address-1']) ? htmlspecialchars($item['address-1']) : '';
 					echo '<th><label for="address-1">Street Address</label></th>';
-					echo '<td><input type="text" id="address-1" name="address-1" value="' . $value . '"></td>';
+					$value = isset($item['address-1']) ? htmlspecialchars($item['address-1']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="address-1" name="address-1" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
+					echo '<th>&nbsp;</th>';
 					$value = isset($item['address-2']) ? htmlspecialchars($item['address-2']) : '';
-					echo '<th></th><td><input type="text" id="address-2" name="address-2" value="' . $value . '"></td>';
+					if ($can_edit) {
+						echo '<td><input type="text" id="address-2" name="address-2" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['city']) ? htmlspecialchars($item['city']) : '';
 					echo '<th><label for="city">City</label></th>';
-					echo '<td><input type="text" id="city" name="city" value="' . $value . '"></td>';
+					$value = isset($item['city']) ? htmlspecialchars($item['city']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="city" name="city" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['state']) ? htmlspecialchars($item['state']) : '';
 					echo '<th><label for="state">State or Province</label></th>';
-					echo '<td><input type="text" id="state" name="state" value="' . $value . '"></td>';
+					$value = isset($item['state']) ? htmlspecialchars($item['state']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="state" name="state" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['zip-code']) ? htmlspecialchars($item['zip-code']) : '';
 					echo '<th><label for="zip-code">ZIP or Postal Code</label></th>';
-					echo '<td><input type="text" id="zip-code" name="zip-code" value="' . $value . '"></td>';
+					$value = isset($item['zip-code']) ? htmlspecialchars($item['zip-code']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="zip-code" name="zip-code" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['country']) ? htmlspecialchars($item['country']) : '';
 					echo '<th><label for="country">Country</label></th>';
-					echo '<td><input type="text" id="country" name="country" value="' . $value . '"></td>';
+					$value = isset($item['country']) ? htmlspecialchars($item['country']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="country" name="country" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				$first = true;
+				function my_question_is_visible($question) {
+					switch ($question['type']) {
+						case 'h1': case 'h2': case 'h3':
+						case 'p': case 'q':
+							return $question['active'] && $question['title'];
+						default:
+							return $question['active'];
+					}
+				}
+				function my_question_is_title($question) {
+					switch ($question['type']) {
+						case 'h1': case 'h2': case 'h3':
+						case 'p': case 'q': case 'hr':
+							return true;
+						default:
+							return false;
+					}
+				}
 				foreach ($questions as $question) {
-					if ($question['active']) {
+					if (my_question_is_visible($question)) {
 						if ($first) {
 							echo '<tr><td colspan="2"><hr></td></tr>';
 							echo '<tr><td colspan="2"><h2>Additional Information</h2></td></tr>';
@@ -282,7 +367,15 @@ echo '<article>';
 							$item['form-answers'][$question['question-id']] :
 							array()
 						);
-						echo cm_form_row($question, $answer);
+						if ($can_edit || my_question_is_title($question)) {
+							if ($question['title']) $question['text'] = null;
+							echo cm_form_row($question, $answer);
+						} else {
+							echo '<tr>';
+							echo '<th><label>' . htmlspecialchars($question['title'] ? $question['title'] : ($question['text'] ? $question['text'] : '')) . '</label></th>';
+							echo '<td>' . paragraph_string(implode("\n", $answer)) . '</td>';
+							echo '</tr>';
+						}
 						$first = false;
 					}
 				}
@@ -291,63 +384,97 @@ echo '<article>';
 				echo '<tr><td colspan="2"><h2>Emergency Contact Information</h2></td></tr>';
 
 				echo '<tr>';
-					$value = isset($item['ice-name']) ? htmlspecialchars($item['ice-name']) : '';
 					echo '<th><label for="ice-name">Emergency Contact Name</label></th>';
-					echo '<td><input type="text" id="ice-name" name="ice-name" value="' . $value . '"></td>';
+					$value = isset($item['ice-name']) ? htmlspecialchars($item['ice-name']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="ice-name" name="ice-name" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['ice-relationship']) ? htmlspecialchars($item['ice-relationship']) : '';
 					echo '<th><label for="ice-relationship">Emergency Contact Relationship</label></th>';
-					echo '<td><input type="text" id="ice-relationship" name="ice-relationship" value="' . $value . '"></td>';
+					$value = isset($item['ice-relationship']) ? htmlspecialchars($item['ice-relationship']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="ice-relationship" name="ice-relationship" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['ice-email-address']) ? htmlspecialchars($item['ice-email-address']) : '';
 					echo '<th><label for="ice-email-address">Emergency Contact Email Address</label></th>';
-					echo '<td><input type="email" id="ice-email-address" name="ice-email-address" value="' . $value . '"></td>';
+					$value = isset($item['ice-email-address']) ? htmlspecialchars($item['ice-email-address']) : '';
+					if ($can_edit) {
+						echo '<td><input type="email" id="ice-email-address" name="ice-email-address" value="' . $value . '"></td>';
+					} else {
+						echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['ice-phone-number']) ? htmlspecialchars($item['ice-phone-number']) : '';
 					echo '<th><label for="ice-phone-number">Emergency Contact Phone Number</label></th>';
-					echo '<td><input type="text" id="ice-phone-number" name="ice-phone-number" value="' . $value . '"></td>';
+					$value = isset($item['ice-phone-number']) ? htmlspecialchars($item['ice-phone-number']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="ice-phone-number" name="ice-phone-number" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr><td colspan="2"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Payment Information</h2></td></tr>';
 
 				echo '<tr>';
-					$value = isset($item['payment-status']) ? htmlspecialchars($item['payment-status']) : '';
 					echo '<th><label for="payment-status">Payment Status</label></th>';
-					echo '<td>';
-						echo '<select id="payment-status" name="payment-status">';
-							foreach ($atdb->payment_statuses as $ps) {
-								$hps = htmlspecialchars($ps);
-								echo '<option value="' . $hps;
-								echo ($value == $hps) ? '" selected>' : '">';
-								echo $hps . '</option>';
-							}
-						echo '</select>';
-					echo '</td>';
+					$value = isset($item['payment-status']) ? htmlspecialchars($item['payment-status']) : '';
+					if ($can_edit) {
+						echo '<td>';
+							echo '<select id="payment-status" name="payment-status">';
+								foreach ($atdb->payment_statuses as $ps) {
+									$hps = htmlspecialchars($ps);
+									echo '<option value="' . $hps;
+									echo ($value == $hps) ? '" selected>' : '">';
+									echo $hps . '</option>';
+								}
+							echo '</select>';
+						echo '</td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['payment-badge-price']) ? htmlspecialchars($item['payment-badge-price']) : '';
 					echo '<th><label for="payment-badge-price">Payment Badge Price</label></th>';
-					echo '<td><input type="number" id="payment-badge-price" name="payment-badge-price" value="' . $value . '" min="0" step="0.01"></td>';
+					if ($can_edit) {
+						$value = isset($item['payment-badge-price']) ? htmlspecialchars($item['payment-badge-price']) : '';
+						echo '<td><input type="number" id="payment-badge-price" name="payment-badge-price" value="' . $value . '" min="0" step="0.01"></td>';
+					} else {
+						$value = isset($item['payment-badge-price']) ? htmlspecialchars(price_string($item['payment-badge-price'])) : '';
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['payment-promo-code']) ? htmlspecialchars($item['payment-promo-code']) : '';
 					echo '<th><label for="payment-promo-code">Payment Promo Code</label></th>';
-					echo '<td><input type="text" id="payment-promo-code" name="payment-promo-code" value="' . $value . '"></td>';
+					$value = isset($item['payment-promo-code']) ? htmlspecialchars($item['payment-promo-code']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="payment-promo-code" name="payment-promo-code" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['payment-promo-price']) ? htmlspecialchars($item['payment-promo-price']) : '';
 					echo '<th><label for="payment-promo-price">Payment Promo Price</label></th>';
-					echo '<td><input type="number" id="payment-promo-price" name="payment-promo-price" value="' . $value . '" min="0" step="0.01"></td>';
+					if ($can_edit) {
+						$value = isset($item['payment-promo-price']) ? htmlspecialchars($item['payment-promo-price']) : '';
+						echo '<td><input type="number" id="payment-promo-price" name="payment-promo-price" value="' . $value . '" min="0" step="0.01"></td>';
+					} else {
+						$value = isset($item['payment-promo-price']) ? htmlspecialchars(price_string($item['payment-promo-price'])) : '';
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				$value = isset($item['payment-group-uuid']) ? htmlspecialchars($item['payment-group-uuid']) : '';
@@ -359,21 +486,34 @@ echo '<article>';
 				}
 
 				echo '<tr>';
-					$value = isset($item['payment-type']) ? htmlspecialchars($item['payment-type']) : '';
 					echo '<th><label for="payment-type">Payment Type</label></th>';
-					echo '<td><input type="text" id="payment-type" name="payment-type" value="' . $value . '"></td>';
+					$value = isset($item['payment-type']) ? htmlspecialchars($item['payment-type']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="payment-type" name="payment-type" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['payment-txn-id']) ? htmlspecialchars($item['payment-txn-id']) : '';
 					echo '<th><label for="payment-txn-id">Payment Transaction ID</label></th>';
-					echo '<td><input type="text" id="payment-txn-id" name="payment-txn-id" value="' . $value . '"></td>';
+					$value = isset($item['payment-txn-id']) ? htmlspecialchars($item['payment-txn-id']) : '';
+					if ($can_edit) {
+						echo '<td><input type="text" id="payment-txn-id" name="payment-txn-id" value="' . $value . '"></td>';
+					} else {
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				echo '<tr>';
-					$value = isset($item['payment-txn-amt']) ? htmlspecialchars($item['payment-txn-amt']) : '';
 					echo '<th><label for="payment-txn-amt">Payment Transaction Amount</label></th>';
-					echo '<td><input type="number" id="payment-txn-amt" name="payment-txn-amt" value="' . $value . '" min="0" step="0.01"></td>';
+					if ($can_edit) {
+						$value = isset($item['payment-txn-amt']) ? htmlspecialchars($item['payment-txn-amt']) : '';
+						echo '<td><input type="number" id="payment-txn-amt" name="payment-txn-amt" value="' . $value . '" min="0" step="0.01"></td>';
+					} else {
+						$value = isset($item['payment-txn-amt']) ? htmlspecialchars(price_string($item['payment-txn-amt'])) : '';
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				$value = isset($item['payment-date']) ? htmlspecialchars($item['payment-date']) : '';
@@ -385,9 +525,14 @@ echo '<article>';
 				}
 
 				echo '<tr>';
-					$value = isset($item['payment-details']) ? htmlspecialchars($item['payment-details']) : '';
 					echo '<th><label for="payment-details">Payment Details</label></th>';
-					echo '<td><textarea id="payment-details" name="payment-details">' . $value . '</textarea></td>';
+					if ($can_edit) {
+						$value = isset($item['payment-details']) ? htmlspecialchars($item['payment-details']) : '';
+						echo '<td><textarea id="payment-details" name="payment-details">' . $value . '</textarea></td>';
+					} else {
+						$value = isset($item['payment-details']) ? paragraph_string($item['payment-details']) : '';
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 				$value = isset($item['review-link']) ? htmlspecialchars($item['review-link']) : '';
@@ -400,7 +545,7 @@ echo '<article>';
 
 				if ($can_edit) {
 					echo '<tr>';
-						echo '<th></th>';
+						echo '<th>&nbsp;</th>';
 						echo '<td><label><input type="checkbox" name="resend-email" value="1">';
 						echo ($new ? 'Send' : 'Resend') . ' Registration Completed Email';
 						echo '</label></td>';
@@ -453,7 +598,7 @@ echo '<article>';
 				if ($new) {
 					if ($can_edit) {
 						echo '<tr>';
-							echo '<th></th>';
+							echo '<th>&nbsp;</th>';
 							echo '<td><label><input type="checkbox" name="print" value="1">Mark Printed</label></td>';
 						echo '</tr>';
 					}
@@ -472,8 +617,12 @@ echo '<article>';
 								echo 'never';
 							}
 							if ($can_edit) {
-								echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-								echo '<label><input type="checkbox" name="print" value="1">Mark Printed</label>';
+								echo '<br>';
+								echo '<label><input type="radio" name="print" value="" checked>Keep</label>';
+								echo '&nbsp;&nbsp;';
+								echo '<label><input type="radio" name="print" value="1">Mark</label>';
+								echo '&nbsp;&nbsp;';
+								echo '<label><input type="radio" name="print" value="reset">Reset</label>';
 							}
 						echo '</td>';
 					echo '</tr>';
@@ -482,7 +631,7 @@ echo '<article>';
 				if ($new) {
 					if ($can_edit) {
 						echo '<tr>';
-							echo '<th></th>';
+							echo '<th>&nbsp;</th>';
 							echo '<td><label><input type="checkbox" name="checkin" value="1">Mark Checked In</label></td>';
 						echo '</tr>';
 					}
@@ -501,17 +650,26 @@ echo '<article>';
 								echo 'never';
 							}
 							if ($can_edit) {
-								echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-								echo '<label><input type="checkbox" name="checkin" value="1">Mark Checked In</label>';
+								echo '<br>';
+								echo '<label><input type="radio" name="checkin" value="" checked>Keep</label>';
+								echo '&nbsp;&nbsp;';
+								echo '<label><input type="radio" name="checkin" value="1">Mark</label>';
+								echo '&nbsp;&nbsp;';
+								echo '<label><input type="radio" name="checkin" value="reset">Reset</label>';
 							}
 						echo '</td>';
 					echo '</tr>';
 				}
 
 				echo '<tr>';
-					$value = isset($item['notes']) ? htmlspecialchars($item['notes']) : '';
 					echo '<th><label for="notes">Notes</label></th>';
-					echo '<td><textarea id="notes" name="notes">' . $value . '</textarea></td>';
+					if ($can_edit) {
+						$value = isset($item['notes']) ? htmlspecialchars($item['notes']) : '';
+						echo '<td><textarea id="notes" name="notes">' . $value . '</textarea></td>';
+					} else {
+						$value = isset($item['notes']) ? paragraph_string($item['notes']) : '';
+						echo '<td>' . $value . '</td>';
+					}
 				echo '</tr>';
 
 			echo '</table>';
@@ -521,7 +679,11 @@ echo '<article>';
 				echo '<input type="submit" name="submit" value="Save Changes">';
 			echo '</div>';
 		}
-	echo '</form>';
+	if ($can_edit) {
+		echo '</form>';
+	} else {
+		echo '</div>';
+	}
 echo '</article>';
 
 cm_admin_dialogs();

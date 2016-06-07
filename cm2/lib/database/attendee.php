@@ -1519,13 +1519,19 @@ class cm_attendee_db {
 		return $count;
 	}
 
-	public function attendee_printed($id) {
+	public function attendee_printed($id, $reset = false) {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(
 			'UPDATE '.$this->cm_db->table_name('attendees').' SET '.
-			'`print_count` = IFNULL(`print_count`, 0) + 1, '.
-			'`print_first_time` = IFNULL(`print_first_time`, NOW()), '.
-			'`print_last_time` = NOW()'.
+			($reset ? (
+				'`print_count` = NULL, '.
+				'`print_first_time` = NULL, '.
+				'`print_last_time` = NULL'
+			) : (
+				'`print_count` = IFNULL(`print_count`, 0) + 1, '.
+				'`print_first_time` = IFNULL(`print_first_time`, NOW()), '.
+				'`print_last_time` = NOW()'
+			)).
 			' WHERE `id` = ? LIMIT 1'
 		);
 		$stmt->bind_param('i', $id);
@@ -1539,13 +1545,19 @@ class cm_attendee_db {
 		return $success;
 	}
 
-	public function attendee_checked_in($id) {
+	public function attendee_checked_in($id, $reset = false) {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(
 			'UPDATE '.$this->cm_db->table_name('attendees').' SET '.
-			'`checkin_count` = IFNULL(`checkin_count`, 0) + 1, '.
-			'`checkin_first_time` = IFNULL(`checkin_first_time`, NOW()), '.
-			'`checkin_last_time` = NOW()'.
+			($reset ? (
+				'`checkin_count` = NULL, '.
+				'`checkin_first_time` = NULL, '.
+				'`checkin_last_time` = NULL'
+			) : (
+				'`checkin_count` = IFNULL(`checkin_count`, 0) + 1, '.
+				'`checkin_first_time` = IFNULL(`checkin_first_time`, NOW()), '.
+				'`checkin_last_time` = NOW()'
+			)).
 			' WHERE `id` = ? LIMIT 1'
 		);
 		$stmt->bind_param('i', $id);
