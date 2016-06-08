@@ -81,7 +81,7 @@ $cm_admin_nav = array(
 		array(
 			'id' => 'staff',
 			'href' => '/admin/staff/index.php',
-			'name' => 'Staff',
+			'name' => 'Staff Applications',
 			'description' => 'Review, approve, or modify staff applications.',
 			'permission' => array('||', 'staff', 'staff-view', 'staff-review', 'staff-edit', 'staff-delete')
 		),

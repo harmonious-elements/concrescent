@@ -1366,6 +1366,8 @@ class cm_staff_db {
 					$assigned_position['department-id'] = null;
 					$assigned_position['department-name'] = ($department_name ? $department_name : null);
 				}
+				$assigned_position['position-name-s'] = $assigned_position['department-name'].' '.$assigned_position['position-name'];
+				$assigned_position['position-name-h'] = $assigned_position['department-name'].' - '.$assigned_position['position-name'];
 				$assigned_positions[] = $assigned_position;
 				$result['search-content'][] = $assigned_position['department-name'];
 				$result['search-content'][] = $assigned_position['position-name'];
@@ -1375,10 +1377,14 @@ class cm_staff_db {
 				$result['assigned-department-name'] = $assigned_positions[0]['department-name'];
 				$result['assigned-position-id'] = $assigned_positions[0]['position-id'];
 				$result['assigned-position-name'] = $assigned_positions[0]['position-name'];
+				$result['assigned-position-name-s'] = $assigned_positions[0]['position-name-s'];
+				$result['assigned-position-name-h'] = $assigned_positions[0]['position-name-h'];
 				$result['assigned-department-ids'] = array_column_simple($assigned_positions, 'department-id');
 				$result['assigned-department-names'] = array_column_simple($assigned_positions, 'department-name');
 				$result['assigned-position-ids'] = array_column_simple($assigned_positions, 'position-id');
 				$result['assigned-position-names'] = array_column_simple($assigned_positions, 'position-name');
+				$result['assigned-position-names-s'] = array_column_simple($assigned_positions, 'position-name-s');
+				$result['assigned-position-names-h'] = array_column_simple($assigned_positions, 'position-name-h');
 				$result['assigned-positions'] = $assigned_positions;
 			}
 			$stmt->close();
@@ -1603,6 +1609,8 @@ class cm_staff_db {
 					$assigned_position['department-id'] = null;
 					$assigned_position['department-name'] = ($department_name ? $department_name : null);
 				}
+				$assigned_position['position-name-s'] = $assigned_position['department-name'].' '.$assigned_position['position-name'];
+				$assigned_position['position-name-h'] = $assigned_position['department-name'].' - '.$assigned_position['position-name'];
 				$assigned_positions[] = $assigned_position;
 				$staff_members[$i]['search-content'][] = $assigned_position['department-name'];
 				$staff_members[$i]['search-content'][] = $assigned_position['position-name'];
@@ -1612,10 +1620,14 @@ class cm_staff_db {
 				$staff_members[$i]['assigned-department-name'] = $assigned_positions[0]['department-name'];
 				$staff_members[$i]['assigned-position-id'] = $assigned_positions[0]['position-id'];
 				$staff_members[$i]['assigned-position-name'] = $assigned_positions[0]['position-name'];
+				$staff_members[$i]['assigned-position-name-s'] = $assigned_positions[0]['position-name-s'];
+				$staff_members[$i]['assigned-position-name-h'] = $assigned_positions[0]['position-name-h'];
 				$staff_members[$i]['assigned-department-ids'] = array_column_simple($assigned_positions, 'department-id');
 				$staff_members[$i]['assigned-department-names'] = array_column_simple($assigned_positions, 'department-name');
 				$staff_members[$i]['assigned-position-ids'] = array_column_simple($assigned_positions, 'position-id');
 				$staff_members[$i]['assigned-position-names'] = array_column_simple($assigned_positions, 'position-name');
+				$staff_members[$i]['assigned-position-names-s'] = array_column_simple($assigned_positions, 'position-name-s');
+				$staff_members[$i]['assigned-position-names-h'] = array_column_simple($assigned_positions, 'position-name-h');
 				$staff_members[$i]['assigned-positions'] = $assigned_positions;
 			}
 			$stmt->close();

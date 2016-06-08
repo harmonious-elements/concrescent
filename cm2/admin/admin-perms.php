@@ -72,27 +72,27 @@ $cm_admin_perms = array(
 	array(
 		array(
 			'id' => 'staff',
-			'name' => 'Staff',
+			'name' => 'Staff Applications',
 			'description' => 'View the list of staff applications.'
 		),
 		array(
 			'id' => 'staff-view',
-			'name' => 'Staff - View',
+			'name' => 'Staff Applications - View',
 			'description' => 'View individual staff applications.'
 		),
 		array(
 			'id' => 'staff-review',
-			'name' => 'Staff - Review',
+			'name' => 'Staff Applications - Review',
 			'description' => 'Review and approve staff applications.'
 		),
 		array(
 			'id' => 'staff-edit',
-			'name' => 'Staff - Edit',
+			'name' => 'Staff Applications - Edit',
 			'description' => 'Modify staff applications.'
 		),
 		array(
 			'id' => 'staff-delete',
-			'name' => 'Staff - Delete',
+			'name' => 'Staff Applications - Delete',
 			'description' => 'Delete staff applications.'
 		),
 	),

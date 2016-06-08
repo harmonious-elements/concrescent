@@ -116,6 +116,9 @@ echo '<article>';
 	} else {
 		echo '<div class="card cm-reg-edit">';
 	}
+		if ($name) {
+			echo '<div class="card-title">' . htmlspecialchars($name) . '</div>';
+		}
 		echo '<div class="card-content">';
 			if ($can_edit && $submitted) {
 				if ($changed) {
@@ -133,6 +136,9 @@ echo '<article>';
 						echo '<b>' . $blacklisted['added-by'] . '</b>.</p>';
 					}
 				echo '</div>';
+			}
+			if (($can_edit && $submitted) || $blacklisted) {
+				echo '<hr>';
 			}
 			echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 

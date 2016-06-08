@@ -83,8 +83,8 @@ $columns = array_merge(
 $list_def = array(
 	'loader' => 'server-side',
 	'ajax-url' => get_site_url(false) . '/admin/staff/index.php',
-	'entity-type' => 'staff member',
-	'entity-type-pl' => 'staff members',
+	'entity-type' => 'staff application',
+	'entity-type-pl' => 'staff applications',
 	'search-criteria' => 'name, badge type, contact info, or transaction ID',
 	'search-delay' => 500,
 	'qr' => 'auto',
@@ -102,7 +102,7 @@ $list_def = array(
 	'add-url' => get_site_url(false) . '/admin/staff/edit.php',
 	'edit-url' => get_site_url(false) . '/admin/staff/edit.php?id=',
 	'review-url' => get_site_url(false) . '/admin/staff/edit.php?review&id=',
-	'delete-title' => 'Delete Staff'
+	'delete-title' => 'Delete Staff Application'
 );
 
 if (isset($_POST['cm-list-action'])) {
@@ -129,9 +129,9 @@ if (isset($_POST['cm-list-action'])) {
 	exit(0);
 }
 
-cm_admin_head('Staff');
+cm_admin_head('Staff Applications');
 cm_list_head($list_def);
-cm_admin_body('Staff');
+cm_admin_body('Staff Applications');
 cm_admin_nav('staff');
 
 echo '<article>';
