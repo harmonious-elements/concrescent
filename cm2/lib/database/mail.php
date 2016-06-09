@@ -22,30 +22,82 @@ class cm_mail_db {
 			'`body` TEXT NOT NULL'
 		));
 		if ($this->cm_db->table_is_empty('mail_templates')) {
-			$stmt = $this->cm_db->connection->prepare(
-				'INSERT INTO '.$this->cm_db->table_name('mail_templates').' SET '.
-				'`name` = ?, `contact_address` = ?, `from` = ?, `bcc` = ?, `subject` = ?, `type` = ?, `body` = ?'
-			);
-			$name = 'attendee-paid';
-			$contact_address = 'registration@' . $_SERVER['SERVER_NAME'];
-			$from = $contact_address;
-			$bcc = $contact_address;
-			$subject = 'Your registration for [[event-name]]';
-			$type = 'Simple HTML';
-			$body = (
-				"Greetings,\n\n".
-				"Thank you for registering for <b>[[event-name]]</b>. ".
-				"Your [[badge-type-name]] registration for <b>[[display-name]]</b> has been completed.\n\n".
-				"Your badge will be available for pickup at the event. ".
-				"Please bring a photo ID and a printout of this email message with you.\n\n".
-				"<img src=\"https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=[[qr-data]]\">\n\n".
-				"You can review your order at any time at the following URL:\n\n".
-				"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
-				"Thanks again,\n[[event-name]] Registration"
-			);
-			$stmt->bind_param('sssssss', $name, $contact_address, $from, $bcc, $subject, $type, $body);
-			$stmt->execute();
-			$stmt->close();
+			$this->set_mail_template(array(
+				'name' => 'attendee-paid',
+				'contact-address' => 'registration@'.$_SERVER['SERVER_NAME'],
+				'from' => 'registration@'.$_SERVER['SERVER_NAME'],
+				'bcc' => 'registration@'.$_SERVER['SERVER_NAME'],
+				'subject' => 'Your registration for [[event-name]]',
+				'type' => 'Simple HTML',
+				'body' => (
+					"Greetings,\n\n".
+					"Thank you for registering for <b>[[event-name]]</b>. ".
+					"Your [[badge-type-name]] registration for <b>[[display-name]]</b> has been completed.\n\n".
+					"Your badge will be available for pickup at the event. ".
+					"Please bring a photo ID and a printout of this email message with you.\n\n".
+					"<img src=\"https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=[[qr-data]]\">\n\n".
+					"You can review your order at any time at the following URL:\n\n".
+					"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
+					"Thanks again,\n[[event-name]] Registration"
+				)
+			));
+			$this->set_mail_template(array(
+				'name' => 'staff-submitted',
+				'contact-address' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'from' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'bcc' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'subject' => 'Your staff application for [[event-name]]',
+				'type' => 'Simple HTML',
+				'body' => (
+					"Greetings,\n\n".
+					"Thank you for applying to be a staffer for <b>[[event-name]]</b>.\n\n".
+					"Your application has been received. ".
+					"We will be contacting you soon regarding your application.\n\n".
+					"If you have any questions, please contact ".
+					"<b><a href=\"mailto:[[contact-address]]\">[[contact-address]]</a></b>.\n\n".
+					"Thanks again,\n[[event-name]] Registration"
+				)
+			));
+			$this->set_mail_template(array(
+				'name' => 'staff-accepted',
+				'contact-address' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'from' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'bcc' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'subject' => 'Your staff registration for [[event-name]]',
+				'type' => 'Simple HTML',
+				'body' => (
+					"Greetings,\n\n".
+					"Your staff application for <b>[[event-name]]</b> ".
+					"in the position of <b>[[assigned-position-name-h]]</b> ".
+					"has been approved! Welcome aboard!\n\n".
+					"Your department head will be contacting your shortly. ".
+					"Meanwhile, <b>please follow the following link</b> ".
+					"to confirm your staff registration and, if required, ".
+					"make a payment for your staff badge.\n\n".
+					"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
+					"If you have any questions, please contact ".
+					"<b><a href=\"mailto:[[contact-address]]\">[[contact-address]]</a></b>.\n\n".
+					"Thanks again,\n[[event-name]] Registration"
+				)
+			));
+			$this->set_mail_template(array(
+				'name' => 'staff-paid',
+				'contact-address' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'from' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'bcc' => 'hr@'.$_SERVER['SERVER_NAME'],
+				'subject' => 'Your staff registration for [[event-name]]',
+				'type' => 'Simple HTML',
+				'body' => (
+					"Greetings,\n\n".
+					"Thank you for completing your staff registration for <b>[[event-name]]</b>.\n\n".
+					"Your badge will be available for pickup at the event. ".
+					"Please bring a photo ID and a printout of this email message with you.\n\n".
+					"<img src=\"https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=[[qr-data]]\">\n\n".
+					"You can review your order at any time at the following URL:\n\n".
+					"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
+					"Thanks again,\n[[event-name]] Registration"
+				)
+			));
 		}
 	}
 

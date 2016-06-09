@@ -58,6 +58,10 @@ echo '<article>';
 				'fandom-name' => 'The applicant\'s fandom name.',
 				'display-name' => 'The name the applicant has chosen to appear on their badge.',
 				'unsubscribe-link' => 'A URL to remove the applicant\'s email address from the mailing list.',
+				'assigned-department-name' => 'The name of the applicant\'s assigned department.',
+				'assigned-position-name' => 'The name of the applicant\'s assigned position.',
+				'assigned-position-name-s' => 'The assigned department and position names, joined with a space (e.g., Registration Second).',
+				'assigned-position-name-h' => 'The assigned department and position names, joined with a hyphen (e.g., Registration - Second).',
 				'payment-txn-id' => 'The PayPal transaction ID.',
 				'payment-txn-amt' => 'The PayPal transaction amount.',
 				'review-link' => 'The URL of the page to review a completed application.'
