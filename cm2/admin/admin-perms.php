@@ -66,7 +66,12 @@ $cm_admin_perms = array(
 		array(
 			'id' => 'staff-departments',
 			'name' => 'Departments',
-			'description' => 'Organize the departments and positions that make up the event staff hierarchy.'
+			'description' => 'Organize the departments and positions that make up the event staff org chart.'
+		),
+		array(
+			'id' => 'staff-orgchart',
+			'name' => 'Org Chart',
+			'description' => 'View the event staff org chart.'
 		),
 	),
 	array(

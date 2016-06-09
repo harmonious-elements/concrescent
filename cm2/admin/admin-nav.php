@@ -73,8 +73,15 @@ $cm_admin_nav = array(
 			'id' => 'staff-departments',
 			'href' => '/admin/staff/departments.php',
 			'name' => 'Departments',
-			'description' => 'Organize the departments and positions that make up the event staff hierarchy.',
+			'description' => 'Organize the departments and positions that make up the event staff org chart.',
 			'permission' => 'staff-departments'
+		),
+		array(
+			'id' => 'staff-orgchart',
+			'href' => '/admin/staff/orgchart.php',
+			'name' => 'Org Chart',
+			'description' => 'View the event staff org chart.',
+			'permission' => 'staff-orgchart'
 		),
 	),
 	array(

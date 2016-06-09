@@ -722,6 +722,52 @@ table.cm-cart td:not(.td-actions) {
 	cursor: pointer;
 }
 
+/* Org Chart Page */
+
+.cm-list-table table tr.cm-orgchart-staff-level-0 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-0 td:first-child {
+	padding-left: 1em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-1 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-1 td:first-child {
+	padding-left: 2em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-2 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-2 td:first-child {
+	padding-left: 3em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-3 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-3 td:first-child {
+	padding-left: 4em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-4 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-4 td:first-child {
+	padding-left: 5em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-5 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-5 td:first-child {
+	padding-left: 6em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-6 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-6 td:first-child {
+	padding-left: 7em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-7 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-7 td:first-child {
+	padding-left: 8em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-8 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-8 td:first-child {
+	padding-left: 9em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-9 td:first-child,
+.cm-list-table table tr.cm-orgchart-dept-level-9 td:first-child {
+	padding-left: 10em;
+}
+.cm-list-table table tr.cm-orgchart-staff-level-10 td:first-child {
+	padding-left: 11em;
+}
+
 /* Reindex Pages */
 
 .progress-track {
