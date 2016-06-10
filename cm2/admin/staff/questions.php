@@ -67,6 +67,14 @@ cm_form_edit_body($form_def, array(
 	),
 ));
 cm_form_edit_body($form_def, array(
+	array('type' => 'h1', 'title' => 'Application Already Submitted'),
+	array('type' => 'custom-text', 'name' => 'application-already-submitted', 'default' =>
+		'A staff application for this person has already been submitted.<br><br>'.
+		'Please <b><a href="mailto:[[contact-address]]">contact us</a></b> '.
+		'if you need an update on your status or if you believe this is an error.'
+	),
+));
+cm_form_edit_body($form_def, array(
 	array('type' => 'h1', 'title' => 'Payment Complete <i>(Staff member successfully paid online.)</i>'),
 	array('type' => 'custom-text', 'name' => 'payment-complete', 'default' =>
 		'Your staff application has been confirmed and your payment, if required, has been accepted.<br><br>'.

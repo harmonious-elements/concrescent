@@ -1903,6 +1903,28 @@ class cm_staff_db {
 		return $success;
 	}
 
+	public function already_exists($person) {
+		if (!$person) return false;
+		$first_name = (isset($person['first-name']) ? strtolower($person['first-name']) : '');
+		$last_name = (isset($person['last-name']) ? strtolower($person['last-name']) : '');
+		$date_of_birth = (isset($person['date-of-birth']) ? strtolower($person['date-of-birth']) : null);
+		$email_address = (isset($person['email-address']) ? strtolower($person['email-address']) : '');
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT 1 FROM '.$this->cm_db->table_name('staff').
+			' WHERE LCASE(`first_name`) = ? AND LCASE(`last_name`) = ?'.
+			' AND LCASE(`date_of_birth`) = ? AND LCASE(`email_address`) = ?'
+		);
+		$stmt->bind_param(
+			'ssss', $first_name, $last_name,
+			$date_of_birth, $email_address
+		);
+		$stmt->execute();
+		$stmt->bind_result($x);
+		$exists = $stmt->fetch() && $x;
+		$stmt->close();
+		return $exists;
+	}
+
 	public function update_payment_status($id, $status, $type, $txn_id, $txn_amt, $date, $details) {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(
