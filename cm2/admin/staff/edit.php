@@ -6,6 +6,7 @@ require_once dirname(__FILE__).'/../../lib/database/attendee.php';
 require_once dirname(__FILE__).'/../../lib/database/mail.php';
 require_once dirname(__FILE__).'/../../lib/util/util.php';
 require_once dirname(__FILE__).'/../../lib/util/cmforms.php';
+require_once dirname(__FILE__).'/../../lib/util/slack.php';
 require_once dirname(__FILE__).'/../admin.php';
 
 cm_admin_check_permission('staff', array('||', 'staff-view', 'staff-review', 'staff-edit'));
@@ -165,8 +166,21 @@ if ($submitted) {
 		}
 		if ($can_edit_status) {
 			if (isset($_POST['resend-application-email']) && $_POST['resend-application-email']) {
-				$template = $mdb->get_mail_template('staff-' . strtolower($item['application-status']));
+				$application_status = strtolower($item['application-status']);
+				$template_name = 'staff-' . $application_status;
+				$template = $mdb->get_mail_template($template_name);
 				$mdb->send_mail($item['email-address'], $template, $item);
+
+				$slack = new cm_slack();
+				if ($slack->get_hook_url($template_name)) {
+					$body = 'The staff application for ';
+					$body .= $slack->make_link(
+						get_site_url(true).'/admin/staff/edit.php?id='.$id,
+						$item['display-name']
+					);
+					$body .= ' has been '.$application_status.'.';
+					$slack->post_message($template_name, $body);
+				}
 			}
 		}
 	}
