@@ -103,9 +103,7 @@ if (isset($_GET['return'])) {
 	$transaction_id = $paypal->get_transaction_id($sale);
 	$details = json_encode($sale);
 
-	$group_uuid = $db->uuid();
 	$payment_date = $db->now();
-
 	if ($transaction_id) {
 		foreach ($staff_ids as $id) {
 			$sdb->update_payment_status($id, 'Completed', 'PayPal', $transaction_id, $total_price, $payment_date, $details);
@@ -125,7 +123,8 @@ if (isset($_GET['return'])) {
 		exit(0);
 	} else {
 		foreach ($staff_ids as $id) {
-			$sdb->update_payment_status($id, 'Rejected', 'PayPal', $group_uuid, $total_price, $payment_date, $details);
+			$staff_member = $sdb->get_staff_member($id, false, $name_map, $dept_map, $pos_map, $fdb);
+			$sdb->update_payment_status($id, 'Rejected', 'PayPal', $staff_member['payment-group-uuid'], $total_price, $payment_date, $details);
 			$staff_member = $sdb->get_staff_member($id, false, $name_map, $dept_map, $pos_map, $fdb);
 		}
 		cm_app_cart_destroy();
@@ -151,11 +150,10 @@ if (isset($_GET['cancel'])) {
 	$total_price = $_SESSION['total_price'];
 	$staff_ids = $_SESSION['staff_ids'];
 
-	$group_uuid = $db->uuid();
 	$payment_date = $db->now();
-
 	foreach ($staff_ids as $id) {
-		$sdb->update_payment_status($id, 'Cancelled', 'PayPal', $group_uuid, $total_price, $payment_date, 'Cancelled');
+		$staff_member = $sdb->get_staff_member($id, false, $name_map, $dept_map, $pos_map, $fdb);
+		$sdb->update_payment_status($id, 'Cancelled', 'PayPal', $staff_member['payment-group-uuid'], $total_price, $payment_date, 'Cancelled');
 		$staff_member = $sdb->get_staff_member($id, false, $name_map, $dept_map, $pos_map, $fdb);
 	}
 	cm_app_cart_destroy();
