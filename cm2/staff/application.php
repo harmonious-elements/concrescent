@@ -154,6 +154,7 @@ echo '<article>';
 						echo 'the message &ldquo;Application Submitted.&rdquo;';
 					echo '</p>';
 				echo '</div>';
+				echo '<hr>';
 			}
 			echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 
@@ -162,6 +163,7 @@ echo '<article>';
 					echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
 					echo '<tr><td colspan="2"><hr></td></tr>';
 				}
+
 				echo '<tr><td colspan="2"><h2>Personal Information</h2></td></tr>';
 				$text = $fdb->get_custom_text('personal');
 				if ($text) echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';

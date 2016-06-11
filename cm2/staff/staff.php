@@ -25,6 +25,30 @@ $questions = $fdb->list_questions();
 $mdb = new cm_mail_db($db);
 $contact_address = $mdb->get_contact_address('staff-submitted');
 
+function cm_app_cart_set_state($state, $cart = null) {
+	if ($cart) $_SESSION['cart'] = $cart;
+	if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
+	$_SESSION['cart_hash'] = md5(serialize($_SESSION['cart']));
+	$_SESSION['cart_state'] = $state;
+}
+
+function cm_app_cart_check_state($expected_state) {
+	if (!isset($_SESSION['cart'])) return false;
+	if (!isset($_SESSION['cart_hash'])) return false;
+	if (!isset($_SESSION['cart_state'])) return false;
+	$expected_hash = md5(serialize($_SESSION['cart']));
+	if ($_SESSION['cart_hash'] != $expected_hash) return false;
+	if ($_SESSION['cart_state'] != $expected_state) return false;
+	return true;
+}
+
+function cm_app_cart_destroy() {
+	unset($_SESSION['cart']);
+	unset($_SESSION['cart_hash']);
+	unset($_SESSION['cart_state']);
+	session_destroy();
+}
+
 function cm_app_head($title) {
 	echo '<!DOCTYPE HTML>';
 	echo '<html>';

@@ -111,6 +111,7 @@ echo '<article>';
 						echo 'the message &ldquo;Payment Complete.&rdquo;';
 					echo '</p>';
 				echo '</div>';
+				echo '<hr>';
 			} else {
 				echo '<div class="cm-reg-badge-types">';
 					echo '<h2>Choose Your Badge Type</h2>';
@@ -172,6 +173,7 @@ echo '<article>';
 					echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
 					echo '<tr><td colspan="2"><hr></td></tr>';
 				}
+
 				echo '<tr><td colspan="2"><h2>Personal Information</h2></td></tr>';
 				$text = $fdb->get_custom_text('personal');
 				if ($text) echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
