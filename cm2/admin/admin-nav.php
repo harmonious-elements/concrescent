@@ -83,6 +83,13 @@ $cm_admin_nav = array(
 			'description' => 'View the event staff org chart.',
 			'permission' => 'staff-orgchart'
 		),
+		array(
+			'id' => 'staff-maillist',
+			'href' => '/admin/staff/maillist.php',
+			'name' => 'Mailing Lists',
+			'description' => 'Generate mailing list memberships based on staff applications and the org chart.',
+			'permission' => 'staff-maillist'
+		),
 	),
 	array(
 		array(

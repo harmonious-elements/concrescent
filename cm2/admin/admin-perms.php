@@ -73,6 +73,11 @@ $cm_admin_perms = array(
 			'name' => 'Org Chart',
 			'description' => 'View the event staff org chart.'
 		),
+		array(
+			'id' => 'staff-maillist',
+			'name' => 'Mailing Lists',
+			'description' => 'Generate mailing list memberships based on staff applications and the org chart.'
+		),
 	),
 	array(
 		array(
