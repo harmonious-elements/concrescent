@@ -19,12 +19,18 @@ function resource_file_url($file, $full) {
 	return get_site_url($full) . '/lib/res/' . $file;
 }
 
+function theme_location() {
+	if (isset($_COOKIE['theme_location']) && $_COOKIE['theme_location']) {
+		return $_COOKIE['theme_location'];
+	} else {
+		return $GLOBALS['cm_config']['theme']['location'];
+	}
+}
+
 function theme_file_path($file) {
-	$theme = $GLOBALS['cm_config']['theme']['location'];
-	return realpath(dirname(__FILE__) . '/../../' . $theme) . '/' . $file;
+	return realpath(dirname(__FILE__) . '/../../' . theme_location()) . '/' . $file;
 }
 
 function theme_file_url($file, $full) {
-	$theme = $GLOBALS['cm_config']['theme']['location'];
-	return get_site_url($full) . '/' . $theme . '/' . $file;
+	return get_site_url($full) . '/' . theme_location() . '/' . $file;
 }
