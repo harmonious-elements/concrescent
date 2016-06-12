@@ -175,7 +175,7 @@ if ($submitted) {
 				if ($slack->get_hook_url($template_name)) {
 					$body = 'The staff application for ';
 					$body .= $slack->make_link(
-						get_site_url(true).'/admin/staff/edit.php?id='.$id,
+						get_site_url(true).'/admin/staff/edit.php?review&id='.$id,
 						$item['display-name']
 					);
 					$body .= ' has been '.$application_status.'.';
@@ -195,6 +195,24 @@ cm_admin_head($new ? 'Add Staff Application' : (
 ));
 
 ?><style>
+	.cm-reg-edit .card-title,
+	.cm-reg-edit .card-content {
+		position: relative;
+	}
+	.cm-reg-edit .mode-switch {
+		position: absolute;
+		top: 7px;
+		right: 7px;
+	}
+	.cm-reg-edit .mode-switch .button {
+		margin: 0;
+	}
+	.cm-reg-edit .card-title .mode-switch {
+		display: flex;
+		align-items: center;
+		top: 0;
+		bottom: 0;
+	}
 	.ea-position-row {
 		white-space: nowrap;
 	}
@@ -220,6 +238,24 @@ cm_admin_body($new ? 'Add Staff Application' : (
 
 cm_admin_nav('staff');
 
+function echo_mode_switch() {
+	global $can_edit, $can_review, $review_mode, $new, $id;
+	if ($can_edit && $review_mode && !$new) {
+		echo '<div class="mode-switch">';
+			echo '<a href="edit.php?id=' . $id . '" class="button">';
+				echo 'Switch to Edit Mode';
+			echo '</a>';
+		echo '</div>';
+	}
+	if ($can_review && !$review_mode && !$new) {
+		echo '<div class="mode-switch">';
+			echo '<a href="edit.php?review&id=' . $id . '" class="button">';
+				echo 'Switch to Review Mode';
+			echo '</a>';
+		echo '</div>';
+	}
+}
+
 echo '<article>';
 	if ($can_submit) {
 		$url = (
@@ -232,9 +268,13 @@ echo '<article>';
 		echo '<div class="card cm-reg-edit">';
 	}
 		if ($name) {
-			echo '<div class="card-title">' . htmlspecialchars($name) . '</div>';
+			echo '<div class="card-title">';
+			echo_mode_switch();
+			echo htmlspecialchars($name);
+			echo '</div>';
 		}
 		echo '<div class="card-content">';
+			if (!$name) echo_mode_switch();
 			if ($can_submit && $submitted) {
 				if ($changed) {
 					echo '<p class="cm-success-box">Changes saved.</p>';
