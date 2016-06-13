@@ -337,7 +337,7 @@ select {
 .cm-list-table {
 	display: block;
 	margin: 16px;
-	overflow: hidden;
+	overflow: auto;
 }
 .cm-list-table table {
 	width: 100%;
