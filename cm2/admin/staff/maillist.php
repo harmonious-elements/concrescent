@@ -34,12 +34,50 @@ $staff = array_filter($staff, function($member) {
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+$known_personal_address_domains = array(
+	"@aol.com", "@arnet.com.ar", "@att.net", "@bellsouth.net",
+	"@blueyonder.co.uk", "@bt.com", "@btinternet.com", "@charter.net",
+	"@comcast.net", "@cox.net", "@daum.net", "@earthlink.net", "@email.com",
+	"@facebook.com", "@fastmail.fm", "@fibertel.com.ar", "@free.fr",
+	"@freeserve.co.uk", "@games.com", "@gmail.com", "@gmx.com", "@gmx.de",
+	"@gmx.fr", "@gmx.net", "@google.com", "@googlemail.com", "@hanmail.net",
+	"@hotmail.be", "@hotmail.co.uk", "@hotmail.com.ar", "@hotmail.com.mx",
+	"@hotmail.com", "@hotmail.de", "@hotmail.es", "@hotmail.fr", "@hush.com",
+	"@hushmail.com", "@icloud.com", "@inbox.com", "@juno.com", "@laposte.net",
+	"@lavabit.com", "@list.ru", "@live.be", "@live.co.uk", "@live.com.ar",
+	"@live.com.mx", "@live.com", "@live.de", "@live.fr", "@love.com",
+	"@mac.com", "@mail.com", "@mail.ru", "@me.com", "@msn.com", "@nate.com",
+	"@naver.com", "@neuf.fr", "@ntlworld.com", "@o2.co.uk", "@online.de",
+	"@orange.fr", "@orange.net", "@outlook.com", "@pobox.com",
+	"@prodigy.net.mx", "@qq.com", "@rambler.ru", "@rocketmail.com",
+	"@safe-mail.net", "@sbcglobal.net", "@sfr.fr", "@sina.com", "@sky.com",
+	"@skynet.be", "@speedy.com.ar", "@t-online.de", "@talktalk.co.uk",
+	"@telenet.be", "@tiscali.co.uk", "@tvcablenet.be", "@verizon.net",
+	"@virgin.net", "@virginmedia.com", "@voo.be", "@wanadoo.co.uk",
+	"@wanadoo.fr", "@web.de", "@wow.com", "@ya.ru", "@yahoo.co.id",
+	"@yahoo.co.in", "@yahoo.co.jp", "@yahoo.co.kr", "@yahoo.co.uk",
+	"@yahoo.com.ar", "@yahoo.com.mx", "@yahoo.com.ph", "@yahoo.com.sg",
+	"@yahoo.com", "@yahoo.de", "@yahoo.fr", "@yandex.com", "@yandex.ru",
+	"@ygm.com", "@ymail.com", "@zoho.com"
+);
+function is_known_personal_address($address) {
+	global $known_personal_address_domains;
+	$o = strpos($address, '@');
+	if ($o === false) return false;
+	$domain = substr($address, $o);
+	return in_array($domain, $known_personal_address_domains);
+}
 function get_mail_aliases($item, $domain) {
 	$aliases = array();
+	if (isset($item['email-address'])) {
+		$external_email = strtolower(trim($item['email-address']));
+	} else {
+		$external_email = null;
+	}
 	if (isset($item['mail-alias-1'])) {
 		foreach (explode(',', $item['mail-alias-1']) as $alias) {
 			$alias = strtolower(trim($alias));
-			if ($alias) {
+			if ($alias && ($alias != $external_email) && !is_known_personal_address($alias)) {
 				if (strpos($alias, '@') === false) {
 					$alias .= '@' . $domain;
 				}
@@ -50,7 +88,7 @@ function get_mail_aliases($item, $domain) {
 	if (isset($item['mail-alias-2'])) {
 		foreach (explode(',', $item['mail-alias-2']) as $alias) {
 			$alias = strtolower(trim($alias));
-			if ($alias) {
+			if ($alias && ($alias != $external_email) && !is_known_personal_address($alias)) {
 				if (strpos($alias, '@') === false) {
 					$alias .= '@' . $domain;
 				}
