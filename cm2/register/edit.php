@@ -363,7 +363,11 @@ echo '<article>';
 							$item['form-answers'][$question['question-id']] :
 							array()
 						);
-						echo cm_form_row($question, $answer);
+						$error = (
+							isset($errors['form-answer-'.$question['question-id']]) ?
+							$errors['form-answer-'.$question['question-id']] : null
+						);
+						echo cm_form_row($question, $answer, $error);
 						$first = false;
 					}
 				}

@@ -689,8 +689,11 @@ select {
 .cm-reg-edit table hr {
 	margin: 12px -40px 12px -20px;
 }
-.cm-reg-edit table .error {
+.cm-reg-edit table span.error {
 	padding-left: 1em;
+}
+.cm-reg-edit table div.error {
+	padding-top: 8px;
 }
 
 /* Shopping Cart Page */

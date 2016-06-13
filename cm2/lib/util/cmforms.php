@@ -78,7 +78,7 @@ function cm_form_input($id, $type, $values, $answer, $required = false, $disable
 	}
 }
 
-function cm_form_row($question, $answer, $for_editor = false) {
+function cm_form_row($question, $answer, $error = null, $for_editor = false) {
 	if ($for_editor) {
 		$out = '<tr>';
 	} else {
@@ -123,10 +123,20 @@ function cm_form_row($question, $answer, $for_editor = false) {
 				$out .= safe_html_string($title, 'cm-question-title');
 				$out .= safe_html_string($text, 'cm-question-text');
 				$out .= '<p>' . cm_form_input($id, $type, $values, $answer, false, $for_editor) . '</p>';
+				if ($error) $out .= '<p class="error">' . htmlspecialchars($error) . '</p>';
 				$out .= '</td>';
 			} else {
 				$out .= '<th>' . cm_form_label($id, ($title ? $title : ($text ? $text : ''))) . '</th>';
-				$out .= '<td>' . cm_form_input($id, $type, $values, $answer, false, $for_editor) . '</td>';
+				$out .= '<td>';
+				$out .= cm_form_input($id, $type, $values, $answer, false, $for_editor);
+				if ($error) {
+					if (strpos($out, '<br>') === false) {
+						$out .= '<span class="error">' . htmlspecialchars($error) . '</span>';
+					} else {
+						$out .= '<div class="error">' . htmlspecialchars($error) . '</div>';
+					}
+				}
+				$out .= '</td>';
 			}
 			break;
 	}
@@ -142,7 +152,7 @@ function cm_form_posted_answer($id, $type) {
 		case 'radio':
 		case 'select':
 			if (!isset($_POST[$htmlid])) return array();
-			return array($_POST[$htmlid]);
+			return ($_POST[$htmlid] ? array($_POST[$htmlid]) : array());
 		case 'textarea':
 			if (!isset($_POST[$htmlid])) return array();
 			$answer = $_POST[$htmlid];
@@ -179,7 +189,7 @@ function cm_form_edit_start() {
 function cm_form_edit_static_section(&$questions) {
 	echo '<tbody class="cm-form-editor-static-section">';
 	foreach ($questions as $question) {
-		echo cm_form_row($question, array('Question provided by system'), true);
+		echo cm_form_row($question, array('Question provided by system'), null, true);
 	}
 	echo '</tbody>';
 }
@@ -383,7 +393,7 @@ function cm_form_edit_process_requests($db) {
 			case 'render-dynamic-row':
 				$question = json_decode($_POST['cm-form-question'], true);
 				$answer = array('Answer provided by user');
-				echo cm_form_row($question, $answer, true);
+				echo cm_form_row($question, $answer, null, true);
 				break;
 			case 'get-question':
 				$id = $_POST['cm-form-question-id'];
@@ -393,7 +403,7 @@ function cm_form_edit_process_requests($db) {
 				if ($ok) {
 					$response['question'] = $question;
 					$answer = array('Answer provided by user');
-					$response['html'] = cm_form_row($question, $answer, true);
+					$response['html'] = cm_form_row($question, $answer, null, true);
 				}
 				echo json_encode($response);
 				break;
@@ -406,7 +416,7 @@ function cm_form_edit_process_requests($db) {
 					$answer = array('Answer provided by user');
 					$response['html'] = array();
 					foreach ($questions as $question) {
-						$response['html'][] = cm_form_row($question, $answer, true);
+						$response['html'][] = cm_form_row($question, $answer, null, true);
 					}
 				}
 				echo json_encode($response);
@@ -422,7 +432,7 @@ function cm_form_edit_process_requests($db) {
 					if ($question !== false) {
 						$response['question'] = $question;
 						$answer = array('Answer provided by user');
-						$response['html'] = cm_form_row($question, $answer, true);
+						$response['html'] = cm_form_row($question, $answer, null, true);
 					}
 				}
 				echo json_encode($response);
@@ -438,7 +448,7 @@ function cm_form_edit_process_requests($db) {
 					if ($question !== false) {
 						$response['question'] = $question;
 						$answer = array('Answer provided by user');
-						$response['html'] = cm_form_row($question, $answer, true);
+						$response['html'] = cm_form_row($question, $answer, null, true);
 					}
 				}
 				echo json_encode($response);
