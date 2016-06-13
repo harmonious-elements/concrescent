@@ -4,6 +4,7 @@ require_once dirname(__FILE__).'/../../lib/database/staff.php';
 require_once dirname(__FILE__).'/../../lib/database/forms.php';
 require_once dirname(__FILE__).'/../../lib/database/attendee.php';
 require_once dirname(__FILE__).'/../../lib/database/mail.php';
+require_once dirname(__FILE__).'/../../lib/database/misc.php';
 require_once dirname(__FILE__).'/../../lib/util/util.php';
 require_once dirname(__FILE__).'/../../lib/util/cmforms.php';
 require_once dirname(__FILE__).'/../../lib/util/slack.php';
@@ -27,6 +28,9 @@ $questions = $fdb->list_questions();
 
 $atdb = new cm_attendee_db($db);
 $mdb = new cm_mail_db($db);
+
+$midb = new cm_misc_db($db);
+$domain = $midb->getval('mail-default-domain', $_SERVER['SERVER_NAME']);
 
 $new = !isset($_GET['id']);
 $id = $new ? -1 : (int)$_GET['id'];
@@ -697,7 +701,7 @@ echo '<article>';
 					if ($can_edit_status) {
 						echo '<td>';
 							echo '<input type="email" id="mail-alias-1" name="mail-alias-1" value="' . $value . '">';
-							echo '&nbsp;&nbsp;(Use a full email address including domain.)';
+							echo '&nbsp;&nbsp;(This is for a <b>mail alias</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> an external address.)';
 						echo '</td>';
 					} else {
 						echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';
@@ -710,7 +714,7 @@ echo '<article>';
 					if ($can_edit_status) {
 						echo '<td>';
 							echo '<input type="email" id="mail-alias-2" name="mail-alias-2" value="' . $value . '">';
-							echo '&nbsp;&nbsp;(Use a full email address including domain.)';
+							echo '&nbsp;&nbsp;(This is for a <b>mail alias</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> an external address.)';
 						echo '</td>';
 					} else {
 						echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';

@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__).'/../../lib/database/staff.php';
+require_once dirname(__FILE__).'/../../lib/database/misc.php';
 require_once dirname(__FILE__).'/../../lib/util/util.php';
 require_once dirname(__FILE__).'/../../lib/util/cmlists.php';
 require_once dirname(__FILE__).'/../admin.php';
@@ -8,6 +9,9 @@ require_once dirname(__FILE__).'/../admin.php';
 cm_admin_check_permission('staff-departments', 'staff-departments');
 
 $sdb = new cm_staff_db($db);
+
+$midb = new cm_misc_db($db);
+$domain = $midb->getval('mail-default-domain', $_SERVER['SERVER_NAME']);
 
 $list_def = array(
 	'ajax-url' => get_site_url(false) . '/admin/staff/departments.php',
@@ -106,8 +110,8 @@ cm_admin_head('Departments');
 
 ?><style>
 	.edit-dialog {
-		width: 700px;
-		margin-left: -350px;
+		width: 800px;
+		margin-left: -400px;
 	}
 	.ea-position-row + .ea-position-row {
 		margin-top: 4px;
@@ -149,14 +153,14 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 		echo '<th><label for="ea-mail-alias-1">Primary Email Alias:</label></th>';
 		echo '<td>';
 			echo '<input type="email" name="ea-mail-alias-1" id="ea-mail-alias-1">';
-			echo '&nbsp;&nbsp;(Use a full email address including domain.)';
+			echo '&nbsp;&nbsp;(This is for a <b>mailing list</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> a personal address.)';
 		echo '</td>';
 	echo '</tr>';
 	echo '<tr>';
 		echo '<th><label for="ea-mail-alias-2">Secondary Email Alias:</label></th>';
 		echo '<td>';
 			echo '<input type="email" name="ea-mail-alias-2" id="ea-mail-alias-2">';
-			echo '&nbsp;&nbsp;(Use a full email address including domain.)';
+			echo '&nbsp;&nbsp;(This is for a <b>mailing list</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> a personal address.)';
 		echo '</td>';
 	echo '</tr>';
 	echo '<tr>';
