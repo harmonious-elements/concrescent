@@ -182,7 +182,29 @@ if ($submitted) {
 						get_site_url(true).'/admin/staff/edit.php?review&id='.$id,
 						$item['display-name']
 					);
-					$body .= ' has been '.$application_status.'.';
+					$body .= ' has been '.$application_status;
+					if ($admin_user['name']) {
+						$body .= ' by '.$admin_user['name'];
+					} else if ($admin_user['username']) {
+						$body .= ' by '.$admin_user['username'];
+					}
+					if (
+						$application_status == 'accepted' &&
+						isset($item['assigned-positions']) &&
+						$item['assigned-positions']
+					) {
+						if (count($item['assigned-positions']) == 1) {
+							$body .= ' for the following position: ';
+							$body .= $item['assigned-positions'][0]['position-name-h'];
+						} else {
+							$body .= ' for the following positions:';
+							foreach ($item['assigned-positions'] as $position) {
+								$body .= "\n".$position['position-name-h'];
+							}
+						}
+					} else {
+						$body .= '.';
+					}
 					$slack->post_message($template_name, $body);
 				}
 			}
