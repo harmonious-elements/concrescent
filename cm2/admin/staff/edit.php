@@ -6,6 +6,7 @@ require_once dirname(__FILE__).'/../../lib/database/attendee.php';
 require_once dirname(__FILE__).'/../../lib/database/mail.php';
 require_once dirname(__FILE__).'/../../lib/database/misc.php';
 require_once dirname(__FILE__).'/../../lib/util/util.php';
+require_once dirname(__FILE__).'/../../lib/util/res.php';
 require_once dirname(__FILE__).'/../../lib/util/cmforms.php';
 require_once dirname(__FILE__).'/../../lib/util/slack.php';
 require_once dirname(__FILE__).'/../admin.php';
@@ -916,7 +917,8 @@ echo '<article>';
 					if ($value) {
 						echo '<tr>';
 							echo '<th><label>QR Code</label></th>';
-							echo '<td><img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=' . $value . '"></td>';
+							$qr_url = htmlspecialchars(resource_file_url('barcode.php', false) . '?s=qr&w=150&h=150&d=');
+							echo '<td><img src="' . $qr_url . $value . '" width="150" height="150"></td>';
 						echo '</tr>';
 					}
 

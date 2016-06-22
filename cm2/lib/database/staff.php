@@ -2,6 +2,7 @@
 
 require_once dirname(__FILE__).'/../../config/config.php';
 require_once dirname(__FILE__).'/../util/util.php';
+require_once dirname(__FILE__).'/../util/res.php';
 require_once dirname(__FILE__).'/database.php';
 require_once dirname(__FILE__).'/lists.php';
 require_once dirname(__FILE__).'/forms.php';
@@ -1225,7 +1226,7 @@ class cm_staff_db {
 			$reg_url = get_site_url(true) . '/staff';
 			$id_string = 'S' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
-			$qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' . $qr_data;
+			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
 			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
 			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
 			$only_name = $real_name;
@@ -1464,10 +1465,11 @@ class cm_staff_db {
 			$payment_date, $payment_details
 		);
 		$reg_url = get_site_url(true) . '/staff';
+		$qr_base_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=';
 		while ($stmt->fetch()) {
 			$id_string = 'S' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
-			$qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' . $qr_data;
+			$qr_url = $qr_base_url . $qr_data;
 			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
 			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
 			$only_name = $real_name;

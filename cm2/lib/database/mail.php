@@ -35,7 +35,7 @@ class cm_mail_db {
 					"Your [[badge-type-name]] registration for <b>[[display-name]]</b> has been completed.\n\n".
 					"Your badge will be available for pickup at the event. ".
 					"Please bring a photo ID and a printout of this email message with you.\n\n".
-					"<img src=\"https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=[[qr-data]]\">\n\n".
+					"<img src=\"[[qr-url]]\">\n\n".
 					"You can review your order at any time at the following URL:\n\n".
 					"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
 					"Thanks again,\n[[event-name]] Registration"
@@ -92,7 +92,7 @@ class cm_mail_db {
 					"Thank you for completing your staff registration for <b>[[event-name]]</b>.\n\n".
 					"Your badge will be available for pickup at the event. ".
 					"Please bring a photo ID and a printout of this email message with you.\n\n".
-					"<img src=\"https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=[[qr-data]]\">\n\n".
+					"<img src=\"[[qr-url]]\">\n\n".
 					"You can review your order at any time at the following URL:\n\n".
 					"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
 					"Thanks again,\n[[event-name]] Registration"
