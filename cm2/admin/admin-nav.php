@@ -137,6 +137,13 @@ $cm_admin_nav = array(
 	),
 	array(
 		array(
+			'id' => 'admin-user',
+			'href' => '/admin/user.php',
+			'name' => 'Account Settings',
+			'description' => 'Change your user name or password.',
+			'permission' => ''
+		),
+		array(
 			'id' => 'admin-users',
 			'href' => '/admin/users.php',
 			'name' => 'Admin Users',

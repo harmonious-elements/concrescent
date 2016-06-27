@@ -11,15 +11,15 @@ $list_def = array(
 	'ajax-url' => get_site_url(false) . '/admin/users.php',
 	'entity-type' => 'user',
 	'entity-type-pl' => 'users',
-	'search-criteria' => 'name or username',
+	'search-criteria' => 'display name or user name',
 	'columns' => array(
 		array(
-			'name' => 'Name',
+			'name' => 'Display Name',
 			'key' => 'name',
 			'type' => 'text'
 		),
 		array(
-			'name' => 'Username',
+			'name' => 'User Name',
 			'key' => 'username',
 			'type' => 'text'
 		),
@@ -131,7 +131,7 @@ cm_list_edit_dialog_start();
 
 echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-user-editor">';
 	echo '<tr>';
-		echo '<th><label for="ea-name">Name:</label></th>';
+		echo '<th><label for="ea-name">Display Name:</label></th>';
 		echo '<td><input type="text" name="ea-name" id="ea-name"></td>';
 	echo '</tr>';
 	echo '<tr>';
