@@ -70,6 +70,15 @@ $cm_admin_nav = array(
 	),
 	array(
 		array(
+			'id' => 'rooms-and-tables',
+			'href' => '/admin/rooms-and-tables.php',
+			'name' => 'Rooms & Tables',
+			'description' => 'Upload an event space floor plan and tag rooms and tables with their identifiers.',
+			'permission' => 'rooms-and-tables'
+		),
+	),
+	array(
+		array(
 			'id' => 'staff-departments',
 			'href' => '/admin/staff/departments.php',
 			'name' => 'Departments',

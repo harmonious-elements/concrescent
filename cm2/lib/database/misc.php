@@ -12,6 +12,13 @@ class cm_misc_db {
 			'`key` VARCHAR(255) NOT NULL PRIMARY KEY,'.
 			'`value` TEXT NULL'
 		));
+		$this->cm_db->table_def('config_misc_files', (
+			'`file_name` VARCHAR(255) NOT NULL PRIMARY KEY,'.
+			'`mime_type` VARCHAR(255) NULL,'.
+			'`image_w` INT NULL,'.
+			'`image_h` INT NULL,'.
+			'`data` LONGBLOB NULL'
+		));
 	}
 
 	public function getval($key, $def = null) {
@@ -48,6 +55,107 @@ class cm_misc_db {
 			' WHERE `key` = ? LIMIT 1'
 		);
 		$stmt->bind_param('s', $key);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function upload_file($name, $type, $image_w, $image_h, $file) {
+		if (!$name || !$type || !$file) return false;
+		$this->cm_db->connection->autocommit(false);
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT 1 FROM '.$this->cm_db->table_name('config_misc_files').
+			' WHERE `file_name` = ? LIMIT 1'
+		);
+		$stmt->bind_param('s', $name);
+		$stmt->execute();
+		$stmt->bind_result($exists);
+		$exists = $stmt->fetch() && $exists;
+		$stmt->close();
+		$null = null;
+		if ($exists) {
+			$stmt = $this->cm_db->connection->prepare(
+				'UPDATE '.$this->cm_db->table_name('config_misc_files').' SET '.
+				'`file_name` = ?, `mime_type` = ?, `image_w` = ?, `image_h` = ?, `data` = ?'.
+				' WHERE `file_name` = ? LIMIT 1'
+			);
+			$stmt->bind_param('ssiibs', $name, $type, $image_w, $image_h, $null, $name);
+		} else {
+			$stmt = $this->cm_db->connection->prepare(
+				'INSERT INTO '.$this->cm_db->table_name('config_misc_files').' SET '.
+				'`file_name` = ?, `mime_type` = ?, `image_w` = ?, `image_h` = ?, `data` = ?'
+			);
+			$stmt->bind_param('ssiib', $name, $type, $image_w, $image_h, $null);
+		}
+		$fp = fopen($file, 'r');
+		if ($fp) {
+			while (!feof($fp)) $stmt->send_long_data(4, fread($fp, 65536));
+			fclose($fp);
+			$success = $stmt->execute();
+		} else {
+			$success = false;
+		}
+		$stmt->close();
+		$this->cm_db->connection->autocommit(true);
+		return $success;
+	}
+
+	public function download_file($name, $attachment = false) {
+		if (!$name) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `mime_type`, `data`'.
+			' FROM '.$this->cm_db->table_name('config_misc_files').
+			' WHERE `file_name` = ? LIMIT 1'
+		);
+		$stmt->bind_param('s', $name);
+		$stmt->execute();
+		$stmt->bind_result($type, $data);
+		if ($stmt->fetch() && $type && $data) {
+			if ($attachment) {
+				if ($attachment !== true) {
+					$name = $attachment;
+				}
+				if (!strrpos($name, '.')) {
+					$o = strrpos($type, '/');
+					if ($o) $name .= '.' . substr($type, $o + 1);
+				}
+				header('Content-Disposition: attachment; filename=' . $name);
+			}
+			header('Content-Type: ' . $type);
+			echo $data;
+			$stmt->close();
+			return true;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function get_file_image_size($name) {
+		if (!$name) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `image_w`, `image_h`'.
+			' FROM '.$this->cm_db->table_name('config_misc_files').
+			' WHERE `file_name` = ? LIMIT 1'
+		);
+		$stmt->bind_param('s', $name);
+		$stmt->execute();
+		$stmt->bind_result($image_w, $image_h);
+		if ($stmt->fetch() && $image_w && $image_h) {
+			$size = array($image_w, $image_h);
+			$stmt->close();
+			return $size;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function delete_file($name) {
+		if (!$name) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('config_misc_files').
+			' WHERE `file_name` = ? LIMIT 1'
+		);
+		$stmt->bind_param('s', $name);
 		$success = $stmt->execute();
 		$stmt->close();
 		return $success;

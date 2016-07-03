@@ -64,6 +64,13 @@ $cm_admin_perms = array(
 	),
 	array(
 		array(
+			'id' => 'rooms-and-tables',
+			'name' => 'Rooms & Tables',
+			'description' => 'Upload an event space floor plan and tag rooms and tables with their identifiers.'
+		),
+	),
+	array(
+		array(
 			'id' => 'staff-departments',
 			'name' => 'Departments',
 			'description' => 'Organize the departments and positions that make up the event staff org chart.'

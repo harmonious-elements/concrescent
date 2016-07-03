@@ -1,0 +1,156 @@
+.tag-map {
+	position: relative;
+	width: 100%;
+	height: 0;
+	background: url('rooms-and-tables.php?image') no-repeat center;
+	background-size: 100% 100%;
+	cursor: crosshair;
+}
+.tags {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.tag {
+	position: absolute;
+	background: rgba(204, 204, 204, 0.2);
+	border: solid 1px rgba(204, 204, 204, 0.4);
+	font-weight: bold;
+	text-align: center;
+	cursor: pointer;
+}
+.tag label {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 20px;
+	height: 20px;
+	margin-top: -10px;
+	margin-left: -10px;
+	line-height: 20px;
+	cursor: pointer;
+}
+.tag label:before {
+	content: "";
+	margin-left: -1000px;
+}
+.tag label:after {
+	content: "";
+	margin-right: -1000px;
+}
+.tag label.stroke {
+	-webkit-text-stroke: 5px rgba(255, 255, 255, 0.8);
+	text-stroke: 5px rgba(255, 255, 255, 0.8);
+	color: rgba(255, 255, 255, 0.8);
+}
+.tag-marquee,
+.tag-editor {
+	position: absolute;
+	background: rgba(204, 204, 255, 0.4);
+	border: solid 1px rgba(204, 204, 255, 0.8);
+}
+.tag-editor {
+	cursor: auto;
+}
+.tag-editor-handle {
+	position: absolute;
+	width: 5px;
+	height: 5px;
+	background: blue;
+	border: solid 1px black;
+}
+.tag-editor-handle-n,
+.tag-editor-handle-nw,
+.tag-editor-handle-ne {
+	top: -4px;
+}
+.tag-editor-handle-s,
+.tag-editor-handle-sw,
+.tag-editor-handle-se {
+	bottom: -4px;
+}
+.tag-editor-handle-w,
+.tag-editor-handle-nw,
+.tag-editor-handle-sw {
+	left: -4px;
+}
+.tag-editor-handle-e,
+.tag-editor-handle-ne,
+.tag-editor-handle-se {
+	right: -4px;
+}
+.tag-editor-handle-n,
+.tag-editor-handle-s,
+.tag-editor-handle-center {
+	left: 50%;
+	margin-left: -4px;
+}
+.tag-editor-handle-w,
+.tag-editor-handle-e,
+.tag-editor-handle-center {
+	top: 50%;
+	margin-top: -4px;
+}
+.tag-editor-handle-n,
+.tag-editor-handle-s {
+	cursor: ns-resize;
+}
+.tag-editor-handle-w,
+.tag-editor-handle-e {
+	cursor: ew-resize;
+}
+.tag-editor-handle-nw,
+.tag-editor-handle-se {
+	cursor: nwse-resize;
+}
+.tag-editor-handle-ne,
+.tag-editor-handle-sw {
+	cursor: nesw-resize;
+}
+.tag-editor-handle-center {
+	cursor: move;
+}
+.tag-editor-input,
+.tag-editor-buttons {
+	position: absolute;
+	left: 50%;
+	width: 180px;
+	margin-left: -95px;
+	background: white;
+	border: solid 1px gray;
+	padding: 4px;
+	text-align: center;
+	cursor: auto;
+}
+.tag-editor-input {
+	bottom: 100%;
+	margin-bottom: 36px;
+	border-bottom: none;
+	padding-bottom: 2px;
+}
+.tag-editor-buttons {
+	top: 0;
+	margin-top: -36px;
+	border-top: none;
+	padding-top: 2px;
+}
+.tag-editor-input input {
+	width: 170px;
+	text-align: center;
+}
+.tag-editor-buttons button {
+	margin: 0 3px 0 0;
+	width: 58px;
+}
+.tag-editor-buttons button:last-child {
+	margin: 0;
+}
+.tag-map-actions td {
+	padding: 2px;
+}
+.tag-map-actions input[type=submit] {
+	margin: 0;
+	width: 112px;
+}
