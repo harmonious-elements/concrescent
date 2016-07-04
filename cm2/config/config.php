@@ -63,6 +63,14 @@ $cm_config = array(
 			/* Notification hook for blacklisted attendee registrations. */
 			'attendee-blacklisted' => '',
 
+			/* Notification hooks for blacklisted applications. */
+			'application-blacklisted' => array(
+				/* Vendors */ 'B' => '',
+				/* Panels  */ 'E' => '',
+				/* Guests  */ 'G' => '',
+				/* Press   */ 'M' => '',
+			),
+
 			/* Notification hooks for application submission. */
 			'application-submitted' => array(
 				/* Vendors */ 'B' => '',
@@ -109,6 +117,35 @@ $cm_config = array(
 
 		/* The last date requiring availability of staff members, in YYYY-MM-DD format. */
 		'staff_end_date' => '2015-12-31',
+
+	),
+
+	/* Application Configuration */
+	'application_types' => array(
+
+		/* Vendors */
+		'B' => array(
+			'nav_prefix' => 'Vendor',
+			'assignment_term' => 'Table'
+		),
+
+		/* Panels */
+		'E' => array(
+			'nav_prefix' => 'Panel',
+			'assignment_term' => 'Time Slot'
+		),
+
+		/* Guests */
+		'G' => array(
+			'nav_prefix' => 'Guest',
+			'assignment_term' => 'Time Slot'
+		),
+
+		/* Press */
+		'M' => array(
+			'nav_prefix' => 'Press',
+			'assignment_term' => 'Time Slot'
+		),
 
 	),
 
