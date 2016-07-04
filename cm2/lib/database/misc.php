@@ -122,6 +122,8 @@ class cm_misc_db {
 				header('Content-Disposition: attachment; filename=' . $name);
 			}
 			header('Content-Type: ' . $type);
+			header('Pragma: no-cache');
+			header('Expires: 0');
 			echo $data;
 			$stmt->close();
 			return true;

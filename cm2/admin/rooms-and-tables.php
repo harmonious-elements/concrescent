@@ -12,6 +12,8 @@ $midb = new cm_misc_db($db);
 if (isset($_GET['image'])) {
 	if (!$midb->download_file('rooms-and-tables')) {
 		header('Content-Type: image/png');
+		header('Pragma: no-cache');
+		header('Expires: 0');
 		$image = imagecreate(640, 480);
 		$bg = imagecolorallocate($image, 255, 255, 255);
 		imagefilledrectangle($image, 0, 0, 640, 480, $bg);
@@ -60,6 +62,8 @@ if (isset($_POST['action'])) {
 			if (!$midb->download_file('rooms-and-tables', true)) {
 				header('Content-Disposition: attachment; filename=rooms-and-tables.png');
 				header('Content-Type: image/png');
+				header('Pragma: no-cache');
+				header('Expires: 0');
 				$image = imagecreate(640, 480);
 				$bg = imagecolorallocate($image, 255, 255, 255);
 				imagefilledrectangle($image, 0, 0, 640, 480, $bg);
