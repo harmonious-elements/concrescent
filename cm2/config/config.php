@@ -126,25 +126,25 @@ $cm_config = array(
 		/* Vendors */
 		'B' => array(
 			'nav_prefix' => 'Vendor',
-			'assignment_term' => 'Table'
+			'assignment_term' => array('Table', 'Tables')
 		),
 
 		/* Panels */
 		'E' => array(
 			'nav_prefix' => 'Panel',
-			'assignment_term' => 'Time Slot'
+			'assignment_term' => array('Time Slot', 'Time Slots')
 		),
 
 		/* Guests */
 		'G' => array(
 			'nav_prefix' => 'Guest',
-			'assignment_term' => 'Time Slot'
+			'assignment_term' => array('Time Slot', 'Time Slots')
 		),
 
 		/* Press */
 		'M' => array(
 			'nav_prefix' => 'Press',
-			'assignment_term' => 'Time Slot'
+			'assignment_term' => array('Time Slot', 'Time Slots')
 		),
 
 	),
