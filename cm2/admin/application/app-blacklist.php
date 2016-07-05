@@ -22,26 +22,36 @@ if (!$ctx_info) {
 	exit(0);
 }
 $ctx_name = $ctx_info['nav_prefix'];
-$ctx_name_lc = strtolower($ctx_name);
 
 cm_admin_check_permission('application-blacklist-'.$ctx_lc, 'application-blacklist-'.$ctx_lc);
 
 $apdb = new cm_application_db($db, $context);
 
+$business_name = $ctx_info['business_name_term'];
+$application_name = $ctx_info['application_name_term'];
+$business_name_lc = strtolower($business_name);
+$application_name_lc = strtolower($application_name);
+
+$search_criteria = (
+	(substr($business_name_lc, -5) == ' name' && substr($application_name_lc, -5) == ' name') ?
+	(substr($business_name_lc, 0, -5) . ' or ' . $application_name_lc) :
+	($business_name_lc . ' or ' . $application_name_lc)
+);
+
 $list_def = array(
 	'ajax-url' => get_site_url(false) . '/admin/application/app-blacklist.php?c=' . $ctx_lc,
 	'entity-type' => 'blacklist entry',
 	'entity-type-pl' => 'blacklist entries',
-	'search-criteria' => 'business or application name',
+	'search-criteria' => $search_criteria,
 	'columns' => array(
 		array(
-			'name' => 'Business Name',
-			'key' => 'business-name',
+			'name' => $application_name,
+			'key' => 'application-name',
 			'type' => 'text'
 		),
 		array(
-			'name' => 'Application Name',
-			'key' => 'application-name',
+			'name' => $business_name,
+			'key' => 'business-name',
 			'type' => 'text'
 		),
 		array(
@@ -142,12 +152,12 @@ cm_list_edit_dialog_start();
 
 echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 	echo '<tr>';
-		echo '<th><label for="ea-business-name">Business Name:</label></th>';
-		echo '<td><input type="text" name="ea-business-name" id="ea-business-name"></td>';
+		echo '<th><label for="ea-application-name">'.htmlspecialchars($application_name).':</label></th>';
+		echo '<td><input type="text" name="ea-application-name" id="ea-application-name"></td>';
 	echo '</tr>';
 	echo '<tr>';
-		echo '<th><label for="ea-application-name">Application Name:</label></th>';
-		echo '<td><input type="text" name="ea-application-name" id="ea-application-name"></td>';
+		echo '<th><label for="ea-business-name">'.htmlspecialchars($business_name).':</label></th>';
+		echo '<td><input type="text" name="ea-business-name" id="ea-business-name"></td>';
 	echo '</tr>';
 	echo '<tr>';
 		echo '<th><label for="ea-added-by">Added/Approved By:</label></th>';

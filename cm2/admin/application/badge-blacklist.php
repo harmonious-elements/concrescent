@@ -22,7 +22,6 @@ if (!$ctx_info) {
 	exit(0);
 }
 $ctx_name = $ctx_info['nav_prefix'];
-$ctx_name_lc = strtolower($ctx_name);
 
 cm_admin_check_permission('applicant-blacklist-'.$ctx_lc, 'applicant-blacklist-'.$ctx_lc);
 

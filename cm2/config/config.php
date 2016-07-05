@@ -126,25 +126,41 @@ $cm_config = array(
 		/* Vendors */
 		'B' => array(
 			'nav_prefix' => 'Vendor',
-			'assignment_term' => array('Table', 'Tables')
+			'assignment_term' => array('Table', 'Tables'),
+			'business_name_term' => 'Business Name',
+			'business_name_text' => 'The name of the business, organization, group, or individual selling or tabling.',
+			'application_name_term' => 'Table Name',
+			'application_name_text' => 'The name of the table. This is the name that appears publicly.'
 		),
 
 		/* Panels */
 		'E' => array(
 			'nav_prefix' => 'Panel',
-			'assignment_term' => array('Time Slot', 'Time Slots')
+			'assignment_term' => array('Time Slot', 'Time Slots'),
+			'business_name_term' => 'Presenter Name',
+			'business_name_text' => 'The name of the business, organization, group, or individual presenting the panel.',
+			'application_name_term' => 'Panel Name',
+			'application_name_text' => 'The name of the panel. This is the name that appears publicly.'
 		),
 
 		/* Guests */
 		'G' => array(
 			'nav_prefix' => 'Guest',
-			'assignment_term' => array('Time Slot', 'Time Slots')
+			'assignment_term' => array('Time Slot', 'Time Slots'),
+			'business_name_term' => 'Business Name',
+			'business_name_text' => 'The name of the business, organization, group, or individual representing the guest.',
+			'application_name_term' => 'Guest Name',
+			'application_name_text' => 'The name by which the guest is known. This is the name that appears publicly.'
 		),
 
 		/* Press */
 		'M' => array(
 			'nav_prefix' => 'Press',
-			'assignment_term' => array('Time Slot', 'Time Slots')
+			'assignment_term' => array('Time Slot', 'Time Slots'),
+			'business_name_term' => 'Business Name',
+			'business_name_text' => 'The name of the business, organization, group, or individual who owns the publication.',
+			'application_name_term' => 'Publication Name',
+			'application_name_text' => 'The name of the publication. This is the name that appears publicly.'
 		),
 
 	),
