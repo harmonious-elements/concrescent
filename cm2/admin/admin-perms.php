@@ -92,6 +92,16 @@ function cm_admin_perms_application_config($context, $ctx_info) {
 			'name' => $ctx_name.' Badge Types',
 			'description' => 'Create or modify the types of badges available on the '.$ctx_name_lc.' application form.'
 		),
+		array(
+			'id' => 'application-blacklist-'.$ctx_lc,
+			'name' => $ctx_name.' App Blacklist',
+			'description' => 'Inform people reviewing '.$ctx_name_lc.' applications of certain applications that should not be accepted.'
+		),
+		array(
+			'id' => 'applicant-blacklist-'.$ctx_lc,
+			'name' => $ctx_name.' Badge Blacklist',
+			'description' => 'Inform people reviewing '.$ctx_name_lc.' applications of certain people who should not receive badges.'
+		),
 	);
 };
 

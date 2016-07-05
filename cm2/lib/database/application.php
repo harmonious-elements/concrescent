@@ -711,4 +711,449 @@ class cm_application_db {
 		return ($index >= 0);
 	}
 
+	public function get_application_blacklist_entry($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `business_name`, `application_name`, `added_by`,'.
+			' `normalized_business_name`, `normalized_application_name`'.
+			' FROM '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $business_name, $application_name, $added_by,
+			$normalized_business_name, $normalized_application_name
+		);
+		if ($stmt->fetch()) {
+			$result = array(
+				'id' => $id,
+				'business-name' => $business_name,
+				'application-name' => $application_name,
+				'added-by' => $added_by,
+				'normalized-business-name' => $normalized_business_name,
+				'normalized-application-name' => $normalized_application_name,
+				'search-content' => array($business_name, $application_name, $added_by)
+			);
+			$stmt->close();
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_application_blacklist_entries() {
+		$blacklist = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `business_name`, `application_name`, `added_by`,'.
+			' `normalized_business_name`, `normalized_application_name`'.
+			' FROM '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).
+			' ORDER BY `business_name`, `application_name`'
+		);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $business_name, $application_name, $added_by,
+			$normalized_business_name, $normalized_application_name
+		);
+		while ($stmt->fetch()) {
+			$blacklist[] = array(
+				'id' => $id,
+				'business-name' => $business_name,
+				'application-name' => $application_name,
+				'added-by' => $added_by,
+				'normalized-business-name' => $normalized_business_name,
+				'normalized-application-name' => $normalized_application_name,
+				'search-content' => array($business_name, $application_name, $added_by)
+			);
+		}
+		$stmt->close();
+		return $blacklist;
+	}
+
+	public function create_application_blacklist_entry($entry) {
+		if (!$entry) return false;
+		$business_name = (isset($entry['business-name']) ? $entry['business-name'] : '');
+		$application_name = (isset($entry['application-name']) ? $entry['application-name'] : '');
+		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$normalized_business_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $business_name));
+		$normalized_application_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $application_name));
+		if (!$business_name) $business_name = null;
+		if (!$application_name) $application_name = null;
+		if (!$added_by) $added_by = null;
+		if (!$normalized_business_name) $normalized_business_name = null;
+		if (!$normalized_application_name) $normalized_application_name = null;
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).' SET '.
+			'`business_name` = ?, `application_name` = ?, `added_by` = ?, '.
+			'`normalized_business_name` = ?, `normalized_application_name` = ?'
+		);
+		$stmt->bind_param(
+			'sssss',
+			$business_name, $application_name, $added_by,
+			$normalized_business_name, $normalized_application_name
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		return $id;
+	}
+
+	public function update_application_blacklist_entry($entry) {
+		if (!$entry || !isset($entry['id']) || !$entry['id']) return false;
+		$business_name = (isset($entry['business-name']) ? $entry['business-name'] : '');
+		$application_name = (isset($entry['application-name']) ? $entry['application-name'] : '');
+		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$normalized_business_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $business_name));
+		$normalized_application_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $application_name));
+		if (!$business_name) $business_name = null;
+		if (!$application_name) $application_name = null;
+		if (!$added_by) $added_by = null;
+		if (!$normalized_business_name) $normalized_business_name = null;
+		if (!$normalized_application_name) $normalized_application_name = null;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).' SET '.
+			'`business_name` = ?, `application_name` = ?, `added_by` = ?, '.
+			'`normalized_business_name` = ?, `normalized_application_name` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'sssssi',
+			$business_name, $application_name, $added_by,
+			$normalized_business_name, $normalized_application_name,
+			$entry['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function delete_application_blacklist_entry($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function is_application_blacklisted($application) {
+		if (!$application) return false;
+		$business_name = (isset($application['business-name']) ? $application['business-name'] : '');
+		$application_name = (isset($application['application-name']) ? $application['application-name'] : '');
+		$normalized_business_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $business_name));
+		$normalized_application_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $application_name));
+		$query_params = array();
+		$bind_params = array('');
+		if ($normalized_business_name) {
+			$query_params[] = '`normalized_business_name` = ?';
+			$query_params[] = '`normalized_application_name` = ?';
+			$bind_params[0] .= 'ss';
+			$bind_params[] = &$normalized_business_name;
+			$bind_params[] = &$normalized_business_name;
+		}
+		if ($normalized_application_name) {
+			$query_params[] = '`normalized_business_name` = ?';
+			$query_params[] = '`normalized_application_name` = ?';
+			$bind_params[0] .= 'ss';
+			$bind_params[] = &$normalized_application_name;
+			$bind_params[] = &$normalized_application_name;
+		}
+		if (!$query_params) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id` FROM '.
+			$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).
+			' WHERE '.implode(' OR ', $query_params).' LIMIT 1'
+		);
+		call_user_func_array(array($stmt, 'bind_param'), $bind_params);
+		$stmt->execute();
+		$stmt->bind_result($id);
+		$success = $stmt->fetch();
+		$stmt->close();
+		return $success ? $this->get_application_blacklist_entry($id) : false;
+	}
+
+	public function get_applicant_blacklist_entry($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
+			' `email_address`, `phone_number`, `added_by`,'.
+			' `normalized_real_name`,'.
+			' `normalized_reversed_name`,'.
+			' `normalized_fandom_name`,'.
+			' `normalized_email_address`,'.
+			' `normalized_phone_number`'.
+			' FROM '.$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number
+		);
+		if ($stmt->fetch()) {
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$reversed_name = trim(trim($last_name) . ' ' . trim($first_name));
+			$result = array(
+				'id' => $id,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'reversed-name' => $reversed_name,
+				'fandom-name' => $fandom_name,
+				'email-address' => $email_address,
+				'phone-number' => $phone_number,
+				'added-by' => $added_by,
+				'normalized-real-name' => $normalized_real_name,
+				'normalized-reversed-name' => $normalized_reversed_name,
+				'normalized-fandom-name' => $normalized_fandom_name,
+				'normalized-email-address' => $normalized_email_address,
+				'normalized-phone-number' => $normalized_phone_number,
+				'search-content' => array(
+					$first_name, $last_name, $real_name, $reversed_name,
+					$fandom_name, $email_address, $phone_number, $added_by
+				)
+			);
+			$stmt->close();
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_applicant_blacklist_entries() {
+		$blacklist = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
+			' `email_address`, `phone_number`, `added_by`,'.
+			' `normalized_real_name`,'.
+			' `normalized_reversed_name`,'.
+			' `normalized_fandom_name`,'.
+			' `normalized_email_address`,'.
+			' `normalized_phone_number`'.
+			' FROM '.$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).
+			' ORDER BY `first_name`, `last_name`'
+		);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number
+		);
+		while ($stmt->fetch()) {
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$reversed_name = trim(trim($last_name) . ' ' . trim($first_name));
+			$blacklist[] = array(
+				'id' => $id,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'reversed-name' => $reversed_name,
+				'fandom-name' => $fandom_name,
+				'email-address' => $email_address,
+				'phone-number' => $phone_number,
+				'added-by' => $added_by,
+				'normalized-real-name' => $normalized_real_name,
+				'normalized-reversed-name' => $normalized_reversed_name,
+				'normalized-fandom-name' => $normalized_fandom_name,
+				'normalized-email-address' => $normalized_email_address,
+				'normalized-phone-number' => $normalized_phone_number,
+				'search-content' => array(
+					$first_name, $last_name, $real_name, $reversed_name,
+					$fandom_name, $email_address, $phone_number, $added_by
+				)
+			);
+		}
+		$stmt->close();
+		return $blacklist;
+	}
+
+	public function create_applicant_blacklist_entry($entry) {
+		if (!$entry) return false;
+		$first_name = (isset($entry['first-name']) ? $entry['first-name'] : '');
+		$last_name = (isset($entry['last-name']) ? $entry['last-name'] : '');
+		$fandom_name = (isset($entry['fandom-name']) ? $entry['fandom-name'] : '');
+		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
+		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
+		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
+		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
+		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
+		$normalized_email_address = strtoupper(preg_replace('/\\+.*@|[^A-Za-z0-9]+/', '', $email_address));
+		$normalized_phone_number = preg_replace('/[^0-9]+/', '', $phone_number);
+		if (!$first_name) $first_name = null;
+		if (!$last_name) $last_name = null;
+		if (!$fandom_name) $fandom_name = null;
+		if (!$email_address) $email_address = null;
+		if (!$phone_number) $phone_number = null;
+		if (!$added_by) $added_by = null;
+		if (!$normalized_real_name) $normalized_real_name = null;
+		if (!$normalized_reversed_name) $normalized_reversed_name = null;
+		if (!$normalized_fandom_name) $normalized_fandom_name = null;
+		if (!$normalized_email_address) $normalized_email_address = null;
+		if (!$normalized_phone_number) $normalized_phone_number = null;
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).' SET '.
+			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`normalized_real_name` = ?, '.
+			'`normalized_reversed_name` = ?, '.
+			'`normalized_fandom_name` = ?, '.
+			'`normalized_email_address` = ?, '.
+			'`normalized_phone_number` = ?'
+		);
+		$stmt->bind_param(
+			'sssssssssss',
+			$first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		return $id;
+	}
+
+	public function update_applicant_blacklist_entry($entry) {
+		if (!$entry || !isset($entry['id']) || !$entry['id']) return false;
+		$first_name = (isset($entry['first-name']) ? $entry['first-name'] : '');
+		$last_name = (isset($entry['last-name']) ? $entry['last-name'] : '');
+		$fandom_name = (isset($entry['fandom-name']) ? $entry['fandom-name'] : '');
+		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
+		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
+		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
+		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
+		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
+		$normalized_email_address = strtoupper(preg_replace('/\\+.*@|[^A-Za-z0-9]+/', '', $email_address));
+		$normalized_phone_number = preg_replace('/[^0-9]+/', '', $phone_number);
+		if (!$first_name) $first_name = null;
+		if (!$last_name) $last_name = null;
+		if (!$fandom_name) $fandom_name = null;
+		if (!$email_address) $email_address = null;
+		if (!$phone_number) $phone_number = null;
+		if (!$added_by) $added_by = null;
+		if (!$normalized_real_name) $normalized_real_name = null;
+		if (!$normalized_reversed_name) $normalized_reversed_name = null;
+		if (!$normalized_fandom_name) $normalized_fandom_name = null;
+		if (!$normalized_email_address) $normalized_email_address = null;
+		if (!$normalized_phone_number) $normalized_phone_number = null;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).' SET '.
+			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`normalized_real_name` = ?, '.
+			'`normalized_reversed_name` = ?, '.
+			'`normalized_fandom_name` = ?, '.
+			'`normalized_email_address` = ?, '.
+			'`normalized_phone_number` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'sssssssssssi',
+			$first_name, $last_name, $fandom_name,
+			$email_address, $phone_number, $added_by,
+			$normalized_real_name,
+			$normalized_reversed_name,
+			$normalized_fandom_name,
+			$normalized_email_address,
+			$normalized_phone_number,
+			$entry['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function delete_applicant_blacklist_entry($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function is_applicant_blacklisted($applicant) {
+		if (!$applicant) return false;
+		$first_name = (isset($applicant['first-name']) ? $applicant['first-name'] : '');
+		$last_name = (isset($applicant['last-name']) ? $applicant['last-name'] : '');
+		$fandom_name = (isset($applicant['fandom-name']) ? $applicant['fandom-name'] : '');
+		$email_address = (isset($applicant['email-address']) ? $applicant['email-address'] : '');
+		$phone_number = (isset($applicant['phone-number']) ? $applicant['phone-number'] : '');
+		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
+		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
+		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
+		$normalized_email_address = strtoupper(preg_replace('/\\+.*@|[^A-Za-z0-9]+/', '', $email_address));
+		$normalized_phone_number = preg_replace('/[^0-9]+/', '', $phone_number);
+		$query_params = array();
+		$bind_params = array('');
+		if ($normalized_real_name) {
+			$query_params[] = '`normalized_real_name` = ?';
+			$query_params[] = '`normalized_reversed_name` = ?';
+			$query_params[] = '`normalized_fandom_name` = ?';
+			$bind_params[0] .= 'sss';
+			$bind_params[] = &$normalized_real_name;
+			$bind_params[] = &$normalized_real_name;
+			$bind_params[] = &$normalized_real_name;
+		}
+		if ($normalized_reversed_name) {
+			$query_params[] = '`normalized_real_name` = ?';
+			$query_params[] = '`normalized_reversed_name` = ?';
+			$query_params[] = '`normalized_fandom_name` = ?';
+			$bind_params[0] .= 'sss';
+			$bind_params[] = &$normalized_reversed_name;
+			$bind_params[] = &$normalized_reversed_name;
+			$bind_params[] = &$normalized_reversed_name;
+		}
+		if ($normalized_fandom_name) {
+			$query_params[] = '`normalized_real_name` = ?';
+			$query_params[] = '`normalized_reversed_name` = ?';
+			$query_params[] = '`normalized_fandom_name` = ?';
+			$bind_params[0] .= 'sss';
+			$bind_params[] = &$normalized_fandom_name;
+			$bind_params[] = &$normalized_fandom_name;
+			$bind_params[] = &$normalized_fandom_name;
+		}
+		if ($normalized_email_address) {
+			$query_params[] = '`normalized_email_address` = ?';
+			$bind_params[0] .= 's';
+			$bind_params[] = &$normalized_email_address;
+		}
+		if ($normalized_phone_number) {
+			$query_params[] = '`normalized_phone_number` = ?';
+			$bind_params[0] .= 's';
+			$bind_params[] = &$normalized_phone_number;
+		}
+		if (!$query_params) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id` FROM '.
+			$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).
+			' WHERE '.implode(' OR ', $query_params).' LIMIT 1'
+		);
+		call_user_func_array(array($stmt, 'bind_param'), $bind_params);
+		$stmt->execute();
+		$stmt->bind_result($id);
+		$success = $stmt->fetch();
+		$stmt->close();
+		return $success ? $this->get_applicant_blacklist_entry($id) : false;
+	}
+
 }

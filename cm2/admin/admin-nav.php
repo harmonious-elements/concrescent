@@ -99,6 +99,20 @@ function cm_admin_nav_application($context, $ctx_info) {
 			'description' => 'Create or modify the types of badges available on the '.$ctx_name_lc.' application form.',
 			'permission' => 'application-badge-types-'.$ctx_lc
 		),
+		array(
+			'id' => 'application-blacklist-'.$ctx_lc,
+			'href' => '/admin/application/app-blacklist.php?c='.$ctx_lc,
+			'name' => $ctx_name.' App Blacklist',
+			'description' => 'Inform people reviewing '.$ctx_name_lc.' applications of certain applications that should not be accepted.',
+			'permission' => 'application-blacklist-'.$ctx_lc
+		),
+		array(
+			'id' => 'applicant-blacklist-'.$ctx_lc,
+			'href' => '/admin/application/badge-blacklist.php?c='.$ctx_lc,
+			'name' => $ctx_name.' Badge Blacklist',
+			'description' => 'Inform people reviewing '.$ctx_name_lc.' applications of certain people who should not receive badges.',
+			'permission' => 'applicant-blacklist-'.$ctx_lc
+		),
 	);
 }
 
