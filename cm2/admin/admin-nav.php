@@ -1,6 +1,8 @@
 <?php
 
-$cm_admin_nav = array(
+require_once dirname(__FILE__).'/../config/config.php';
+
+$cm_admin_nav_home = (
 	array(
 		array(
 			'id' => 'home',
@@ -16,7 +18,10 @@ $cm_admin_nav = array(
 			'description' => 'Get a statistical overview of people registered and checked in.',
 			'permission' => 'statistics'
 		),
-	),
+	)
+);
+
+$cm_admin_nav_attendee = (
 	array(
 		array(
 			'id' => 'attendees',
@@ -67,7 +72,10 @@ $cm_admin_nav = array(
 			'description' => 'Download a CSV file of attendee registration records.',
 			'permission' => 'attendee-csv'
 		),
-	),
+	)
+);
+
+$cm_admin_nav_application_common = (
 	array(
 		array(
 			'id' => 'rooms-and-tables',
@@ -76,7 +84,25 @@ $cm_admin_nav = array(
 			'description' => 'Upload an event space floor plan and tag rooms and tables with their identifiers.',
 			'permission' => 'rooms-and-tables'
 		),
-	),
+	)
+);
+
+function cm_admin_nav_application($context, $ctx_info) {
+	$ctx_lc = strtolower($context);
+	$ctx_name = $ctx_info['nav_prefix'];
+	$ctx_name_lc = strtolower($ctx_name);
+	return array(
+		array(
+			'id' => 'application-badge-types-'.$ctx_lc,
+			'href' => '/admin/application/badge-types.php?c='.$ctx_lc,
+			'name' => $ctx_name.' Badge Types',
+			'description' => 'Create or modify the types of badges available on the '.$ctx_name_lc.' application form.',
+			'permission' => 'application-badge-types-'.$ctx_lc
+		),
+	);
+}
+
+$cm_admin_nav_staff_departments = (
 	array(
 		array(
 			'id' => 'staff-departments',
@@ -99,7 +125,10 @@ $cm_admin_nav = array(
 			'description' => 'Generate mailing list memberships based on staff applications and the org chart.',
 			'permission' => 'staff-maillist'
 		),
-	),
+	)
+);
+
+$cm_admin_nav_staff = (
 	array(
 		array(
 			'id' => 'staff',
@@ -143,7 +172,10 @@ $cm_admin_nav = array(
 			'description' => 'Download a CSV file of staff application records.',
 			'permission' => 'staff-csv'
 		),
-	),
+	)
+);
+
+$cm_admin_nav_admin = (
 	array(
 		array(
 			'id' => 'admin-user',
@@ -159,5 +191,18 @@ $cm_admin_nav = array(
 			'description' => 'Manage CONcrescent administrators and their permissions.',
 			'permission' => 'admin-users'
 		),
-	),
+	)
 );
+
+$cm_admin_nav = array();
+$cm_admin_nav[] = $cm_admin_nav_home;
+$cm_admin_nav[] = $cm_admin_nav_attendee;
+
+$cm_admin_nav[] = $cm_admin_nav_application_common;
+foreach ($cm_config['application_types'] as $context => $ctx_info) {
+	$cm_admin_nav[] = cm_admin_nav_application($context, $ctx_info);
+}
+
+$cm_admin_nav[] = $cm_admin_nav_staff_departments;
+$cm_admin_nav[] = $cm_admin_nav_staff;
+$cm_admin_nav[] = $cm_admin_nav_admin;

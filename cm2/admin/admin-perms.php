@@ -1,13 +1,18 @@
 <?php
 
-$cm_admin_perms = array(
+require_once dirname(__FILE__).'/../config/config.php';
+
+$cm_admin_perms_home = (
 	array(
 		array(
 			'id' => 'statistics',
 			'name' => 'Statistics',
 			'description' => 'Get a statistical overview of people registered and checked in.'
 		),
-	),
+	)
+);
+
+$cm_admin_perms_attendee = (
 	array(
 		array(
 			'id' => 'attendees',
@@ -29,7 +34,10 @@ $cm_admin_perms = array(
 			'name' => 'Attendees - Delete',
 			'description' => 'Delete attendee registration records.'
 		),
-	),
+	)
+);
+
+$cm_admin_perms_attendee_config = (
 	array(
 		array(
 			'id' => 'attendee-badge-types',
@@ -61,14 +69,33 @@ $cm_admin_perms = array(
 			'name' => 'Attendee CSV',
 			'description' => 'Download a CSV file of attendee registration records.'
 		),
-	),
+	)
+);
+
+$cm_admin_perms_application_common = (
 	array(
 		array(
 			'id' => 'rooms-and-tables',
 			'name' => 'Rooms & Tables',
 			'description' => 'Upload an event space floor plan and tag rooms and tables with their identifiers.'
 		),
-	),
+	)
+);
+
+function cm_admin_perms_application_config($context, $ctx_info) {
+	$ctx_lc = strtolower($context);
+	$ctx_name = $ctx_info['nav_prefix'];
+	$ctx_name_lc = strtolower($ctx_name);
+	return array(
+		array(
+			'id' => 'application-badge-types-'.$ctx_lc,
+			'name' => $ctx_name.' Badge Types',
+			'description' => 'Create or modify the types of badges available on the '.$ctx_name_lc.' application form.'
+		),
+	);
+};
+
+$cm_admin_perms_staff_departments = (
 	array(
 		array(
 			'id' => 'staff-departments',
@@ -85,7 +112,10 @@ $cm_admin_perms = array(
 			'name' => 'Mailing Lists',
 			'description' => 'Generate mailing list memberships based on staff applications and the org chart.'
 		),
-	),
+	)
+);
+
+$cm_admin_perms_staff = (
 	array(
 		array(
 			'id' => 'staff',
@@ -112,7 +142,10 @@ $cm_admin_perms = array(
 			'name' => 'Staff Applications - Delete',
 			'description' => 'Delete staff applications.'
 		),
-	),
+	)
+);
+
+$cm_admin_perms_staff_config = (
 	array(
 		array(
 			'id' => 'staff-badge-types',
@@ -139,19 +172,41 @@ $cm_admin_perms = array(
 			'name' => 'Staff CSV',
 			'description' => 'Download a CSV file of staff application records.'
 		),
-	),
+	)
+);
+
+$cm_admin_perms_admin = (
 	array(
 		array(
 			'id' => 'admin-users',
 			'name' => 'Admin Users',
 			'description' => 'Manage CONcrescent administrators and their permissions.'
 		),
-	),
+	)
+);
+
+$cm_admin_perms_all = (
 	array(
 		array(
 			'id' => '*',
 			'name' => 'ALL',
 			'description' => 'Grant all possible permissions to this user.'
 		),
-	),
+	)
 );
+
+$cm_admin_perms = array();
+$cm_admin_perms[] = $cm_admin_perms_home;
+$cm_admin_perms[] = $cm_admin_perms_attendee;
+$cm_admin_perms[] = $cm_admin_perms_attendee_config;
+
+$cm_admin_perms[] = $cm_admin_perms_application_common;
+foreach ($cm_config['application_types'] as $context => $ctx_info) {
+	$cm_admin_perms[] = cm_admin_perms_application_config($context, $ctx_info);
+}
+
+$cm_admin_perms[] = $cm_admin_perms_staff_departments;
+$cm_admin_perms[] = $cm_admin_perms_staff;
+$cm_admin_perms[] = $cm_admin_perms_staff_config;
+$cm_admin_perms[] = $cm_admin_perms_admin;
+$cm_admin_perms[] = $cm_admin_perms_all;
