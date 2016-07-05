@@ -102,6 +102,11 @@ function cm_admin_perms_application_config($context, $ctx_info) {
 			'name' => $ctx_name.' Badge Blacklist',
 			'description' => 'Inform people reviewing '.$ctx_name_lc.' applications of certain people who should not receive badges.'
 		),
+		array(
+			'id' => 'application-mail-'.$ctx_lc,
+			'name' => $ctx_name.' Form Letters',
+			'description' => 'Write form letters to be emailed to '.$ctx_name_lc.' applicants.'
+		),
 	);
 };
 

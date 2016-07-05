@@ -113,6 +113,13 @@ function cm_admin_nav_application($context, $ctx_info) {
 			'description' => 'Inform people reviewing '.$ctx_name_lc.' applications of certain people who should not receive badges.',
 			'permission' => 'applicant-blacklist-'.$ctx_lc
 		),
+		array(
+			'id' => 'application-mail-'.$ctx_lc,
+			'href' => '/admin/application/mail.php?c='.$ctx_lc,
+			'name' => $ctx_name.' Form Letters',
+			'description' => 'Write form letters to be emailed to '.$ctx_name_lc.' applicants.',
+			'permission' => 'application-mail-'.$ctx_lc
+		),
 	);
 }
 
