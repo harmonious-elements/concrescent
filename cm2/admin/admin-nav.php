@@ -100,6 +100,13 @@ function cm_admin_nav_application($context, $ctx_info) {
 			'permission' => 'application-badge-types-'.$ctx_lc
 		),
 		array(
+			'id' => 'application-questions-'.$ctx_lc,
+			'href' => '/admin/application/questions.php?c='.$ctx_lc,
+			'name' => $ctx_name.' Questions',
+			'description' => 'Add explanatory text and questions to the '.$ctx_name_lc.' application form.',
+			'permission' => 'application-questions-'.$ctx_lc
+		),
+		array(
 			'id' => 'application-blacklist-'.$ctx_lc,
 			'href' => '/admin/application/app-blacklist.php?c='.$ctx_lc,
 			'name' => $ctx_name.' App Blacklist',

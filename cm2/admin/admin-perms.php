@@ -93,6 +93,11 @@ function cm_admin_perms_application_config($context, $ctx_info) {
 			'description' => 'Create or modify the types of badges available on the '.$ctx_name_lc.' application form.'
 		),
 		array(
+			'id' => 'application-questions-'.$ctx_lc,
+			'name' => $ctx_name.' Questions',
+			'description' => 'Add explanatory text and questions to the '.$ctx_name_lc.' application form.'
+		),
+		array(
 			'id' => 'application-blacklist-'.$ctx_lc,
 			'name' => $ctx_name.' App Blacklist',
 			'description' => 'Inform people reviewing '.$ctx_name_lc.' applications of certain applications that should not be accepted.'
