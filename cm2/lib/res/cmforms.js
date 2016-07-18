@@ -45,7 +45,7 @@
 			editor.filter('.ear-visible-advanced').addClass('hidden');
 			editor.filter('.ear-visible-advanced').find('input').prop('checked', false);
 			for (var i = 0, n = formdef['subcontext'].length; i < n; ++i) {
-				var id = formdef['subcontext'][i]['id'];
+				var id = String(formdef['subcontext'][i]['id']);
 				var checked = (question['visible'] && question['visible'].indexOf(id) >= 0);
 				editor.find('.ea-visible-' + id).prop('checked', checked);
 				if (checked) editor.filter('.ear-visible-advanced').removeClass('hidden');
@@ -61,7 +61,7 @@
 			editor.filter('.ear-required-advanced').addClass('hidden');
 			editor.filter('.ear-required-advanced').find('input').prop('checked', false);
 			for (var i = 0, n = formdef['subcontext'].length; i < n; ++i) {
-				var id = formdef['subcontext'][i]['id'];
+				var id = String(formdef['subcontext'][i]['id']);
 				var checked = (question['required'] && question['required'].indexOf(id) >= 0);
 				editor.find('.ea-required-' + id).prop('checked', checked);
 				if (checked) editor.filter('.ear-required-advanced').removeClass('hidden');
