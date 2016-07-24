@@ -1156,4 +1156,1253 @@ class cm_application_db {
 		return $success ? $this->get_applicant_blacklist_entry($id) : false;
 	}
 
+	public function get_application($id, $uuid = null, $expand = false, $name_map = null, $fdb = null) {
+		if (!$id && !$uuid) return false;
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'application-'.$this->ctx_lc);
+		$query = (
+			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
+			' `badge_type_id`, `notes`, `contact_first_name`,'.
+			' `contact_last_name`, `contact_subscribed`,'.
+			' `contact_email_address`, `contact_phone_number`,'.
+			' `contact_address_1`, `contact_address_2`, `contact_city`,'.
+			' `contact_state`, `contact_zip_code`, `contact_country`,'.
+			' `business_name`, `application_name`, `applicant_count`,'.
+			' `assignment_count`, `application_status`, `permit_number`,'.
+			' `payment_status`, `payment_badge_price`,'.
+			' `payment_group_uuid`, `payment_type`,'.
+			' `payment_txn_id`, `payment_txn_amt`,'.
+			' `payment_date`, `payment_details`'.
+			' FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc)
+		);
+		if ($id) {
+			if ($uuid) $query .= ' WHERE `id` = ? AND `uuid` = ? LIMIT 1';
+			else $query .= ' WHERE `id` = ? LIMIT 1';
+		} else {
+			$query .= ' WHERE `uuid` = ? LIMIT 1';
+		}
+		$stmt = $this->cm_db->connection->prepare($query);
+		if ($id) {
+			if ($uuid) $stmt->bind_param('is', $id, $uuid);
+			else $stmt->bind_param('i', $id);
+		} else {
+			$stmt->bind_param('s', $uuid);
+		}
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $uuid, $date_created, $date_modified,
+			$badge_type_id, $notes, $contact_first_name,
+			$contact_last_name, $contact_subscribed,
+			$contact_email_address, $contact_phone_number,
+			$contact_address_1, $contact_address_2, $contact_city,
+			$contact_state, $contact_zip_code, $contact_country,
+			$business_name, $application_name, $applicant_count,
+			$assignment_count, $application_status, $permit_number,
+			$payment_status, $payment_badge_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details
+		);
+		if ($stmt->fetch()) {
+			$reg_url = get_site_url(true) . '/application';
+			$id_string = $this->ctx_uc . 'A' . $id;
+			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
+			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
+			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
+			$contact_real_name = trim(trim($contact_first_name) . ' ' . trim($contact_last_name));
+			$contact_email_address_subscribed = ($contact_subscribed ? $contact_email_address : null);
+			$contact_unsubscribe_link = $reg_url . '/unsubscribe.php?c=' . $this->ctx_lc . '&email=' . $contact_email_address;
+			$contact_address = trim(trim($contact_address_1) . "\n" . trim($contact_address_2));
+			$contact_csz = trim(trim(trim($contact_city) . ' ' . trim($contact_state)) . ' ' . trim($contact_zip_code));
+			$contact_address_full = trim(trim(trim($contact_address) . "\n" . trim($contact_csz)) . "\n" . trim($contact_country));
+			$review_link = (($payment_group_uuid && $payment_txn_id) ? (
+				$reg_url . '/review.php?c=' . $this->ctx_lc .
+				'&gid=' . $payment_group_uuid .
+				'&tid=' . $payment_txn_id
+			) : null);
+			$search_content = array(
+				$id, $uuid, $notes, $contact_first_name, $contact_last_name,
+				$contact_email_address, $contact_phone_number,
+				$contact_address_1, $contact_address_2, $contact_city,
+				$contact_state, $contact_zip_code, $contact_country,
+				$business_name, $application_name,
+				$application_status, $permit_number,
+				$payment_status, $payment_group_uuid, $payment_txn_id,
+				$id_string, $qr_data, $badge_type_name,
+				$contact_real_name, $contact_address,
+				$contact_csz, $contact_address_full
+			);
+			$result = array(
+				'id' => $id,
+				'id-string' => $id_string,
+				'uuid' => $uuid,
+				'qr-data' => $qr_data,
+				'qr-url' => $qr_url,
+				'date-created' => $date_created,
+				'date-modified' => $date_modified,
+				'badge-type-id' => $badge_type_id,
+				'badge-type-name' => $badge_type_name,
+				'notes' => $notes,
+				'contact-first-name' => $contact_first_name,
+				'contact-last-name' => $contact_last_name,
+				'contact-real-name' => $contact_real_name,
+				'contact-subscribed' => !!$contact_subscribed,
+				'contact-email-address' => $contact_email_address,
+				'contact-email-address-subscribed' => $contact_email_address_subscribed,
+				'contact-unsubscribe-link' => $contact_unsubscribe_link,
+				'contact-phone-number' => $contact_phone_number,
+				'contact-address-1' => $contact_address_1,
+				'contact-address-2' => $contact_address_2,
+				'contact-address' => $contact_address,
+				'contact-city' => $contact_city,
+				'contact-state' => $contact_state,
+				'contact-zip-code' => $contact_zip_code,
+				'contact-csz' => $contact_csz,
+				'contact-country' => $contact_country,
+				'contact-address-full' => $contact_address_full,
+				'business-name' => $business_name,
+				'application-name' => $application_name,
+				'applicant-count' => $applicant_count,
+				'assignment-count' => $assignment_count,
+				'application-status' => $application_status,
+				'permit-number' => $permit_number,
+				'payment-status' => $payment_status,
+				'payment-badge-price' => $payment_badge_price,
+				'payment-group-uuid' => $payment_group_uuid,
+				'payment-type' => $payment_type,
+				'payment-txn-id' => $payment_txn_id,
+				'payment-txn-amt' => $payment_txn_amt,
+				'payment-date' => $payment_date,
+				'payment-details' => $payment_details,
+				'review-link' => $review_link,
+				'search-content' => $search_content
+			);
+			$stmt->close();
+
+			if ($expand) {
+				$applicants = $this->list_applicants($id, false, $name_map, $fdb);
+				$result['applicants'] = $applicants;
+			}
+
+			$stmt = $this->cm_db->connection->prepare(
+				'SELECT `context`, `context_id`, `room_or_table_id`, `start_time`, `end_time`'.
+				' FROM '.$this->cm_db->table_name('room_and_table_assignments').
+				' WHERE `context` = ? AND `context_id` = ?'.
+				' ORDER BY `start_time`, `end_time`, `room_or_table_id`'
+			);
+			$stmt->bind_param('si', $this->ctx_uc, $id);
+			$stmt->execute();
+			$stmt->bind_result(
+				$context, $context_id,
+				$room_or_table_id, $start_time, $end_time
+			);
+			$assigned_rooms_and_tables = array();
+			while ($stmt->fetch()) {
+				$assigned_rooms_and_tables[] = array(
+					'context' => $context,
+					'context-id' => $context_id,
+					'room-or-table-id' => $room_or_table_id,
+					'start-time' => $start_time,
+					'end-time' => $end_time
+				);
+				$result['search-content'][] = $room_or_table_id;
+			}
+			if ($assigned_rooms_and_tables) {
+				$result['assigned-room-or-table-id'] = $assigned_rooms_and_tables[0]['room-or-table-id'];
+				$result['assigned-start-time'] = $assigned_rooms_and_tables[0]['start-time'];
+				$result['assigned-end-time'] = $assigned_rooms_and_tables[0]['end-time'];
+				$result['assigned-room-and-table-ids'] = array_column_simple($assigned_rooms_and_tables, 'room-or-table-id');
+				$result['assigned-start-times'] = array_column_simple($assigned_rooms_and_tables, 'start-time');
+				$result['assigned-end-times'] = array_column_simple($assigned_rooms_and_tables, 'end-time');
+				$result['assigned-rooms-and-tables'] = $assigned_rooms_and_tables;
+			}
+			$stmt->close();
+
+			$answers = $fdb->list_answers($id);
+			if ($answers) {
+				$result['form-answers'] = $answers;
+				foreach ($answers as $qid => $answer) {
+					$answer_string = implode("\n", $answer);
+					$result['form-answer-array-' . $qid] = $answer;
+					$result['form-answer-string-' . $qid] = $answer_string;
+					$result['search-content'][] = $answer_string;
+				}
+			}
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_applications($gid = null, $tid = null, $expand = false, $name_map = null, $fdb = null) {
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'application-'.$this->ctx_lc);
+		$applications = array();
+		$query = (
+			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
+			' `badge_type_id`, `notes`, `contact_first_name`,'.
+			' `contact_last_name`, `contact_subscribed`,'.
+			' `contact_email_address`, `contact_phone_number`,'.
+			' `contact_address_1`, `contact_address_2`, `contact_city`,'.
+			' `contact_state`, `contact_zip_code`, `contact_country`,'.
+			' `business_name`, `application_name`, `applicant_count`,'.
+			' `assignment_count`, `application_status`, `permit_number`,'.
+			' `payment_status`, `payment_badge_price`,'.
+			' `payment_group_uuid`, `payment_type`,'.
+			' `payment_txn_id`, `payment_txn_amt`,'.
+			' `payment_date`, `payment_details`'.
+			' FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc)
+		);
+		$first = true;
+		$bind = array('');
+		if ($gid) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `payment_group_uuid` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$gid;
+		}
+		if ($tid) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `payment_txn_id` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$tid;
+		}
+		$stmt = $this->cm_db->connection->prepare($query . ' ORDER BY `id`');
+		if (!$first) call_user_func_array(array($stmt, 'bind_param'), $bind);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $uuid, $date_created, $date_modified,
+			$badge_type_id, $notes, $contact_first_name,
+			$contact_last_name, $contact_subscribed,
+			$contact_email_address, $contact_phone_number,
+			$contact_address_1, $contact_address_2, $contact_city,
+			$contact_state, $contact_zip_code, $contact_country,
+			$business_name, $application_name, $applicant_count,
+			$assignment_count, $application_status, $permit_number,
+			$payment_status, $payment_badge_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details
+		);
+		$reg_url = get_site_url(true) . '/application';
+		$qr_base_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=';
+		while ($stmt->fetch()) {
+			$id_string = $this->ctx_uc . 'A' . $id;
+			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
+			$qr_url = $qr_base_url . $qr_data;
+			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
+			$contact_real_name = trim(trim($contact_first_name) . ' ' . trim($contact_last_name));
+			$contact_email_address_subscribed = ($contact_subscribed ? $contact_email_address : null);
+			$contact_unsubscribe_link = $reg_url . '/unsubscribe.php?email=' . $contact_email_address;
+			$contact_address = trim(trim($contact_address_1) . "\n" . trim($contact_address_2));
+			$contact_csz = trim(trim(trim($contact_city) . ' ' . trim($contact_state)) . ' ' . trim($contact_zip_code));
+			$contact_address_full = trim(trim(trim($contact_address) . "\n" . trim($contact_csz)) . "\n" . trim($contact_country));
+			$review_link = (($payment_group_uuid && $payment_txn_id) ? (
+				$reg_url . '/review.php?c=' . $this->ctx_lc .
+				'&gid=' . $payment_group_uuid .
+				'&tid=' . $payment_txn_id
+			) : null);
+			$search_content = array(
+				$id, $uuid, $notes, $contact_first_name, $contact_last_name,
+				$contact_email_address, $contact_phone_number,
+				$contact_address_1, $contact_address_2, $contact_city,
+				$contact_state, $contact_zip_code, $contact_country,
+				$business_name, $application_name,
+				$application_status, $permit_number,
+				$payment_status, $payment_group_uuid, $payment_txn_id,
+				$id_string, $qr_data, $badge_type_name,
+				$contact_real_name, $contact_address,
+				$contact_csz, $contact_address_full
+			);
+			$applications[] = array(
+				'id' => $id,
+				'id-string' => $id_string,
+				'uuid' => $uuid,
+				'qr-data' => $qr_data,
+				'qr-url' => $qr_url,
+				'date-created' => $date_created,
+				'date-modified' => $date_modified,
+				'badge-type-id' => $badge_type_id,
+				'badge-type-name' => $badge_type_name,
+				'notes' => $notes,
+				'contact-first-name' => $contact_first_name,
+				'contact-last-name' => $contact_last_name,
+				'contact-real-name' => $contact_real_name,
+				'contact-subscribed' => !!$contact_subscribed,
+				'contact-email-address' => $contact_email_address,
+				'contact-email-address-subscribed' => $contact_email_address_subscribed,
+				'contact-unsubscribe-link' => $contact_unsubscribe_link,
+				'contact-phone-number' => $contact_phone_number,
+				'contact-address-1' => $contact_address_1,
+				'contact-address-2' => $contact_address_2,
+				'contact-address' => $contact_address,
+				'contact-city' => $contact_city,
+				'contact-state' => $contact_state,
+				'contact-zip-code' => $contact_zip_code,
+				'contact-csz' => $contact_csz,
+				'contact-country' => $contact_country,
+				'contact-address-full' => $contact_address_full,
+				'business-name' => $business_name,
+				'application-name' => $application_name,
+				'applicant-count' => $applicant_count,
+				'assignment-count' => $assignment_count,
+				'application-status' => $application_status,
+				'permit-number' => $permit_number,
+				'payment-status' => $payment_status,
+				'payment-badge-price' => $payment_badge_price,
+				'payment-group-uuid' => $payment_group_uuid,
+				'payment-type' => $payment_type,
+				'payment-txn-id' => $payment_txn_id,
+				'payment-txn-amt' => $payment_txn_amt,
+				'payment-date' => $payment_date,
+				'payment-details' => $payment_details,
+				'review-link' => $review_link,
+				'search-content' => $search_content
+			);
+		}
+		$stmt->close();
+		foreach ($applications as $i => $application) {
+			if ($expand) {
+				$applicants = $this->list_applicants($application['id'], false, $name_map, $fdb);
+				$applications[$i]['applicants'] = $applicants;
+			}
+
+			$stmt = $this->cm_db->connection->prepare(
+				'SELECT `context`, `context_id`, `room_or_table_id`, `start_time`, `end_time`'.
+				' FROM '.$this->cm_db->table_name('room_and_table_assignments').
+				' WHERE `context` = ? AND `context_id` = ?'.
+				' ORDER BY `start_time`, `end_time`, `room_or_table_id`'
+			);
+			$stmt->bind_param('si', $this->ctx_uc, $application['id']);
+			$stmt->execute();
+			$stmt->bind_result(
+				$context, $context_id,
+				$room_or_table_id, $start_time, $end_time
+			);
+			$assigned_rooms_and_tables = array();
+			while ($stmt->fetch()) {
+				$assigned_rooms_and_tables[] = array(
+					'context' => $context,
+					'context-id' => $context_id,
+					'room-or-table-id' => $room_or_table_id,
+					'start-time' => $start_time,
+					'end-time' => $end_time
+				);
+				$applications[$i]['search-content'][] = $room_or_table_id;
+			}
+			if ($assigned_rooms_and_tables) {
+				$applications[$i]['assigned-room-or-table-id'] = $assigned_rooms_and_tables[0]['room-or-table-id'];
+				$applications[$i]['assigned-start-time'] = $assigned_rooms_and_tables[0]['start-time'];
+				$applications[$i]['assigned-end-time'] = $assigned_rooms_and_tables[0]['end-time'];
+				$applications[$i]['assigned-room-and-table-ids'] = array_column_simple($assigned_rooms_and_tables, 'room-or-table-id');
+				$applications[$i]['assigned-start-times'] = array_column_simple($assigned_rooms_and_tables, 'start-time');
+				$applications[$i]['assigned-end-times'] = array_column_simple($assigned_rooms_and_tables, 'end-time');
+				$applications[$i]['assigned-rooms-and-tables'] = $assigned_rooms_and_tables;
+			}
+			$stmt->close();
+
+			$answers = $fdb->list_answers($application['id']);
+			if ($answers) {
+				$applications[$i]['form-answers'] = $answers;
+				foreach ($answers as $qid => $answer) {
+					$answer_string = implode("\n", $answer);
+					$applications[$i]['form-answer-array-' . $qid] = $answer;
+					$applications[$i]['form-answer-string-' . $qid] = $answer_string;
+					$applications[$i]['search-content'][] = $answer_string;
+				}
+			}
+		}
+		return $applications;
+	}
+
+	public function create_application($application, $fdb = null) {
+		if (!$application) return false;
+		$badge_type_id = (isset($application['badge-type-id']) ? $application['badge-type-id'] : null);
+		$notes = (isset($application['notes']) ? $application['notes'] : null);
+		$contact_first_name = (isset($application['contact-first-name']) ? $application['contact-first-name'] : '');
+		$contact_last_name = (isset($application['contact-last-name']) ? $application['contact-last-name'] : '');
+		$contact_subscribed = (isset($application['contact-subscribed']) ? ($application['contact-subscribed'] ? 1 : 0) : 0);
+		$contact_email_address = (isset($application['contact-email-address']) ? $application['contact-email-address'] : '');
+		$contact_phone_number = (isset($application['contact-phone-number']) ? $application['contact-phone-number'] : '');
+		$contact_address_1 = (isset($application['contact-address-1']) ? $application['contact-address-1'] : '');
+		$contact_address_2 = (isset($application['contact-address-2']) ? $application['contact-address-2'] : '');
+		$contact_city = (isset($application['contact-city']) ? $application['contact-city'] : '');
+		$contact_state = (isset($application['contact-state']) ? $application['contact-state'] : '');
+		$contact_zip_code = (isset($application['contact-zip-code']) ? $application['contact-zip-code'] : '');
+		$contact_country = (isset($application['contact-country']) ? $application['contact-country'] : '');
+		$business_name = (isset($application['business-name']) ? $application['business-name'] : '');
+		$application_name = (isset($application['application-name']) ? $application['application-name'] : '');
+		$applicant_count = (isset($application['applicant-count']) ? $application['applicant-count'] : null);
+		$assignment_count = (isset($application['assignment-count']) ? $application['assignment-count'] : null);
+		$application_status = (isset($application['application-status']) ? $application['application-status'] : null);
+		$permit_number = (isset($application['permit-number']) ? $application['permit-number'] : null);
+		$payment_status = (isset($application['payment-status']) ? $application['payment-status'] : null);
+		$payment_badge_price = (isset($application['payment-badge-price']) ? $application['payment-badge-price'] : null);
+		$payment_group_uuid = (isset($application['payment-group-uuid']) ? $application['payment-group-uuid'] : null);
+		$payment_type = (isset($application['payment-type']) ? $application['payment-type'] : null);
+		$payment_txn_id = (isset($application['payment-txn-id']) ? $application['payment-txn-id'] : null);
+		$payment_txn_amt = (isset($application['payment-txn-amt']) ? $application['payment-txn-amt'] : null);
+		$payment_date = (isset($application['payment-date']) ? $application['payment-date'] : null);
+		$payment_details = (isset($application['payment-details']) ? $application['payment-details'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' SET '.
+			'`uuid` = UUID(), `date_created` = NOW(), `date_modified` = NOW(), '.
+			'`badge_type_id` = ?, `notes` = ?, `contact_first_name` = ?, '.
+			'`contact_last_name` = ?, `contact_subscribed` = ?, '.
+			'`contact_email_address` = ?, `contact_phone_number` = ?, '.
+			'`contact_address_1` = ?, `contact_address_2` = ?, `contact_city` = ?, '.
+			'`contact_state` = ?, `contact_zip_code` = ?, `contact_country` = ?, '.
+			'`business_name` = ?, `application_name` = ?, `applicant_count` = ?, '.
+			'`assignment_count` = ?, `application_status` = ?, `permit_number` = ?, '.
+			'`payment_status` = ?, `payment_badge_price` = ?, '.
+			'`payment_group_uuid` = ?, `payment_type` = ?, '.
+			'`payment_txn_id` = ?, `payment_txn_amt` = ?, '.
+			'`payment_date` = ?, `payment_details` = ?'
+		);
+		$stmt->bind_param(
+			'isssissssssssssiisssdsssdss',
+			$badge_type_id, $notes, $contact_first_name,
+			$contact_last_name, $contact_subscribed,
+			$contact_email_address, $contact_phone_number,
+			$contact_address_1, $contact_address_2, $contact_city,
+			$contact_state, $contact_zip_code, $contact_country,
+			$business_name, $application_name, $applicant_count,
+			$assignment_count, $application_status, $permit_number,
+			$payment_status, $payment_badge_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		if ($id !== false) {
+			if (isset($application['assigned-rooms-and-tables'])) {
+				foreach ($application['assigned-rooms-and-tables'] as $art) {
+					$room_or_table_id = (isset($art['room-or-table-id']) && $art['room-or-table-id']) ? $art['room-or-table-id'] : null;
+					$start_time = (isset($art['start-time']) && $art['start-time']) ? $art['start-time'] : null;
+					$end_time = (isset($art['end-time']) && $art['end-time']) ? $art['end-time'] : null;
+					if ($room_or_table_id) {
+						$stmt = $this->cm_db->connection->prepare(
+							'INSERT INTO '.
+							$this->cm_db->table_name('room_and_table_assignments').
+							' SET `context` = ?, `context_id` = ?, '.
+							'`room_or_table_id` = ?, `start_time` = ?, `end_time` = ?'
+						);
+						$stmt->bind_param(
+							'sisss',
+							$this->ctx_uc, $id,
+							$room_or_table_id, $start_time, $end_time
+						);
+						$stmt->execute();
+						$stmt->close();
+					}
+				}
+			}
+			if ($fdb && isset($application['form-answers'])) {
+				$fdb->set_answers($id, $application['form-answers']);
+			}
+			$application = $this->get_application($id, null, true);
+			$this->cm_anldb->add_entity($application);
+		}
+		return $id;
+	}
+
+	public function update_application($application, $fdb = null) {
+		if (!$application || !isset($application['id']) || !$application['id']) return false;
+		$badge_type_id = (isset($application['badge-type-id']) ? $application['badge-type-id'] : null);
+		$notes = (isset($application['notes']) ? $application['notes'] : null);
+		$contact_first_name = (isset($application['contact-first-name']) ? $application['contact-first-name'] : '');
+		$contact_last_name = (isset($application['contact-last-name']) ? $application['contact-last-name'] : '');
+		$contact_subscribed = (isset($application['contact-subscribed']) ? ($application['contact-subscribed'] ? 1 : 0) : 0);
+		$contact_email_address = (isset($application['contact-email-address']) ? $application['contact-email-address'] : '');
+		$contact_phone_number = (isset($application['contact-phone-number']) ? $application['contact-phone-number'] : '');
+		$contact_address_1 = (isset($application['contact-address-1']) ? $application['contact-address-1'] : '');
+		$contact_address_2 = (isset($application['contact-address-2']) ? $application['contact-address-2'] : '');
+		$contact_city = (isset($application['contact-city']) ? $application['contact-city'] : '');
+		$contact_state = (isset($application['contact-state']) ? $application['contact-state'] : '');
+		$contact_zip_code = (isset($application['contact-zip-code']) ? $application['contact-zip-code'] : '');
+		$contact_country = (isset($application['contact-country']) ? $application['contact-country'] : '');
+		$business_name = (isset($application['business-name']) ? $application['business-name'] : '');
+		$application_name = (isset($application['application-name']) ? $application['application-name'] : '');
+		$applicant_count = (isset($application['applicant-count']) ? $application['applicant-count'] : null);
+		$assignment_count = (isset($application['assignment-count']) ? $application['assignment-count'] : null);
+		$application_status = (isset($application['application-status']) ? $application['application-status'] : null);
+		$permit_number = (isset($application['permit-number']) ? $application['permit-number'] : null);
+		$payment_status = (isset($application['payment-status']) ? $application['payment-status'] : null);
+		$payment_badge_price = (isset($application['payment-badge-price']) ? $application['payment-badge-price'] : null);
+		$payment_group_uuid = (isset($application['payment-group-uuid']) ? $application['payment-group-uuid'] : null);
+		$payment_type = (isset($application['payment-type']) ? $application['payment-type'] : null);
+		$payment_txn_id = (isset($application['payment-txn-id']) ? $application['payment-txn-id'] : null);
+		$payment_txn_amt = (isset($application['payment-txn-amt']) ? $application['payment-txn-amt'] : null);
+		$payment_date = (isset($application['payment-date']) ? $application['payment-date'] : null);
+		$payment_details = (isset($application['payment-details']) ? $application['payment-details'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' SET '.
+			'`date_modified` = NOW(), '.
+			'`badge_type_id` = ?, `notes` = ?, `contact_first_name` = ?, '.
+			'`contact_last_name` = ?, `contact_subscribed` = ?, '.
+			'`contact_email_address` = ?, `contact_phone_number` = ?, '.
+			'`contact_address_1` = ?, `contact_address_2` = ?, `contact_city` = ?, '.
+			'`contact_state` = ?, `contact_zip_code` = ?, `contact_country` = ?, '.
+			'`business_name` = ?, `application_name` = ?, `applicant_count` = ?, '.
+			'`assignment_count` = ?, `application_status` = ?, `permit_number` = ?, '.
+			'`payment_status` = ?, `payment_badge_price` = ?, '.
+			'`payment_group_uuid` = ?, `payment_type` = ?, '.
+			'`payment_txn_id` = ?, `payment_txn_amt` = ?, '.
+			'`payment_date` = ?, `payment_details` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'isssissssssssssiisssdsssdssi',
+			$badge_type_id, $notes, $contact_first_name,
+			$contact_last_name, $contact_subscribed,
+			$contact_email_address, $contact_phone_number,
+			$contact_address_1, $contact_address_2, $contact_city,
+			$contact_state, $contact_zip_code, $contact_country,
+			$business_name, $application_name, $applicant_count,
+			$assignment_count, $application_status, $permit_number,
+			$payment_status, $payment_badge_price,
+			$payment_group_uuid, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details,
+			$application['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			if (isset($application['assigned-rooms-and-tables'])) {
+				$stmt = $this->cm_db->connection->prepare(
+					'DELETE FROM '.$this->cm_db->table_name('room_and_table_assignments').
+					' WHERE `context` = ? AND `context_id` = ?'
+				);
+				$stmt->bind_param('si', $this->ctx_uc, $application['id']);
+				$stmt->execute();
+				$stmt->close();
+				foreach ($application['assigned-rooms-and-tables'] as $art) {
+					$room_or_table_id = (isset($art['room-or-table-id']) && $art['room-or-table-id']) ? $art['room-or-table-id'] : null;
+					$start_time = (isset($art['start-time']) && $art['start-time']) ? $art['start-time'] : null;
+					$end_time = (isset($art['end-time']) && $art['end-time']) ? $art['end-time'] : null;
+					if ($room_or_table_id) {
+						$stmt = $this->cm_db->connection->prepare(
+							'INSERT INTO '.
+							$this->cm_db->table_name('room_and_table_assignments').
+							' SET `context` = ?, `context_id` = ?, '.
+							'`room_or_table_id` = ?, `start_time` = ?, `end_time` = ?'
+						);
+						$stmt->bind_param(
+							'sisss',
+							$this->ctx_uc, $id,
+							$room_or_table_id, $start_time, $end_time
+						);
+						$stmt->execute();
+						$stmt->close();
+					}
+				}
+			}
+			if ($fdb && isset($application['form-answers'])) {
+				$fdb->clear_answers($application['id']);
+				$fdb->set_answers($application['id'], $application['form-answers']);
+			}
+			$application = $this->get_application($application['id'], null, true);
+			$this->cm_anldb->remove_entity($application['id']);
+			$this->cm_anldb->add_entity($application);
+		}
+		return $success;
+	}
+
+	public function delete_application($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			$applicant_ids = array();
+			$stmt = $this->cm_db->connection->prepare(
+				'SELECT `id` FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).
+				' WHERE `application_id` = ?'
+			);
+			$stmt->bind_param('i', $id);
+			$stmt->execute();
+			$stmt->bind_result($applicant_id);
+			while ($stmt->fetch()) {
+				$applicant_ids[] = $applicant_id;
+			}
+			$stmt->close();
+			foreach ($applicant_ids as $applicant_id) {
+				$this->delete_applicant($applicant_id);
+			}
+
+			$stmt = $this->cm_db->connection->prepare(
+				'DELETE FROM '.$this->cm_db->table_name('room_and_table_assignments').
+				' WHERE `context` = ? AND `context_id` = ?'
+			);
+			$stmt->bind_param('si', $this->ctx_uc, $id);
+			$stmt->execute();
+			$stmt->close();
+			$this->cm_anldb->remove_entity($id);
+		}
+		return $success;
+	}
+
+	public function already_exists($application) {
+		if (!$application) return false;
+		$application_name = (isset($application['application-name']) ? strtolower($application['application-name']) : '');
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT 1 FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).
+			' WHERE LCASE(`application_name`) = ?'
+		);
+		$stmt->bind_param('s', $application_name);
+		$stmt->execute();
+		$stmt->bind_result($x);
+		$exists = $stmt->fetch() && $x;
+		$stmt->close();
+		return $exists;
+	}
+
+	public function update_payment_status($id, $status, $type, $txn_id, $txn_amt, $date, $details) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' SET '.
+			'`payment_status` = ?, `payment_type` = ?, `payment_txn_id` = ?, '.
+			'`payment_txn_amt` = ?, `payment_date` = ?, `payment_details` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'ssssssi',
+			$status, $type, $txn_id,
+			$txn_amt, $date, $details, $id
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			$application = $this->get_application($id, null, true);
+			$this->cm_anldb->remove_entity($id);
+			$this->cm_anldb->add_entity($application);
+		}
+		return $success;
+	}
+
+	public function get_applicant($id, $uuid = null, $expand = false, $name_map = null, $fdb = null) {
+		if (!$id && !$uuid) return false;
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'application-'.$this->ctx_lc);
+		$query = (
+			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
+			' `print_count`, `print_first_time`, `print_last_time`,'.
+			' `checkin_count`, `checkin_first_time`, `checkin_last_time`,'.
+			' `application_id`, `attendee_id`, `notes`, `first_name`,'.
+			' `last_name`, `fandom_name`, `name_on_badge`, `date_of_birth`,'.
+			' `subscribed`, `email_address`, `phone_number`,'.
+			' `address_1`, `address_2`, `city`, `state`, `zip_code`,'.
+			' `country`, `ice_name`, `ice_relationship`,'.
+			' `ice_email_address`, `ice_phone_number`'.
+			' FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc)
+		);
+		if ($id) {
+			if ($uuid) $query .= ' WHERE `id` = ? AND `uuid` = ? LIMIT 1';
+			else $query .= ' WHERE `id` = ? LIMIT 1';
+		} else {
+			$query .= ' WHERE `uuid` = ? LIMIT 1';
+		}
+		$stmt = $this->cm_db->connection->prepare($query);
+		if ($id) {
+			if ($uuid) $stmt->bind_param('is', $id, $uuid);
+			else $stmt->bind_param('i', $id);
+		} else {
+			$stmt->bind_param('s', $uuid);
+		}
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $uuid, $date_created, $date_modified,
+			$print_count, $print_first_time, $print_last_time,
+			$checkin_count, $checkin_first_time, $checkin_last_time,
+			$application_id, $attendee_id, $notes, $first_name,
+			$last_name, $fandom_name, $name_on_badge, $date_of_birth,
+			$subscribed, $email_address, $phone_number,
+			$address_1, $address_2, $city, $state, $zip_code,
+			$country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number
+		);
+		if ($stmt->fetch()) {
+			$reg_url = get_site_url(true) . '/application';
+			$id_string = $this->ctx_uc . $id;
+			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
+			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$only_name = $real_name;
+			$large_name = '';
+			$small_name = '';
+			$display_name = $real_name;
+			if ($fandom_name) {
+				switch ($name_on_badge) {
+					case 'Fandom Name Large, Real Name Small':
+						$only_name = '';
+						$large_name = $fandom_name;
+						$small_name = $real_name;
+						$display_name = trim($fandom_name) . ' (' . trim($real_name) . ')';
+						break;
+					case 'Real Name Large, Fandom Name Small':
+						$only_name = '';
+						$large_name = $real_name;
+						$small_name = $fandom_name;
+						$display_name = trim($real_name) . ' (' . trim($fandom_name) . ')';
+						break;
+					case 'Fandom Name Only':
+						$only_name = $fandom_name;
+						$display_name = $fandom_name;
+						break;
+				}
+			}
+			$age = calculate_age($this->event_info['start_date'], $date_of_birth);
+			$email_address_subscribed = ($subscribed ? $email_address : null);
+			$unsubscribe_link = $reg_url . '/unsubscribe.php?c=' . $this->ctx_lc . '&email=' . $email_address;
+			$address = trim(trim($address_1) . "\n" . trim($address_2));
+			$csz = trim(trim(trim($city) . ' ' . trim($state)) . ' ' . trim($zip_code));
+			$address_full = trim(trim(trim($address) . "\n" . trim($csz)) . "\n" . trim($country));
+			$search_content = array(
+				$id, $uuid, $notes, $first_name, $last_name, $fandom_name,
+				$date_of_birth, $email_address, $phone_number,
+				$address_1, $address_2, $city, $state, $zip_code, $country,
+				$id_string, $qr_data, $real_name, $only_name, $large_name,
+				$small_name, $display_name, $address, $csz, $address_full
+			);
+			$result = array(
+				'id' => $id,
+				'id-string' => $id_string,
+				'uuid' => $uuid,
+				'qr-data' => $qr_data,
+				'qr-url' => $qr_url,
+				'date-created' => $date_created,
+				'date-modified' => $date_modified,
+				'print-count' => $print_count,
+				'print-first-time' => $print_first_time,
+				'print-last-time' => $print_last_time,
+				'checkin-count' => $checkin_count,
+				'checkin-first-time' => $checkin_first_time,
+				'checkin-last-time' => $checkin_last_time,
+				'application-id' => $application_id,
+				'attendee-id' => $attendee_id,
+				'notes' => $notes,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'fandom-name' => $fandom_name,
+				'name-on-badge' => $name_on_badge,
+				'only-name' => $only_name,
+				'large-name' => $large_name,
+				'small-name' => $small_name,
+				'display-name' => $display_name,
+				'date-of-birth' => $date_of_birth,
+				'age' => $age,
+				'subscribed' => !!$subscribed,
+				'email-address' => $email_address,
+				'email-address-subscribed' => $email_address_subscribed,
+				'unsubscribe-link' => $unsubscribe_link,
+				'phone-number' => $phone_number,
+				'address-1' => $address_1,
+				'address-2' => $address_2,
+				'address' => $address,
+				'city' => $city,
+				'state' => $state,
+				'zip-code' => $zip_code,
+				'csz' => $csz,
+				'country' => $country,
+				'address-full' => $address_full,
+				'ice-name' => $ice_name,
+				'ice-relationship' => $ice_relationship,
+				'ice-email-address' => $ice_email_address,
+				'ice-phone-number' => $ice_phone_number,
+				'search-content' => $search_content
+			);
+			$stmt->close();
+			if ($expand && $application_id) {
+				$application = $this->get_application($application_id, null, false, $name_map, $fdb);
+				if ($application) {
+					$result['search-content'] = array_merge($result['search-content'], $application['search-content']);
+					$result['application'] = $application;
+					$result += $application;
+				}
+			}
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_applicants($application_id = null, $expand = false, $name_map = null, $fdb = null) {
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'application-'.$this->ctx_lc);
+		$applicants = array();
+		$query = (
+			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
+			' `print_count`, `print_first_time`, `print_last_time`,'.
+			' `checkin_count`, `checkin_first_time`, `checkin_last_time`,'.
+			' `application_id`, `attendee_id`, `notes`, `first_name`,'.
+			' `last_name`, `fandom_name`, `name_on_badge`, `date_of_birth`,'.
+			' `subscribed`, `email_address`, `phone_number`,'.
+			' `address_1`, `address_2`, `city`, `state`, `zip_code`,'.
+			' `country`, `ice_name`, `ice_relationship`,'.
+			' `ice_email_address`, `ice_phone_number`'.
+			' FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc)
+		);
+		$first = true;
+		$bind = array('');
+		if ($application_id) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `application_id` = ?';
+			$first = false;
+			$bind[0] .= 'i';
+			$bind[] = &$application_id;
+		}
+		$stmt = $this->cm_db->connection->prepare($query . ' ORDER BY `id`');
+		if (!$first) call_user_func_array(array($stmt, 'bind_param'), $bind);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $uuid, $date_created, $date_modified,
+			$print_count, $print_first_time, $print_last_time,
+			$checkin_count, $checkin_first_time, $checkin_last_time,
+			$application_id, $attendee_id, $notes, $first_name,
+			$last_name, $fandom_name, $name_on_badge, $date_of_birth,
+			$subscribed, $email_address, $phone_number,
+			$address_1, $address_2, $city, $state, $zip_code,
+			$country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number
+		);
+		$reg_url = get_site_url(true) . '/application';
+		$qr_base_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=';
+		while ($stmt->fetch()) {
+			$id_string = $this->ctx_uc . $id;
+			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
+			$qr_url = $qr_base_url . $qr_data;
+			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
+			$only_name = $real_name;
+			$large_name = '';
+			$small_name = '';
+			$display_name = $real_name;
+			if ($fandom_name) {
+				switch ($name_on_badge) {
+					case 'Fandom Name Large, Real Name Small':
+						$only_name = '';
+						$large_name = $fandom_name;
+						$small_name = $real_name;
+						$display_name = trim($fandom_name) . ' (' . trim($real_name) . ')';
+						break;
+					case 'Real Name Large, Fandom Name Small':
+						$only_name = '';
+						$large_name = $real_name;
+						$small_name = $fandom_name;
+						$display_name = trim($real_name) . ' (' . trim($fandom_name) . ')';
+						break;
+					case 'Fandom Name Only':
+						$only_name = $fandom_name;
+						$display_name = $fandom_name;
+						break;
+				}
+			}
+			$age = calculate_age($this->event_info['start_date'], $date_of_birth);
+			$email_address_subscribed = ($subscribed ? $email_address : null);
+			$unsubscribe_link = $reg_url . '/unsubscribe.php?c=' . $this->ctx_lc . '&email=' . $email_address;
+			$address = trim(trim($address_1) . "\n" . trim($address_2));
+			$csz = trim(trim(trim($city) . ' ' . trim($state)) . ' ' . trim($zip_code));
+			$address_full = trim(trim(trim($address) . "\n" . trim($csz)) . "\n" . trim($country));
+			$search_content = array(
+				$id, $uuid, $notes, $first_name, $last_name, $fandom_name,
+				$date_of_birth, $email_address, $phone_number,
+				$address_1, $address_2, $city, $state, $zip_code, $country,
+				$id_string, $qr_data, $real_name, $only_name, $large_name,
+				$small_name, $display_name, $address, $csz, $address_full
+			);
+			$applicants[] = array(
+				'id' => $id,
+				'id-string' => $id_string,
+				'uuid' => $uuid,
+				'qr-data' => $qr_data,
+				'qr-url' => $qr_url,
+				'date-created' => $date_created,
+				'date-modified' => $date_modified,
+				'print-count' => $print_count,
+				'print-first-time' => $print_first_time,
+				'print-last-time' => $print_last_time,
+				'checkin-count' => $checkin_count,
+				'checkin-first-time' => $checkin_first_time,
+				'checkin-last-time' => $checkin_last_time,
+				'application-id' => $application_id,
+				'attendee-id' => $attendee_id,
+				'notes' => $notes,
+				'first-name' => $first_name,
+				'last-name' => $last_name,
+				'real-name' => $real_name,
+				'fandom-name' => $fandom_name,
+				'name-on-badge' => $name_on_badge,
+				'only-name' => $only_name,
+				'large-name' => $large_name,
+				'small-name' => $small_name,
+				'display-name' => $display_name,
+				'date-of-birth' => $date_of_birth,
+				'age' => $age,
+				'subscribed' => !!$subscribed,
+				'email-address' => $email_address,
+				'email-address-subscribed' => $email_address_subscribed,
+				'unsubscribe-link' => $unsubscribe_link,
+				'phone-number' => $phone_number,
+				'address-1' => $address_1,
+				'address-2' => $address_2,
+				'address' => $address,
+				'city' => $city,
+				'state' => $state,
+				'zip-code' => $zip_code,
+				'csz' => $csz,
+				'country' => $country,
+				'address-full' => $address_full,
+				'ice-name' => $ice_name,
+				'ice-relationship' => $ice_relationship,
+				'ice-email-address' => $ice_email_address,
+				'ice-phone-number' => $ice_phone_number,
+				'search-content' => $search_content
+			);
+		}
+		$stmt->close();
+		if ($expand) {
+			foreach ($applicants as $i => $applicant) {
+				if ($applicant['application-id']) {
+					$application = $this->get_application($applicant['application-id'], null, false, $name_map, $fdb);
+					if ($application) {
+						$applicant['search-content'] = array_merge($applicant['search-content'], $application['search-content']);
+						$applicant['application'] = $application;
+						$applicants[$i] = $applicant + $application;
+					}
+				}
+			}
+		}
+		return $applicants;
+	}
+
+	public function create_applicant($applicant) {
+		if (!$applicant) return false;
+		$application_id = (isset($applicant['application-id']) ? $applicant['application-id'] : null);
+		$attendee_id = (isset($applicant['attendee-id']) ? $applicant['attendee-id'] : null);
+		$notes = (isset($applicant['notes']) ? $applicant['notes'] : null);
+		$first_name = (isset($applicant['first-name']) ? $applicant['first-name'] : '');
+		$last_name = (isset($applicant['last-name']) ? $applicant['last-name'] : '');
+		$fandom_name = (isset($applicant['fandom-name']) ? $applicant['fandom-name'] : '');
+		$name_on_badge = (($fandom_name && isset($applicant['name-on-badge'])) ? $applicant['name-on-badge'] : 'Real Name Only');
+		$date_of_birth = (isset($applicant['date-of-birth']) ? $applicant['date-of-birth'] : null);
+		$subscribed = (isset($applicant['subscribed']) ? ($applicant['subscribed'] ? 1 : 0) : 0);
+		$email_address = (isset($applicant['email-address']) ? $applicant['email-address'] : '');
+		$phone_number = (isset($applicant['phone-number']) ? $applicant['phone-number'] : '');
+		$address_1 = (isset($applicant['address-1']) ? $applicant['address-1'] : '');
+		$address_2 = (isset($applicant['address-2']) ? $applicant['address-2'] : '');
+		$city = (isset($applicant['city']) ? $applicant['city'] : '');
+		$state = (isset($applicant['state']) ? $applicant['state'] : '');
+		$zip_code = (isset($applicant['zip-code']) ? $applicant['zip-code'] : '');
+		$country = (isset($applicant['country']) ? $applicant['country'] : '');
+		$ice_name = (isset($applicant['ice-name']) ? $applicant['ice-name'] : '');
+		$ice_relationship = (isset($applicant['ice-relationship']) ? $applicant['ice-relationship'] : '');
+		$ice_email_address = (isset($applicant['ice-email-address']) ? $applicant['ice-email-address'] : '');
+		$ice_phone_number = (isset($applicant['ice-phone-number']) ? $applicant['ice-phone-number'] : '');
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' SET '.
+			'`uuid` = UUID(), `date_created` = NOW(), `date_modified` = NOW(), '.
+			'`application_id` = ?, `attendee_id` = ?, `notes` = ?, '.
+			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
+			'`name_on_badge` = ?, `date_of_birth` = ?, `subscribed` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `address_1` = ?, '.
+			'`address_2` = ?, `city` = ?, `state` = ?, `zip_code` = ?, '.
+			'`country` = ?, `ice_name` = ?, `ice_relationship` = ?, '.
+			'`ice_email_address` = ?, `ice_phone_number` = ?'
+		);
+		$stmt->bind_param(
+			'iissssssissssssssssss',
+			$application_id, $attendee_id, $notes,
+			$first_name, $last_name, $fandom_name,
+			$name_on_badge, $date_of_birth, $subscribed,
+			$email_address, $phone_number, $address_1,
+			$address_2, $city, $state, $zip_code,
+			$country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		if ($id !== false) {
+			$applicant = $this->get_applicant($id, null, true);
+			$this->cm_atldb->add_entity($applicant);
+		}
+		return $id;
+	}
+
+	public function update_applicant($applicant) {
+		if (!$applicant || !isset($applicant['id']) || !$applicant['id']) return false;
+		$application_id = (isset($applicant['application-id']) ? $applicant['application-id'] : null);
+		$attendee_id = (isset($applicant['attendee-id']) ? $applicant['attendee-id'] : null);
+		$notes = (isset($applicant['notes']) ? $applicant['notes'] : null);
+		$first_name = (isset($applicant['first-name']) ? $applicant['first-name'] : '');
+		$last_name = (isset($applicant['last-name']) ? $applicant['last-name'] : '');
+		$fandom_name = (isset($applicant['fandom-name']) ? $applicant['fandom-name'] : '');
+		$name_on_badge = (($fandom_name && isset($applicant['name-on-badge'])) ? $applicant['name-on-badge'] : 'Real Name Only');
+		$date_of_birth = (isset($applicant['date-of-birth']) ? $applicant['date-of-birth'] : null);
+		$subscribed = (isset($applicant['subscribed']) ? ($applicant['subscribed'] ? 1 : 0) : 0);
+		$email_address = (isset($applicant['email-address']) ? $applicant['email-address'] : '');
+		$phone_number = (isset($applicant['phone-number']) ? $applicant['phone-number'] : '');
+		$address_1 = (isset($applicant['address-1']) ? $applicant['address-1'] : '');
+		$address_2 = (isset($applicant['address-2']) ? $applicant['address-2'] : '');
+		$city = (isset($applicant['city']) ? $applicant['city'] : '');
+		$state = (isset($applicant['state']) ? $applicant['state'] : '');
+		$zip_code = (isset($applicant['zip-code']) ? $applicant['zip-code'] : '');
+		$country = (isset($applicant['country']) ? $applicant['country'] : '');
+		$ice_name = (isset($applicant['ice-name']) ? $applicant['ice-name'] : '');
+		$ice_relationship = (isset($applicant['ice-relationship']) ? $applicant['ice-relationship'] : '');
+		$ice_email_address = (isset($applicant['ice-email-address']) ? $applicant['ice-email-address'] : '');
+		$ice_phone_number = (isset($applicant['ice-phone-number']) ? $applicant['ice-phone-number'] : '');
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' SET '.
+			'`date_modified` = NOW(), '.
+			'`application_id` = ?, `attendee_id` = ?, `notes` = ?, '.
+			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
+			'`name_on_badge` = ?, `date_of_birth` = ?, `subscribed` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `address_1` = ?, '.
+			'`address_2` = ?, `city` = ?, `state` = ?, `zip_code` = ?, '.
+			'`country` = ?, `ice_name` = ?, `ice_relationship` = ?, '.
+			'`ice_email_address` = ?, `ice_phone_number` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'iissssssissssssssssssi',
+			$application_id, $attendee_id, $notes,
+			$first_name, $last_name, $fandom_name,
+			$name_on_badge, $date_of_birth, $subscribed,
+			$email_address, $phone_number, $address_1,
+			$address_2, $city, $state, $zip_code,
+			$country, $ice_name, $ice_relationship,
+			$ice_email_address, $ice_phone_number,
+			$applicant['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			$applicant = $this->get_applicant($applicant['id'], null, true);
+			$this->cm_atldb->remove_entity($applicant['id']);
+			$this->cm_atldb->add_entity($applicant);
+		}
+		return $success;
+	}
+
+	public function delete_applicant($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			$this->cm_atldb->remove_entity($id);
+		}
+		return $success;
+	}
+
+	public function unsubscribe_email_address($email) {
+		if (!$email) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' SET '.
+			'`contact_subscribed` = FALSE WHERE LCASE(`contact_email_address`) = LCASE(?)'
+		);
+		$stmt->bind_param('s', $email);
+		$ancount = $stmt->execute() ? $this->cm_db->connection->affected_rows : 0;
+		$stmt->close();
+		if ($ancount) {
+			$ids = array();
+			$stmt = $this->cm_db->connection->prepare(
+				'SELECT `id` FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).
+				' WHERE LCASE(`contact_email_address`) = LCASE(?)'
+			);
+			$stmt->bind_param('s', $email);
+			$stmt->execute();
+			$stmt->bind_result($id);
+			while ($stmt->fetch()) $ids[] = $id;
+			$stmt->close();
+			foreach ($ids as $id) {
+				$application = $this->get_application($id, null, true);
+				$this->cm_anldb->remove_entity($id);
+				$this->cm_anldb->add_entity($application);
+			}
+		}
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' SET '.
+			'`subscribed` = FALSE WHERE LCASE(`email_address`) = LCASE(?)'
+		);
+		$stmt->bind_param('s', $email);
+		$atcount = $stmt->execute() ? $this->cm_db->connection->affected_rows : 0;
+		$stmt->close();
+		if ($atcount) {
+			$ids = array();
+			$stmt = $this->cm_db->connection->prepare(
+				'SELECT `id` FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).
+				' WHERE LCASE(`email_address`) = LCASE(?)'
+			);
+			$stmt->bind_param('s', $email);
+			$stmt->execute();
+			$stmt->bind_result($id);
+			while ($stmt->fetch()) $ids[] = $id;
+			$stmt->close();
+			foreach ($ids as $id) {
+				$applicant = $this->get_applicant($id, null, true);
+				$this->cm_atldb->remove_entity($id);
+				$this->cm_atldb->add_entity($applicant);
+			}
+		}
+		return $ancount + $atcount;
+	}
+
+	public function applicant_printed($id, $reset = false) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' SET '.
+			($reset ? (
+				'`print_count` = NULL, '.
+				'`print_first_time` = NULL, '.
+				'`print_last_time` = NULL'
+			) : (
+				'`print_count` = IFNULL(`print_count`, 0) + 1, '.
+				'`print_first_time` = IFNULL(`print_first_time`, NOW()), '.
+				'`print_last_time` = NOW()'
+			)).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			$applicant = $this->get_applicant($id, null, true);
+			$this->cm_atldb->remove_entity($id);
+			$this->cm_atldb->add_entity($applicant);
+		}
+		return $success;
+	}
+
+	public function applicant_checked_in($id, $reset = false) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' SET '.
+			($reset ? (
+				'`checkin_count` = NULL, '.
+				'`checkin_first_time` = NULL, '.
+				'`checkin_last_time` = NULL'
+			) : (
+				'`checkin_count` = IFNULL(`checkin_count`, 0) + 1, '.
+				'`checkin_first_time` = IFNULL(`checkin_first_time`, NOW()), '.
+				'`checkin_last_time` = NOW()'
+			)).
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			$applicant = $this->get_applicant($id, null, true);
+			$this->cm_atldb->remove_entity($id);
+			$this->cm_atldb->add_entity($applicant);
+		}
+		return $success;
+	}
+
+	public function get_applicant_statistics($granularity = 300, $name_map = null) {
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		$timestamps = array();
+		$counters = array();
+		$timelines = array();
+		foreach ($name_map as $k => $v) {
+			$counters[$k] = array(0, 0, 0, 0);
+			$timelines[$k] = array(array(), array(), array(), array());
+		}
+		$counters['*'] = array(0, 0, 0, 0);
+		$timelines['*'] = array(array(), array(), array(), array());
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(at.`date_created`), an.`badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' at'.
+			' LEFT JOIN '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' an'.
+			' ON at.`application_id` = an.`id`'.
+			' ORDER BY at.`date_created`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][0][$timestamp] = ++$counters[$btid][0];
+			$timelines['*'][0][$timestamp] = ++$counters['*'][0];
+		}
+		$stmt->close();
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(an.`payment_date`), an.`badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' at'.
+			' LEFT JOIN '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' an'.
+			' ON at.`application_id` = an.`id`'.
+			' WHERE an.`payment_status` = \'Completed\''.
+			' AND an.`payment_date` IS NOT NULL'.
+			' ORDER BY an.`payment_date`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][1][$timestamp] = ++$counters[$btid][1];
+			$timelines['*'][1][$timestamp] = ++$counters['*'][1];
+		}
+		$stmt->close();
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(at.`print_first_time`), an.`badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' at'.
+			' LEFT JOIN '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' an'.
+			' ON at.`application_id` = an.`id`'.
+			' WHERE at.`print_first_time` IS NOT NULL'.
+			' ORDER BY at.`print_first_time`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][2][$timestamp] = ++$counters[$btid][2];
+			$timelines['*'][2][$timestamp] = ++$counters['*'][2];
+		}
+		$stmt->close();
+
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT UNIX_TIMESTAMP(at.`checkin_first_time`), an.`badge_type_id`'.
+			' FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' at'.
+			' LEFT JOIN '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' an'.
+			' ON at.`application_id` = an.`id`'.
+			' WHERE at.`checkin_first_time` IS NOT NULL'.
+			' ORDER BY at.`checkin_first_time`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($timestamp, $btid);
+		while ($stmt->fetch()) {
+			$timestamp -= $timestamp % $granularity;
+			$timestamp *= 1000;
+			$timestamps[$timestamp] = $timestamp;
+			$timelines[$btid][3][$timestamp] = ++$counters[$btid][3];
+			$timelines['*'][3][$timestamp] = ++$counters['*'][3];
+		}
+		$stmt->close();
+
+		ksort($timestamps);
+		return array(
+			'timestamps' => $timestamps,
+			'counters' => $counters,
+			'timelines' => $timelines
+		);
+	}
+
 }
