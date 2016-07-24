@@ -245,9 +245,6 @@ echo '<article>';
 							if ($bt['description']) {
 								echo '<p>' . safe_html_string($bt['description']) . '</p>';
 							}
-							if ($bt['description'] && $bt['rewards']) {
-								echo '<p><br></p>';
-							}
 							if ($bt['rewards']) {
 								if (substr(trim($bt['description']), -1) != ':') {
 									echo '<p><b>Rewards:</b></p>';
