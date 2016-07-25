@@ -1,0 +1,1 @@
+<?php header('Location: application.php?' . $_SERVER['QUERY_STRING']);

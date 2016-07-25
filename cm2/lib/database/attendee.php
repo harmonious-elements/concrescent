@@ -946,6 +946,34 @@ class cm_attendee_db {
 		return $success ? $this->get_blacklist_entry($id) : false;
 	}
 
+	public function lookup_attendee($person) {
+		if (!$person) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id` FROM '.$this->cm_db->table_name('attendees').
+			' WHERE LCASE(`first_name`) = LCASE(?)'.
+			' AND LCASE(`last_name`) = LCASE(?)'.
+			' AND (`date_of_birth` = ?'.
+			' OR LCASE(`email_address`) = LCASE(?)'.
+			' OR LCASE(`phone_number`) = LCASE(?))'.
+			' AND `payment_status` = "Completed"'.
+			' ORDER BY `payment_txn_amt` DESC LIMIT 1'
+		);
+		$stmt->bind_param(
+			'sssss',
+			$person['first-name'], $person['last-name'],
+			$person['date-of-birth'], $person['email-address'],
+			$person['phone-number']
+		);
+		$stmt->execute();
+		$stmt->bind_result($id);
+		if ($stmt->fetch()) {
+			$stmt->close();
+			return $id;
+		}
+		$stmt->close();
+		return false;
+	}
+
 	public function get_attendee($id, $uuid = null, $name_map = null, $fdb = null) {
 		if (!$id && !$uuid) return false;
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
