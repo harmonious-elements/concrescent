@@ -1204,7 +1204,7 @@ class cm_application_db {
 			$payment_date, $payment_details
 		);
 		if ($stmt->fetch()) {
-			$reg_url = get_site_url(true) . '/application';
+			$reg_url = get_site_url(true) . '/apply';
 			$id_string = $this->ctx_uc . 'A' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
@@ -1384,7 +1384,7 @@ class cm_application_db {
 			$payment_txn_id, $payment_txn_amt,
 			$payment_date, $payment_details
 		);
-		$reg_url = get_site_url(true) . '/application';
+		$reg_url = get_site_url(true) . '/apply';
 		$qr_base_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=';
 		while ($stmt->fetch()) {
 			$id_string = $this->ctx_uc . 'A' . $id;
@@ -1828,7 +1828,7 @@ class cm_application_db {
 			$ice_email_address, $ice_phone_number
 		);
 		if ($stmt->fetch()) {
-			$reg_url = get_site_url(true) . '/application';
+			$reg_url = get_site_url(true) . '/apply';
 			$id_string = $this->ctx_uc . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
@@ -1971,7 +1971,7 @@ class cm_application_db {
 			$country, $ice_name, $ice_relationship,
 			$ice_email_address, $ice_phone_number
 		);
-		$reg_url = get_site_url(true) . '/application';
+		$reg_url = get_site_url(true) . '/apply';
 		$qr_base_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=';
 		while ($stmt->fetch()) {
 			$id_string = $this->ctx_uc . $id;
