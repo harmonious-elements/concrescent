@@ -155,6 +155,8 @@ function cm_list_row(&$list_def, &$entity) {
 			switch ($type) {
 				case 'html'        : $out .= '<td>' . $value                   . '</td>'; break;
 				case 'text'        : $out .= '<td>' . htmlspecialchars($value) . '</td>'; break;
+				case 'bool'        : $out .= '<td>' . ($value ? 'Yes' : 'No')  . '</td>'; break;
+				case 'bool-inverse': $out .= '<td>' . ($value ? 'No' : 'Yes')  . '</td>'; break;
 				case 'url'         : $out .= '<td>' . url_link($value)         . '</td>'; break;
 				case 'url-short'   : $out .= '<td>' . url_link_short($value)   . '</td>'; break;
 				case 'email'       : $out .= '<td>' . email_link($value)       . '</td>'; break;

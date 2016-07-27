@@ -93,6 +93,31 @@ function cm_admin_nav_application($context, $ctx_info) {
 	$ctx_name_lc = strtolower($ctx_name);
 	return array(
 		array(
+			'id' => 'applications-'.$ctx_lc,
+			'href' => '/admin/application/index.php?c='.$ctx_lc,
+			'name' => $ctx_name.' Applications',
+			'description' => 'Review, approve, or modify '.$ctx_name_lc.' applications.',
+			'permission' => array('||',
+				'applications-'.$ctx_lc,
+				'applications-view-'.$ctx_lc,
+				'applications-review-'.$ctx_lc,
+				'applications-edit-'.$ctx_lc,
+				'applications-delete-'.$ctx_lc
+			)
+		),
+		array(
+			'id' => 'applicants-'.$ctx_lc,
+			'href' => '/admin/application/badge-index.php?c='.$ctx_lc,
+			'name' => $ctx_name.' Badges',
+			'description' => 'View or modify '.$ctx_name_lc.' badge registration records.',
+			'permission' => array('||',
+				'applicants-'.$ctx_lc,
+				'applicants-view-'.$ctx_lc,
+				'applicants-edit-'.$ctx_lc,
+				'applicants-delete-'.$ctx_lc
+			)
+		),
+		array(
 			'id' => 'application-badge-types-'.$ctx_lc,
 			'href' => '/admin/application/badge-types.php?c='.$ctx_lc,
 			'name' => $ctx_name.' Badge Types',

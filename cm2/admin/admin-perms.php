@@ -82,6 +82,67 @@ $cm_admin_perms_application_common = (
 	)
 );
 
+function cm_admin_perms_application($context, $ctx_info) {
+	$ctx_lc = strtolower($context);
+	$ctx_name = $ctx_info['nav_prefix'];
+	$ctx_name_lc = strtolower($ctx_name);
+	return array(
+		array(
+			'id' => 'applications-'.$ctx_lc,
+			'name' => $ctx_name.' Applications',
+			'description' => 'View the list of '.$ctx_name_lc.' applications.'
+		),
+		array(
+			'id' => 'applications-view-'.$ctx_lc,
+			'name' => $ctx_name.' Applications - View',
+			'description' => 'View individual '.$ctx_name_lc.' applications.'
+		),
+		array(
+			'id' => 'applications-review-'.$ctx_lc,
+			'name' => $ctx_name.' Applications - Review',
+			'description' => 'Review and approve '.$ctx_name_lc.' applications.'
+		),
+		array(
+			'id' => 'applications-edit-'.$ctx_lc,
+			'name' => $ctx_name.' Applications - Edit',
+			'description' => 'Modify '.$ctx_name_lc.' applications.'
+		),
+		array(
+			'id' => 'applications-delete-'.$ctx_lc,
+			'name' => $ctx_name.' Applications - Delete',
+			'description' => 'Delete '.$ctx_name_lc.' applications.'
+		),
+	);
+}
+
+function cm_admin_perms_applicant($context, $ctx_info) {
+	$ctx_lc = strtolower($context);
+	$ctx_name = $ctx_info['nav_prefix'];
+	$ctx_name_lc = strtolower($ctx_name);
+	return array(
+		array(
+			'id' => 'applicants-'.$ctx_lc,
+			'name' => $ctx_name.' Badges',
+			'description' => 'View the list of '.$ctx_name_lc.' badge registration records.'
+		),
+		array(
+			'id' => 'applicants-view-'.$ctx_lc,
+			'name' => $ctx_name.' Badges - View',
+			'description' => 'View individual '.$ctx_name_lc.' badge registration records.'
+		),
+		array(
+			'id' => 'applicants-edit-'.$ctx_lc,
+			'name' => $ctx_name.' Badges - Edit',
+			'description' => 'Modify '.$ctx_name_lc.' badge registration records.'
+		),
+		array(
+			'id' => 'applicants-delete-'.$ctx_lc,
+			'name' => $ctx_name.' Badges - Delete',
+			'description' => 'Delete '.$ctx_name_lc.' badge registration records.'
+		),
+	);
+}
+
 function cm_admin_perms_application_config($context, $ctx_info) {
 	$ctx_lc = strtolower($context);
 	$ctx_name = $ctx_info['nav_prefix'];
@@ -222,6 +283,8 @@ $cm_admin_perms[] = $cm_admin_perms_attendee_config;
 
 $cm_admin_perms[] = $cm_admin_perms_application_common;
 foreach ($cm_config['application_types'] as $context => $ctx_info) {
+	$cm_admin_perms[] = cm_admin_perms_application($context, $ctx_info);
+	$cm_admin_perms[] = cm_admin_perms_applicant($context, $ctx_info);
 	$cm_admin_perms[] = cm_admin_perms_application_config($context, $ctx_info);
 }
 
