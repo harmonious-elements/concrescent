@@ -189,9 +189,11 @@ if ($submitted) {
 		$id = $apdb->create_application($item, $fdb);
 		$new = ($id === false);
 		$changed = ($id !== false);
-		$action_url .= '&id=' . $id;
-		$list_def['ajax-url'] = get_site_url(false) . '/admin/application/' . $action_url;
-		$list_def['add-url'] = get_site_url(false) . '/admin/application/badge-edit.php?c='.$ctx_lc.'&pid='.$id;
+		if ($changed) {
+			$action_url .= '&id=' . $id;
+			$list_def['ajax-url'] = get_site_url(false) . '/admin/application/' . $action_url;
+			$list_def['add-url'] = get_site_url(false) . '/admin/application/badge-edit.php?c='.$ctx_lc.'&pid='.$id;
+		}
 	} else {
 		$changed = $apdb->update_application($item, $fdb);
 	}

@@ -25,7 +25,7 @@ function ua($x) {
 }
 
 function float_or_null($s) {
-	return (is_null($s) ? null : (strlen($s) ? (float)$s : null));
+	return (strlen($s) ? (float)$s : null);
 }
 
 function paragraph_string($s) {
