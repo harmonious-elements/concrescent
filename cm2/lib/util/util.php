@@ -24,6 +24,10 @@ function ua($x) {
 	return (strpos($_SERVER['HTTP_USER_AGENT'], $x) !== FALSE);
 }
 
+function float_or_null($s) {
+	return (is_null($s) ? null : (strlen($s) ? (float)$s : null));
+}
+
 function paragraph_string($s) {
 	$s = htmlspecialchars($s);
 	$s = str_replace("\r\n", "<br>", $s);
