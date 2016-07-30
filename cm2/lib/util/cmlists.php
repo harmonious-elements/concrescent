@@ -113,7 +113,7 @@ function cm_list_table(&$list_def) {
 						echo '</th>';
 					}
 				}
-				if (isset($list_def['row-actions']) && $list_def['row-actions']) {
+				if (isset($list_def['row-actions']) && array_filter($list_def['row-actions'])) {
 					$column_count++;
 					echo '<th class="td-actions">Actions</th>';
 				}
@@ -121,7 +121,7 @@ function cm_list_table(&$list_def) {
 		echo '</thead>';
 		echo '<tbody>';
 		echo '</tbody>';
-		if (isset($list_def['table-actions']) && $list_def['table-actions']) {
+		if (isset($list_def['table-actions']) && array_filter($list_def['table-actions'])) {
 			echo '<tfoot>';
 				echo '<tr>';
 					echo '<th colspan="' . $column_count . '" class="td-actions">';
@@ -175,7 +175,7 @@ function cm_list_row(&$list_def, &$entity) {
 			}
 		}
 	}
-	if (isset($list_def['row-actions']) && $list_def['row-actions']) {
+	if (isset($list_def['row-actions']) && array_filter($list_def['row-actions'])) {
 		$out .= '<td class="td-actions">';
 			if (in_array('select', $list_def['row-actions'])) {
 				$label = (isset($list_def['select-label']) ? htmlspecialchars($list_def['select-label']) : 'Select');
@@ -233,7 +233,7 @@ function cm_list_edit_dialog_end() {
 
 function cm_list_dialogs(&$list_def) {
 	$type = (isset($list_def['entity-type']) && $list_def['entity-type']) ? $list_def['entity-type'] : 'item';
-	$switchable = (isset($list_def['row-actions']) && $list_def['row-actions'] && in_array('switch', $list_def['row-actions']));
+	$switchable = (isset($list_def['row-actions']) && in_array('switch', $list_def['row-actions']));
 	echo '<div class="dialog delete-dialog hidden">';
 		echo '<div class="dialog-title">Delete</div>';
 		echo '<div class="dialog-content">';

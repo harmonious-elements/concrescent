@@ -676,14 +676,16 @@
 				var entity = loader.getEntity(id);
 				var name = entity ? (entity[listdef['name-key'] || 'name'] || id) : id;
 				if (selectable) {
-					tr.find('.select-button').bind('click', function() {
+					tr.find('.select-button').bind('click', function(event) {
 						if (listdef['select-function']) {
 							listdef['select-function'](id, entity);
 						}
+						event.stopPropagation();
+						event.preventDefault();
 					});
 				}
 				if (switchable) {
-					tr.find('.activate-button').bind('click', function() {
+					tr.find('.activate-button').bind('click', function(event) {
 						doAjax('Activating ' + name + '...', {
 							'cm-list-action': 'activate',
 							'cm-list-key': id,
@@ -692,8 +694,10 @@
 							loader.replaceEntity(id, data['row']);
 							doFilter();
 						});
+						event.stopPropagation();
+						event.preventDefault();
 					});
-					tr.find('.deactivate-button').bind('click', function() {
+					tr.find('.deactivate-button').bind('click', function(event) {
 						doAjax('Deactivating ' + name + '...', {
 							'cm-list-action': 'deactivate',
 							'cm-list-key': id,
@@ -702,10 +706,12 @@
 							loader.replaceEntity(id, data['row']);
 							doFilter();
 						});
+						event.stopPropagation();
+						event.preventDefault();
 					});
 				}
 				if (editable && !listdef['edit-url']) {
-					tr.find('.edit-button').bind('click', function() {
+					tr.find('.edit-button').bind('click', function(event) {
 						entityIdUnderEdit = id;
 						entityUnderEdit = entity;
 						entityNameUnderEdit = name;
@@ -714,10 +720,12 @@
 							listdef['edit-load-function'](id, entity);
 						}
 						cmui.showDialog('edit');
+						event.stopPropagation();
+						event.preventDefault();
 					});
 				}
 				if (reorderable) {
-					tr.find('.up-button').bind('click', function() {
+					tr.find('.up-button').bind('click', function(event) {
 						doAjax('Moving ' + name + '...', {
 							'cm-list-action': 'reorder',
 							'cm-list-key': id,
@@ -727,8 +735,10 @@
 							loader.reorderEntity(id, -1);
 							doFilter();
 						});
+						event.stopPropagation();
+						event.preventDefault();
 					});
-					tr.find('.down-button').bind('click', function() {
+					tr.find('.down-button').bind('click', function(event) {
 						doAjax('Moving ' + name + '...', {
 							'cm-list-action': 'reorder',
 							'cm-list-key': id,
@@ -738,23 +748,29 @@
 							loader.reorderEntity(id, +1);
 							doFilter();
 						});
+						event.stopPropagation();
+						event.preventDefault();
 					});
 				}
 				if (deleteable) {
-					tr.find('.delete-button').bind('click', function() {
+					tr.find('.delete-button').bind('click', function(event) {
 						entityIdUnderDelete = id;
 						entityUnderDelete = entity;
 						entityNameUnderDelete = name;
 						$('.delete-dialog .dialog-title').text(listdef['delete-title'] || 'Delete');
 						$('.delete-dialog .delete-name').text(name);
 						cmui.showDialog('delete');
+						event.stopPropagation();
+						event.preventDefault();
 					});
 				}
 				if (reviewable && !listdef['review-url']) {
-					tr.find('.review-button').bind('click', function() {
+					tr.find('.review-button').bind('click', function(event) {
 						if (listdef['review-function']) {
 							listdef['review-function'](id, entity);
 						}
+						event.stopPropagation();
+						event.preventDefault();
 					});
 				}
 			});
@@ -764,7 +780,7 @@
 		if (listdef['table-actions']) {
 			var addable = (listdef['table-actions'].indexOf('add') >= 0);
 			if (addable && !listdef['add-url']) {
-				$('.cm-list-table .add-button').bind('click', function() {
+				$('.cm-list-table .add-button').bind('click', function(event) {
 					entityIdUnderEdit = null;
 					entityUnderEdit = null;
 					entityNameUnderEdit = null;
@@ -773,6 +789,8 @@
 						listdef['edit-clear-function']();
 					}
 					cmui.showDialog('edit');
+					event.stopPropagation();
+					event.preventDefault();
 				});
 			}
 		}
