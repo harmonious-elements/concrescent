@@ -355,7 +355,7 @@ echo '<article>';
 			if (($can_submit && $submitted) || $attendee_blacklisted || $applicant_blacklisted || $application_blacklisted) {
 				echo '<hr>';
 			}
-			echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
+			echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-list-table-containing-table">';
 
 				echo '<tr><td colspan="2"><h2>Primary Contact Information</h2></td></tr>';
 
@@ -631,7 +631,63 @@ echo '<article>';
 							echo '<td>' . $value . '</td>';
 						}
 					echo '</tr>';
-					# TODO calculated price
+
+					if (!$new) {
+						$invoice = $apdb->generate_invoice($item, $atdb);
+						if ($invoice) {
+							echo '<tr>';
+								echo '<th></th>';
+								echo '<td>';
+									echo 'If left blank, the amount to be paid will be the price calculated below. ';
+									echo 'If the calculated price is incorrect or not desired, set this field to the desired payment amount.';
+								echo '</td>';
+							echo '</tr>';
+							echo '<tr>';
+								echo '<th></th>';
+								echo '<td class="cm-list-table-containing-cell">';
+									echo '<div class="cm-list-table">';
+										echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-cart">';
+											echo '<thead>';
+												echo '<tr>';
+													echo '<th>Item</th>';
+													echo '<th class="td-numeric">Price</th>';
+												echo '</tr>';
+											echo '</thead>';
+											$total_price = 0;
+											echo '<tbody>';
+												foreach ($invoice as $ii) {
+													echo '<tr>';
+														echo '<td>';
+															echo '<div><b>' . htmlspecialchars($ii['name']) . '</b></div>';
+															echo '<div>' . htmlspecialchars($ii['details']) . '</div>';
+														echo '</td>';
+														echo '<td class="td-numeric">';
+															echo htmlspecialchars($ii['price-string']);
+														echo '</td>';
+													echo '</tr>';
+													$total_price += $ii['price'];
+												}
+											echo '</tbody>';
+											echo '<tfoot>';
+												echo '<tr>';
+													echo '<th>Total:</th>';
+													echo '<th class="td-numeric">';
+														echo htmlspecialchars(price_string($total_price));
+													echo '</th>';
+												echo '</tr>';
+											echo '</tfoot>';
+										echo '</table>';
+									echo '</div>';
+								echo '</td>';
+							echo '</tr>';
+							echo '<tr>';
+								echo '<th></th>';
+								echo '<td>';
+									echo 'The calculated price will not be updated until after changes have been saved.';
+								echo '</td>';
+							echo '</tr>';
+						}
+					}
 
 					$value = isset($item['payment-group-uuid']) ? htmlspecialchars($item['payment-group-uuid']) : '';
 					if ($value) {

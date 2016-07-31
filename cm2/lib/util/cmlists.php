@@ -88,7 +88,7 @@ function cm_list_search_box(&$list_def) {
 }
 
 function cm_list_table(&$list_def) {
-	echo '<div class="cm-list-table">';
+	echo '<div class="cm-list-table cm-list-table-auto">';
 	echo '<table border="0" cellpadding="0" cellspacing="0">';
 		$column_count = 0;
 		echo '<thead>';

@@ -1763,6 +1763,108 @@ class cm_application_db {
 		return $exists;
 	}
 
+	public function generate_invoice($application, $atdb = null) {
+		$ctx_info = $this->ctx_info;
+		if (!$ctx_info) return false;
+		$badge = $this->get_badge_type($application['badge-type-id']);
+		if (!$badge) return false;
+
+		$applications = array();
+		$assignments = array();
+		$applicants = array();
+		$discounts = array();
+
+		$applications[] = array(
+			'name' => $ctx_info['nav_prefix'] . ' Application Fee',
+			'details' => $badge['name'],
+			'price' => $badge['base-price'],
+			'price-string' => price_string($badge['base-price'])
+		);
+
+		$free_assignments = $badge['base-assignment-count'];
+		if (isset($application['assigned-rooms-and-tables']) && $application['assigned-rooms-and-tables']) {
+			$count = count($application['assigned-rooms-and-tables']);
+			foreach ($application['assigned-rooms-and-tables'] as $index => $art) {
+				$assignments[] = array(
+					'name' => $ctx_info['nav_prefix'] . ' ' . $ctx_info['assignment_term'][0] . ' Fee',
+					'details' => $art['room-or-table-id'] . ' (' . ($index + 1) . ' of ' . $count . ')',
+					'price' => ($index < $free_assignments) ? 0 : $badge['price-per-assignment'],
+					'price-string' => ($index < $free_assignments) ? 'INCLUDED' : price_string($badge['price-per-assignment'])
+				);
+			}
+		} else {
+			$count = $application['assignment-count'];
+			for ($index = 0; $index < $count; $index++) {
+				$assignments[] = array(
+					'name' => $ctx_info['nav_prefix'] . ' ' . $ctx_info['assignment_term'][0] . ' Fee',
+					'details' => '(' . ($index + 1) . ' of ' . $count . ')',
+					'price' => ($index < $free_assignments) ? 0 : $badge['price-per-assignment'],
+					'price-string' => ($index < $free_assignments) ? 'INCLUDED' : price_string($badge['price-per-assignment'])
+				);
+			}
+		}
+
+		$free_applicants = $badge['base-applicant-count'] * $count;
+		if (isset($application['applicants']) && $application['applicants']) {
+			$count = count($application['applicants']);
+			foreach ($application['applicants'] as $index => $applicant) {
+				$applicants[] = array(
+					'name' => $ctx_info['nav_prefix'] . ' Badge Fee',
+					'details' => $applicant['display-name'] . ' (' . ($index + 1) . ' of ' . $count . ')',
+					'price' => ($index < $free_applicants) ? 0 : $badge['price-per-applicant'],
+					'price-string' => ($index < $free_applicants) ? 'INCLUDED' : price_string($badge['price-per-applicant'])
+				);
+			}
+		} else {
+			$count = $application['applicant-count'];
+			for ($index = 0; $index < $count; $index++) {
+				$applicants[] = array(
+					'name' => $ctx_info['nav_prefix'] . ' Badge Fee',
+					'details' => '(' . ($index + 1) . ' of ' . $count . ')',
+					'price' => ($index < $free_applicants) ? 0 : $badge['price-per-applicant'],
+					'price-string' => ($index < $free_applicants) ? 'INCLUDED' : price_string($badge['price-per-applicant'])
+				);
+			}
+		}
+
+		if (isset($application['applicants']) && $application['applicants'] && $atdb) {
+			$name_map = $atdb->get_badge_type_name_map();
+			$fdb = new cm_forms_db($this->cm_db, 'attendee');
+
+			$total_price = 0;
+			foreach ($applications as $a) $total_price += $a['price'];
+			foreach ($assignments as $a) $total_price += $a['price'];
+			foreach ($applicants as $a) $total_price += $a['price'];
+
+			$max_discount = 0;
+			switch ($badge['max-prereg-discount']) {
+				case 'Price per Applicant' : $max_discount = $badge['price-per-applicant' ]; break;
+				case 'Price per Assignment': $max_discount = $badge['price-per-assignment']; break;
+				case 'Total Price'         : $max_discount = $total_price                  ; break;
+			}
+
+			foreach ($application['applicants'] as $applicant) {
+				if (isset($applicant['attendee-id']) && $applicant['attendee-id']) {
+					$attendee = $atdb->get_attendee($applicant['attendee-id'], false, $name_map, $fdb);
+					if ($attendee && $attendee['payment-status'] == 'Completed') {
+						$discount = min($attendee['payment-txn-amt'], $max_discount, $total_price);
+						if ($discount > 0) {
+							$discounts[] = array(
+								'name' => 'Attendee Preregistration Discount',
+								'details' => $attendee['display-name'],
+								'price' => -$discount,
+								'price-string' => '-' . price_string($discount)
+							);
+							$total_price -= $discount;
+						}
+					}
+				}
+			}
+		}
+
+		return array_merge($applications, $assignments, $applicants, $discounts);
+	}
+
 	public function update_payment_status($id, $status, $type, $txn_id, $txn_amt, $date, $details) {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(

@@ -506,7 +506,7 @@
 			}
 		};
 		var setListHTML = function(html) {
-			$('.cm-list-table tbody').html(html);
+			$('.cm-list-table-auto tbody').html(html);
 			if (htmlInit) htmlInit();
 		};
 		var loader;
@@ -609,7 +609,7 @@
 		/* Sort Headers */
 		if (sortable) {
 			var updateSortIndicators = function() {
-				$('.cm-list-table thead th')
+				$('.cm-list-table-auto thead th')
 					.removeClass('th-sort-ascending')
 					.removeClass('th-sort-descending')
 					.removeClass('th-sort-primary');
@@ -617,7 +617,7 @@
 					var columnIndex = sortOrder[i];
 					var descending = (columnIndex < 0);
 					if (descending) columnIndex = ~columnIndex;
-					var header = $('.cm-list-table thead th:eq(' + columnIndex + ')');
+					var header = $('.cm-list-table-auto thead th:eq(' + columnIndex + ')');
 					header.addClass(descending ? 'th-sort-descending' : 'th-sort-ascending');
 					if ((i + 1) == n) header.addClass('th-sort-primary');
 				}
@@ -646,7 +646,7 @@
 			for (var i = 0, n = listdef['columns'].length; i < n; ++i) {
 				var type = listdef['columns'][i]['type'];
 				if (type && sortFunctions[type]) {
-					var header = $('.cm-list-table thead th:eq(' + i + ')');
+					var header = $('.cm-list-table-auto thead th:eq(' + i + ')');
 					header.addClass('th-sortable');
 					header.bind('click', makeSortFunction(i));
 				}
@@ -670,7 +670,7 @@
 			var reorderable = (listdef['row-actions'].indexOf('reorder') >= 0);
 			var deleteable  = (listdef['row-actions'].indexOf('delete' ) >= 0);
 			var reviewable  = (listdef['row-actions'].indexOf('review' ) >= 0);
-			$('.cm-list-table tbody tr').each(function() {
+			$('.cm-list-table-auto tbody tr').each(function() {
 				var tr = $(this);
 				var id = tr.attr('id').substring(6);
 				var entity = loader.getEntity(id);
@@ -780,7 +780,7 @@
 		if (listdef['table-actions']) {
 			var addable = (listdef['table-actions'].indexOf('add') >= 0);
 			if (addable && !listdef['add-url']) {
-				$('.cm-list-table .add-button').bind('click', function(event) {
+				$('.cm-list-table-auto .add-button').bind('click', function(event) {
 					entityIdUnderEdit = null;
 					entityUnderEdit = null;
 					entityNameUnderEdit = null;

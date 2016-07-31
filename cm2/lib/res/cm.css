@@ -388,14 +388,14 @@ select {
 .cm-list-table table .deactivate-button {
 	width: 76px;
 }
+.cm-list-table-containing-table {
+	width: auto !important;
+}
 .cm-list-table-containing-cell {
-	padding: 0;
+	padding: 4px;
 }
 .cm-list-table-containing-cell .cm-list-table {
 	margin: 0;
-}
-.card .card-content > table > tbody > tr > .cm-list-table-containing-cell .cm-list-table {
-	margin-right: 32px;
 }
 /* Flexbox makes the cm-search-box look much nicer,
    so let's use it if the browser supports it. */
