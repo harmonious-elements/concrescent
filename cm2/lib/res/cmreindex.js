@@ -1,7 +1,7 @@
 (function($,window,document,cmui){
 	var doAjax = function(request, done) {
 		window.setTimeout(function() {
-			$.post('reindex.php', request, function(response) {
+			$.post('', request, function(response) {
 				if (!response['ok']) {
 					cmui.showButterbarPersistent('An error occurred. Please try again.');
 				} else {

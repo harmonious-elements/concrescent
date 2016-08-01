@@ -1233,6 +1233,7 @@ class cm_application_db {
 				$contact_csz, $contact_address_full
 			);
 			$result = array(
+				'type' => 'application',
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -1415,6 +1416,7 @@ class cm_application_db {
 				$contact_csz, $contact_address_full
 			);
 			$applications[] = array(
+				'type' => 'application',
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -1973,6 +1975,7 @@ class cm_application_db {
 				$small_name, $display_name, $address, $csz, $address_full
 			);
 			$result = array(
+				'type' => 'applicant',
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -2118,6 +2121,7 @@ class cm_application_db {
 				$small_name, $display_name, $address, $csz, $address_full
 			);
 			$applicants[] = array(
+				'type' => 'applicant',
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
