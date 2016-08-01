@@ -98,9 +98,7 @@ $list_def = array(
 		(($can_view || $can_edit) ? 'edit' : null),
 		($can_delete ? 'delete' : null)
 	),
-	'table-actions' => array(($can_edit ? 'add' : null)),
 	'edit-label' => ($can_edit ? 'Edit' : 'View'),
-	'add-url' => get_site_url(false) . '/admin/application/badge-edit.php?c='.$ctx_lc,
 	'edit-url' => get_site_url(false) . '/admin/application/badge-edit.php?c='.$ctx_lc.'&id=',
 	'delete-title' => 'Delete '.$ctx_name.' Badge'
 );
