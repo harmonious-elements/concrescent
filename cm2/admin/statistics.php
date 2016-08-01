@@ -1,6 +1,8 @@
 <?php
 
+require_once dirname(__FILE__).'/../config/config.php';
 require_once dirname(__FILE__).'/../lib/database/attendee.php';
+require_once dirname(__FILE__).'/../lib/database/application.php';
 require_once dirname(__FILE__).'/../lib/database/staff.php';
 require_once dirname(__FILE__).'/admin.php';
 
@@ -14,6 +16,14 @@ function atsection($db) {
 	return array('names' => $atnames, 'stat' => $atstat);
 }
 
+function apsection($db, $context, $ctx_info) {
+	$apdb = new cm_application_db($db, $context);
+	$apnames = $apdb->get_badge_type_name_map();
+	$apstat = $apdb->get_applicant_statistics(300, $apnames);
+	$apnames['*'] = 'All ' . $ctx_info['nav_prefix'] . ' Badges';
+	return array('names' => $apnames, 'stat' => $apstat);
+}
+
 function ssection($db) {
 	$sdb = new cm_staff_db($db);
 	$snames = $sdb->get_badge_type_name_map();
@@ -22,10 +32,12 @@ function ssection($db) {
 	return array('names' => $snames, 'stat' => $sstat);
 }
 
-$sections = array(
-	atsection($db),
-	ssection($db),
-);
+$sections = array();
+$sections[] = atsection($db);
+foreach ($cm_config['application_types'] as $context => $ctx_info) {
+	$sections[] = apsection($db, $context, $ctx_info);
+}
+$sections[] = ssection($db);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
