@@ -1,0 +1,80 @@
+.cm-reg-edit .card-title,
+.cm-reg-edit .card-content {
+	position: relative;
+}
+.cm-reg-edit .mode-switch {
+	position: absolute;
+	top: 7px;
+	right: 7px;
+}
+.cm-reg-edit .mode-switch .button {
+	margin: 0;
+}
+.cm-reg-edit .card-title .mode-switch {
+	display: flex;
+	align-items: center;
+	top: 0;
+	bottom: 0;
+}
+
+.ea-assignment-row {
+	white-space: nowrap;
+}
+.ea-assignment-row + .ea-assignment-row {
+	margin-top: 4px;
+}
+.ea-assignment-row label,
+.ea-assignment-row input[type=text],
+.ea-assignment-row input[type=datetime-local] {
+	margin-right: 4px;
+}
+.ea-assignment-row input[type=text] {
+	width: 60px;
+}
+
+.dialog.room-table-select-dialog {
+	top: 10%;
+	width: 800px;
+	max-height: 80%;
+	margin-left: -400px;
+}
+.tag-map {
+	position: relative;
+	width: 100%;
+	height: 0;
+	background: url('../rooms-and-tables-image.php') no-repeat center;
+	background-size: 100% 100%;
+}
+.tags {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.tag {
+	position: absolute;
+	text-align: center;
+}
+.tag-button-container {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	margin-top: -9px;
+	text-align: center;
+}
+.tag-button-container:before {
+	content: "";
+	margin-left: -1000px;
+}
+.tag-button-container:after {
+	content: "";
+	margin-right: -1000px;
+}
+.tag-button-container button {
+	margin: 0;
+	padding: 1px 2px;
+	height: 18px;
+	font-weight: bold;
+}

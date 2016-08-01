@@ -1691,7 +1691,7 @@ class cm_application_db {
 						);
 						$stmt->bind_param(
 							'sisss',
-							$this->ctx_uc, $id,
+							$this->ctx_uc, $application['id'],
 							$room_or_table_id, $start_time, $end_time
 						);
 						$stmt->execute();

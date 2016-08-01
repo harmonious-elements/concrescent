@@ -9,23 +9,6 @@ cm_admin_check_permission('rooms-and-tables', 'rooms-and-tables');
 $apdb = new cm_application_db($db, null);
 $midb = new cm_misc_db($db);
 
-if (isset($_GET['image'])) {
-	if (!$midb->download_file('rooms-and-tables')) {
-		header('Content-Type: image/png');
-		header('Pragma: no-cache');
-		header('Expires: 0');
-		$image = imagecreate(640, 480);
-		$bg = imagecolorallocate($image, 255, 255, 255);
-		imagefilledrectangle($image, 0, 0, 640, 480, $bg);
-		$fg = imagecolorallocate($image, 0, 0, 255);
-		imagestring($image, 5, (640-9*21)/2, 480/2-8-12, 'Could not load image.', $fg);
-		imagestring($image, 5, (640-9*24)/2, 480/2-8+12, 'Please upload a new one.', $fg);
-		imagepng($image);
-		imagedestroy($image);
-	}
-	exit(0);
-}
-
 $message = null;
 $success = null;
 
@@ -44,8 +27,7 @@ if (isset($_POST['action'])) {
 				$image_type = ($image_path ? exif_imagetype($image_path) : null);
 				$mime_type = ($image_type ? image_type_to_mime_type($image_type) : null);
 				if (
-					$mime_type &&
-					$midb->upload_file(
+					$mime_type && $midb->upload_file(
 						'rooms-and-tables', $mime_type,
 						$image_w, $image_h, $image_path
 					)

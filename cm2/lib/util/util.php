@@ -100,6 +100,32 @@ function parse_date($x) {
 	}
 }
 
+function parse_time($x) {
+	$a = date_parse($x);
+	if ($a && strlen($a['hour']) && strlen($a['minute']) && !count($a['errors'])) {
+		return sprintf("%02d:%02d:%02d", $a['hour'], $a['minute'], $a['second']);
+	} else {
+		return null;
+	}
+}
+
+function parse_datetime($x) {
+	$a = date_parse($x);
+	if (
+		$a && $a['year'] && $a['month'] && $a['day'] &&
+		strlen($a['hour']) && strlen($a['minute']) &&
+		!count($a['errors'])
+	) {
+		return sprintf(
+			"%04d-%02d-%02d %02d:%02d:%02d",
+			$a['year'], $a['month'], $a['day'],
+			$a['hour'], $a['minute'], $a['second']
+		);
+	} else {
+		return null;
+	}
+}
+
 function date_range_string($start_date, $end_date) {
 	if ($start_date && $end_date) {
 		return htmlspecialchars($start_date) . ' &mdash; ' . htmlspecialchars($end_date);

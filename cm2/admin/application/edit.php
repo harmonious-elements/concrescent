@@ -5,6 +5,7 @@ require_once dirname(__FILE__).'/../../lib/database/application.php';
 require_once dirname(__FILE__).'/../../lib/database/forms.php';
 require_once dirname(__FILE__).'/../../lib/database/attendee.php';
 require_once dirname(__FILE__).'/../../lib/database/mail.php';
+require_once dirname(__FILE__).'/../../lib/database/misc.php';
 require_once dirname(__FILE__).'/../../lib/util/util.php';
 require_once dirname(__FILE__).'/../../lib/util/cmlists.php';
 require_once dirname(__FILE__).'/../../lib/util/cmforms.php';
@@ -55,6 +56,7 @@ $questions = $fdb->list_questions();
 
 $atdb = new cm_attendee_db($db);
 $mdb = new cm_mail_db($db);
+$midb = new cm_misc_db($db);
 
 $new = !isset($_GET['id']);
 $id = $new ? -1 : (int)$_GET['id'];
@@ -181,7 +183,34 @@ if ($submitted) {
 		$item['notes'] = $_POST['notes'];
 
 		/* Assigned Rooms & Tables */
-		# TODO assigned tables
+		$assignments = array();
+		foreach ($_POST as $k => $v) {
+			if (substr($k, 0, 28) === 'assignment-room-or-table-id-') {
+				$key = substr($k, 28);
+				if (isset($assignments[$key])) {
+					$assignments[$key]['room-or-table-id'] = trim($v);
+				} else {
+					$assignments[$key] = array('room-or-table-id' => trim($v));
+				}
+			}
+			if (substr($k, 0, 22) === 'assignment-start-time-') {
+				$key = substr($k, 22);
+				if (isset($assignments[$key])) {
+					$assignments[$key]['start-time'] = parse_datetime(trim($v));
+				} else {
+					$assignments[$key] = array('start-time' => parse_datetime(trim($v)));
+				}
+			}
+			if (substr($k, 0, 20) === 'assignment-end-time-') {
+				$key = substr($k, 20);
+				if (isset($assignments[$key])) {
+					$assignments[$key]['end-time'] = parse_datetime(trim($v));
+				} else {
+					$assignments[$key] = array('end-time' => parse_datetime(trim($v)));
+				}
+			}
+		}
+		$item['assigned-rooms-and-tables'] = array_values($assignments);
 	}
 
 	/* Write Changes */
@@ -243,30 +272,16 @@ $title = ($new ? 'Add ' : ($review_mode ? 'Review ' : 'Edit ')) . $ctx_name . ' 
 $name = isset($item['application-name']) ? $item['application-name'] : null;
 $full_title = (!$new && $name) ? ($title . ' - ' . $name) : $title;
 
+$image_size = $midb->get_file_image_size('rooms-and-tables');
+if (!$image_size) $image_size = array(640, 480);
+$image_ratio = $image_size[1] * 100 / $image_size[0];
+
 cm_admin_head($full_title);
 if (!$new) cm_list_head($list_def);
 
-?><style>
-	.cm-reg-edit .card-title,
-	.cm-reg-edit .card-content {
-		position: relative;
-	}
-	.cm-reg-edit .mode-switch {
-		position: absolute;
-		top: 7px;
-		right: 7px;
-	}
-	.cm-reg-edit .mode-switch .button {
-		margin: 0;
-	}
-	.cm-reg-edit .card-title .mode-switch {
-		display: flex;
-		align-items: center;
-		top: 0;
-		bottom: 0;
-	}
-</style><?php
-
+echo '<link rel="stylesheet" href="edit.css">';
+echo '<style>.tag-map { padding-bottom: ' . $image_ratio . '%; }</style>';
+echo '<script type="text/javascript">cm_assigned_rooms_and_tables = ('.json_encode(isset($item['assigned-rooms-and-tables']) ? $item['assigned-rooms-and-tables'] : array()).');</script>';
 echo '<script type="text/javascript" src="edit.js"></script>';
 
 cm_admin_body($title);
@@ -565,7 +580,71 @@ echo '<article>';
 					}
 				echo '</tr>';
 
-				# TODO assigned tables
+				if ($can_edit_status) {
+					echo '<tr>';
+						echo '<th>Assigned ' . htmlspecialchars($ctx_info['assignment_term'][1]) . '</th>';
+						echo '<td id="ea-assignments">';
+							echo '<div class="ea-assignment-row">';
+								echo 'Loading...';
+							echo '</div>';
+						echo '</td>';
+					echo '</tr>';
+					echo '<tr class="hidden">';
+						echo '<th>&nbsp;</th>';
+						echo '<td id="ea-assignment-none">';
+							echo '<div class="ea-assignment-row">';
+								echo 'None';
+							echo '</div>';
+						echo '</td>';
+					echo '</tr>';
+					echo '<tr class="hidden">';
+						echo '<th>&nbsp;</th>';
+						echo '<td id="ea-assignment-template">';
+							echo '<div class="ea-assignment-row">';
+								echo '<label>Room/Table:</label>';
+								echo '<input type="text" class="ea-assignment-room-or-table-id">';
+								echo '<button class="select-button">Select</button>';
+								echo '<label>Start Time:</label>';
+								echo '<input type="datetime-local" class="ea-assignment-start-time" value="'.$cm_config['event']['start_date'].'T00:00">';
+								echo '<label>End Time:</label>';
+								echo '<input type="datetime-local" class="ea-assignment-end-time" value="'.$cm_config['event']['end_date'].'T23:59">';
+								echo '<button class="delete-button">Delete</button>';
+							echo '</div>';
+						echo '</td>';
+					echo '</tr>';
+					echo '<tr>';
+						echo '<th>&nbsp;</th>';
+						echo '<td id="ea-assignment-add">';
+							echo '<button class="add-button">Add</button>';
+							if (!ua('Chrome')) echo ' (For start and end time, use the format YYYY-MM-DD HH:MM.)';
+						echo '</td>';
+					echo '</tr>';
+				} else {
+					echo '<tr>';
+						echo '<th>Assigned ' . htmlspecialchars($ctx_info['assignment_term'][1]) . '</th>';
+						echo '<td>';
+							if (isset($item['assigned-rooms-and-tables']) && $item['assigned-rooms-and-tables']) {
+								foreach ($item['assigned-rooms-and-tables'] as $art) {
+									echo '<div>';
+										echo htmlspecialchars($art['room-or-table-id']);
+										if ($art['start-time']) {
+											if ($art['end-time']) {
+												echo ' &mdash; ' . htmlspecialchars($art['start-time']);
+												echo ' through ' . htmlspecialchars($art['end-time']);
+											} else {
+												echo ' &mdash; starting ' . htmlspecialchars($art['start-time']);
+											}
+										} else if ($art['end-time']) {
+											echo ' &mdash; ending ' . htmlspecialchars($art['end-time']);
+										}
+									echo '</div>';
+								}
+							} else {
+								echo '<div>None</div>';
+							}
+						echo '</td>';
+					echo '</tr>';
+				}
 
 				echo '<tr>';
 					echo '<th><label for="notes">Notes</label></th>';
@@ -636,14 +715,14 @@ echo '<article>';
 						$invoice = $apdb->generate_invoice($item, $atdb);
 						if ($invoice) {
 							echo '<tr>';
-								echo '<th></th>';
+								echo '<th>&nbsp;</th>';
 								echo '<td>';
 									echo 'If left blank, the amount to be paid will be the price calculated below. ';
 									echo 'If the calculated price is incorrect or not desired, set this field to the desired payment amount.';
 								echo '</td>';
 							echo '</tr>';
 							echo '<tr>';
-								echo '<th></th>';
+								echo '<th>&nbsp;</th>';
 								echo '<td class="cm-list-table-containing-cell">';
 									echo '<div class="cm-list-table">';
 										echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-cart">';
@@ -681,7 +760,7 @@ echo '<article>';
 								echo '</td>';
 							echo '</tr>';
 							echo '<tr>';
-								echo '<th></th>';
+								echo '<th>&nbsp;</th>';
 								echo '<td>';
 									echo 'The calculated price will not be updated until after changes have been saved.';
 								echo '</td>';
@@ -820,5 +899,38 @@ echo '<article>';
 echo '</article>';
 
 cm_admin_dialogs();
+
+echo '<div class="dialog room-table-select-dialog hidden">';
+	echo '<div class="dialog-title">Select Room or Table</div>';
+	echo '<div class="dialog-content">';
+		echo '<div class="spacing">';
+			echo '<div class="tag-map">';
+				echo '<div class="tags">';
+					$tags = $apdb->list_rooms_and_tables();
+					if ($tags) {
+						foreach ($tags as $tag) {
+							echo '<div class="tag" style="';
+							echo 'top:' . (min($tag['y1'], $tag['y2']) * 100) . '%;';
+							echo 'left:' . (min($tag['x1'], $tag['x2']) * 100) . '%;';
+							echo 'right:' . ((1 - max($tag['x1'], $tag['x2'])) * 100) . '%;';
+							echo 'bottom:' . ((1 - max($tag['y1'], $tag['y2'])) * 100) . '%;';
+							echo '">';
+								echo '<div class="tag-button-container">';
+									echo '<button class="confirm-select-button">';
+										echo htmlspecialchars($tag['id']);
+									echo '</button>';
+								echo '</div>';
+							echo '</div>';
+						}
+					}
+				echo '</div>';
+			echo '</div>';
+		echo '</div>';
+	echo '</div>';
+	echo '<div class="dialog-buttons">';
+		echo '<button class="cancel-select-button">Cancel</button>';
+	echo '</div>';
+echo '</div>';
+
 if (!$new) cm_list_dialogs($list_def);
 cm_admin_tail();

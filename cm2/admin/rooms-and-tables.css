@@ -2,7 +2,7 @@
 	position: relative;
 	width: 100%;
 	height: 0;
-	background: url('rooms-and-tables.php?image') no-repeat center;
+	background: url('rooms-and-tables-image.php') no-repeat center;
 	background-size: 100% 100%;
 	cursor: crosshair;
 }
