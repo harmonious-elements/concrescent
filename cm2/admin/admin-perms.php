@@ -173,6 +173,11 @@ function cm_admin_perms_application_config($context, $ctx_info) {
 			'name' => $ctx_name.' Form Letters',
 			'description' => 'Write form letters to be emailed to '.$ctx_name_lc.' applicants.'
 		),
+		array(
+			'id' => 'application-csv-'.$ctx_lc,
+			'name' => $ctx_name.' CSV',
+			'description' => 'Download a CSV file of '.$ctx_name_lc.' applications or badge registration records.'
+		),
 	);
 };
 

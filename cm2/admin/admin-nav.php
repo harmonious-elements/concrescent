@@ -152,6 +152,13 @@ function cm_admin_nav_application($context, $ctx_info) {
 			'description' => 'Write form letters to be emailed to '.$ctx_name_lc.' applicants.',
 			'permission' => 'application-mail-'.$ctx_lc
 		),
+		array(
+			'id' => 'application-csv-'.$ctx_lc,
+			'href' => '/admin/application/csv.php?c='.$ctx_lc,
+			'name' => $ctx_name.' CSV',
+			'description' => 'Download a CSV file of '.$ctx_name_lc.' applications or badge registration records.',
+			'permission' => 'application-csv-'.$ctx_lc
+		),
 	);
 }
 
