@@ -30,7 +30,9 @@ if (count($_GET) == 1) {
 			$apdb->update_payment_status($id, 'Completed', 'Free Ride', $group_uuid, $payment_price, $payment_date, 'Free Ride');
 			$application = $apdb->get_application($id, false, true, $name_map, $fdb);
 			$template = $mdb->get_mail_template('application-paid-' . $ctx_lc);
-			$mdb->send_mail($application['contact-email-address'], $template, $application);
+			foreach ($application['applicants'] as $applicant) {
+				$mdb->send_mail($applicant['email-address'], $template, $applicant + $application);
+			}
 		}
 		cm_app_cart_destroy();
 
@@ -111,7 +113,9 @@ if (isset($_GET['return'])) {
 			$apdb->update_payment_status($id, 'Completed', 'PayPal', $transaction_id, $payment_price, $payment_date, $details);
 			$application = $apdb->get_application($id, false, true, $name_map, $fdb);
 			$template = $mdb->get_mail_template('application-paid-' . $ctx_lc);
-			$mdb->send_mail($application['contact-email-address'], $template, $application);
+			foreach ($application['applicants'] as $applicant) {
+				$mdb->send_mail($applicant['email-address'], $template, $applicant + $application);
+			}
 		}
 		cm_app_cart_destroy();
 
