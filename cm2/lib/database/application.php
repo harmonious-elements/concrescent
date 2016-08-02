@@ -1777,6 +1777,7 @@ class cm_application_db {
 		$discounts = array();
 
 		$applications[] = array(
+			'application-id' => $application['id'],
 			'name' => $ctx_info['nav_prefix'] . ' Application Fee',
 			'details' => $badge['name'],
 			'price' => $badge['base-price'],
@@ -1788,6 +1789,7 @@ class cm_application_db {
 			$count = count($application['assigned-rooms-and-tables']);
 			foreach ($application['assigned-rooms-and-tables'] as $index => $art) {
 				$assignments[] = array(
+					'application-id' => $application['id'],
 					'name' => $ctx_info['nav_prefix'] . ' ' . $ctx_info['assignment_term'][0] . ' Fee',
 					'details' => $art['room-or-table-id'] . ' (' . ($index + 1) . ' of ' . $count . ')',
 					'price' => ($index < $free_assignments) ? 0 : $badge['price-per-assignment'],
@@ -1798,6 +1800,7 @@ class cm_application_db {
 			$count = $application['assignment-count'];
 			for ($index = 0; $index < $count; $index++) {
 				$assignments[] = array(
+					'application-id' => $application['id'],
 					'name' => $ctx_info['nav_prefix'] . ' ' . $ctx_info['assignment_term'][0] . ' Fee',
 					'details' => '(' . ($index + 1) . ' of ' . $count . ')',
 					'price' => ($index < $free_assignments) ? 0 : $badge['price-per-assignment'],
@@ -1811,6 +1814,7 @@ class cm_application_db {
 			$count = count($application['applicants']);
 			foreach ($application['applicants'] as $index => $applicant) {
 				$applicants[] = array(
+					'application-id' => $application['id'],
 					'name' => $ctx_info['nav_prefix'] . ' Badge Fee',
 					'details' => $applicant['display-name'] . ' (' . ($index + 1) . ' of ' . $count . ')',
 					'price' => ($index < $free_applicants) ? 0 : $badge['price-per-applicant'],
@@ -1821,6 +1825,7 @@ class cm_application_db {
 			$count = $application['applicant-count'];
 			for ($index = 0; $index < $count; $index++) {
 				$applicants[] = array(
+					'application-id' => $application['id'],
 					'name' => $ctx_info['nav_prefix'] . ' Badge Fee',
 					'details' => '(' . ($index + 1) . ' of ' . $count . ')',
 					'price' => ($index < $free_applicants) ? 0 : $badge['price-per-applicant'],
@@ -1852,6 +1857,7 @@ class cm_application_db {
 						$discount = min($attendee['payment-txn-amt'], $max_discount, $total_price);
 						if ($discount > 0) {
 							$discounts[] = array(
+								'application-id' => $application['id'],
 								'name' => 'Attendee Preregistration Discount',
 								'details' => $attendee['display-name'],
 								'price' => -$discount,
@@ -1865,6 +1871,24 @@ class cm_application_db {
 		}
 
 		return array_merge($applications, $assignments, $applicants, $discounts);
+	}
+
+	public function update_permit_number($id, $permit_number) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' SET '.
+			'`permit_number` = ?'.
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('si', $permit_number, $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		if ($success) {
+			$application = $this->get_application($id, null, true);
+			$this->cm_anldb->remove_entity($id);
+			$this->cm_anldb->add_entity($application);
+		}
+		return $success;
 	}
 
 	public function update_payment_status($id, $status, $type, $txn_id, $txn_amt, $date, $details) {

@@ -150,12 +150,12 @@ if ($submitted) {
 		/* Payment Information */
 		if (
 			$new
-			|| (               $item['payment-status'     ]  !=               $_POST['payment-status'     ]  )
-			|| ( float_or_null($item['payment-badge-price']) != float_or_null($_POST['payment-badge-price']) )
-			|| (               $item['payment-type'       ]  !=               $_POST['payment-type'       ]  )
-			|| (               $item['payment-txn-id'     ]  !=               $_POST['payment-txn-id'     ]  )
-			|| ( float_or_null($item['payment-txn-amt'    ]) != float_or_null($_POST['payment-txn-amt'    ]) )
-			|| (               $item['payment-details'    ]  !=               $_POST['payment-details'    ]  )
+			|| (               $item['payment-status'     ]  !=                $_POST['payment-status'     ]  )
+			|| ( float_or_null($item['payment-badge-price']) !== float_or_null($_POST['payment-badge-price']) )
+			|| (               $item['payment-type'       ]  !=                $_POST['payment-type'       ]  )
+			|| (               $item['payment-txn-id'     ]  !=                $_POST['payment-txn-id'     ]  )
+			|| ( float_or_null($item['payment-txn-amt'    ]) !== float_or_null($_POST['payment-txn-amt'    ]) )
+			|| (               $item['payment-details'    ]  !=                $_POST['payment-details'    ]  )
 		) {
 			$item['payment-status'     ] =          trim($_POST['payment-status'     ]);
 			$item['payment-badge-price'] = float_or_null($_POST['payment-badge-price']);
