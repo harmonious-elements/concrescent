@@ -98,6 +98,104 @@ class cm_mail_db {
 					"Thanks again,\n[[event-name]] Registration"
 				)
 			));
+			foreach ($GLOBALS['cm_config']['application_types'] as $context => $ctx_info) {
+				$ctx_lc = strtolower($context);
+				$ctx_name_lc = strtolower($ctx_info['nav_prefix']);
+				$this->set_mail_template(array(
+					'name' => 'application-submitted-'.$ctx_lc,
+					'contact-address' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'from' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'bcc' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'subject' => 'Your '.$ctx_name_lc.' application for [[event-name]]',
+					'type' => 'Simple HTML',
+					'body' => (
+						"Greetings,\n\n".
+						"Thank you for applying for <b>[[event-name]]</b>.\n\n".
+						"Your application for <b>[[application-name]]</b> has been received.\n\n".
+						"We will be contacting you soon regarding your application.\n\n".
+						"If you have any questions, please contact ".
+						"<b><a href=\"mailto:[[contact-address]]\">[[contact-address]]</a></b>.\n\n".
+						"Thanks again,\n[[event-name]] Registration"
+					)
+				));
+				$this->set_mail_template(array(
+					'name' => 'application-accepted-'.$ctx_lc,
+					'contact-address' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'from' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'bcc' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'subject' => 'Your '.$ctx_name_lc.' registration for [[event-name]]',
+					'type' => 'Simple HTML',
+					'body' => (
+						"Congratulations!\n\n".
+						"Your application for <b>[[application-name]]</b> ".
+						"at <b>[[event-name]]</b> has been approved!\n\n".
+						"<b>Please follow the following link</b> to confirm your registration ".
+						"and, if required, make a payment for your badges.\n\n".
+						"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
+						"If you have any questions, please contact ".
+						"<b><a href=\"mailto:[[contact-address]]\">[[contact-address]]</a></b>.\n\n".
+						"Thanks again,\n[[event-name]] Registration"
+					)
+				));
+				$this->set_mail_template(array(
+					'name' => 'application-paid-'.$ctx_lc,
+					'contact-address' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'from' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'bcc' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'subject' => 'Your '.$ctx_name_lc.' registration for [[event-name]]',
+					'type' => 'Simple HTML',
+					'body' => (
+						"Greetings,\n\n".
+						"Your registration for <b>[[application-name]]</b> ".
+						"at <b>[[event-name]]</b> has been completed. Thank you.\n\n".
+						"Your badge will be available for pickup at the event. ".
+						"Please bring a photo ID and a printout of this email message with you.\n\n".
+						"<img src=\"[[qr-url]]\">\n\n".
+						"You can review your order at any time at the following URL:\n\n".
+						"<a href=\"[[review-link]]\">[[review-link]]</a>\n\n".
+						"Thanks again,\n[[event-name]] Registration"
+					)
+				));
+				$this->set_mail_template(array(
+					'name' => 'application-waitlisted-'.$ctx_lc,
+					'contact-address' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'from' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'bcc' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'subject' => 'Your '.$ctx_name_lc.' application for [[event-name]]',
+					'type' => 'Simple HTML',
+					'body' => (
+						"Greetings,\n\n".
+						"Thank you for applying for <b>[[event-name]]</b>.\n\n".
+						"Due to the number of applications we have received, your application ".
+						"for <b>[[application-name]]</b> has been placed on our waitlist. ".
+						"You are near the top, so you still have a chance to get in! ".
+						"We will let you know as soon as a spot becomes available.\n\n".
+						"Thank you for applying and thank you for your patience.\n\n".
+						"If you have any questions, please contact ".
+						"<b><a href=\"mailto:[[contact-address]]\">[[contact-address]]</a></b>.\n\n".
+						"Thanks again,\n[[event-name]] Registration"
+					)
+				));
+				$this->set_mail_template(array(
+					'name' => 'application-rejected-'.$ctx_lc,
+					'contact-address' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'from' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'bcc' => $ctx_name_lc.'@'.$_SERVER['SERVER_NAME'],
+					'subject' => 'Your '.$ctx_name_lc.' application for [[event-name]]',
+					'type' => 'Simple HTML',
+					'body' => (
+						"Greetings,\n\n".
+						"Thank you for applying for <b>[[event-name]]</b>.\n\n".
+						"Due to the number of applications we have received, your application ".
+						"for <b>[[application-name]]</b> has been placed on our waitlist. ".
+						"If any spots become available, we will let you know.\n\n".
+						"Thank you for applying and thank you for your patience.\n\n".
+						"If you have any questions, please contact ".
+						"<b><a href=\"mailto:[[contact-address]]\">[[contact-address]]</a></b>.\n\n".
+						"Thanks again,\n[[event-name]] Registration"
+					)
+				));
+			}
 		}
 	}
 
