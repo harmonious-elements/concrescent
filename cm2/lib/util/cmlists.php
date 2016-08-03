@@ -98,17 +98,25 @@ function cm_list_table(&$list_def) {
 						$column_count++;
 						$name = (isset($column['name']) && $column['name']) ? $column['name'] : '?';
 						$type = (isset($column['type']) && $column['type']) ? $column['type'] : '?';
+						$key  = (isset($column['key' ]) && $column['key' ]) ? $column['key' ] : '';
+						$key1 = (isset($column['key1']) && $column['key1']) ? $column['key1'] : '';
+						$key2 = (isset($column['key2']) && $column['key2']) ? $column['key2'] : '';
+						$keys = implode(', ', array_filter(array($key, $key1, $key2)));
+						echo '<th';
+						if ($keys) {
+							echo ' title="';
+							echo htmlspecialchars($keys);
+							echo '"';
+						}
 						switch ($type) {
 							case 'html-numeric':
 							case 'numeric':
 							case 'quantity':
 							case 'price':
-								echo '<th class="td-numeric">';
-								break;
-							default:
-								echo '<th>';
+								echo ' class="td-numeric"';
 								break;
 						}
+						echo '>';
 						echo htmlspecialchars($name);
 						echo '</th>';
 					}
