@@ -300,16 +300,16 @@ class cm_mail_db {
 	public function send_mail($to, $template, $entity) {
 		if ($to && $template && isset($template['body']) && trim($template['body']) && $entity) {
 			$mail_fields = array();
+			foreach ($entity as $k => $v) {
+				$mail_fields[strtolower(str_replace('_', '-', $k))] = $v;
+				$mail_fields[strtolower(str_replace('-', '_', $k))] = $v;
+			}
 			foreach ($this->event_info as $k => $v) {
 				$mail_fields['event-' . strtolower(str_replace('_', '-', $k))] = $v;
 				$mail_fields['event_' . strtolower(str_replace('-', '_', $k))] = $v;
 			}
 			$mail_fields['contact-address'] = $template['contact-address'];
 			$mail_fields['contact_address'] = $template['contact-address'];
-			foreach ($entity as $k => $v) {
-				$mail_fields[strtolower(str_replace('_', '-', $k))] = $v;
-				$mail_fields[strtolower(str_replace('-', '_', $k))] = $v;
-			}
 
 			$mail_subject = mail_merge($template['subject'], $mail_fields);
 			$mail_subject = str_replace("\r\n", " ", $mail_subject);
