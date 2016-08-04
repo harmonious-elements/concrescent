@@ -89,7 +89,10 @@ class cm_lists_db {
 		);
 	}
 
+	private $sql_expr_id = 0;
+
 	public function list_query_op_to_sql($key, $op, $value) {
+		$exid = 'e' . $this->sql_expr_id++;
 		$key = $this->normalize_key($key);
 		$value = $this->normalize_value($value);
 		switch ($op) {
@@ -98,12 +101,26 @@ class cm_lists_db {
 				$value = str_replace('%', '\\%', $value);
 				$value = str_replace('_', '\\_', $value);
 				$value = '%' . $value . '%';
-				$sqlquery = '(i.`key` = ? AND i.`value` LIKE ?)';
+				$sqlquery = (
+					'(EXISTS (SELECT 1 FROM '.
+					$this->cm_db->table_name($this->index_table_name).' '.$exid.
+					' WHERE '.$exid.'.`id` = i.`id`'.
+					' AND '.$exid.'.`key` = ?'.
+					' AND '.$exid.'.`value` LIKE ?'.
+					' LIMIT 1))'
+				);
 				$bindtype = 'ss';
 				$bindvalue = array($key, $value);
 				break;
 			case '<': case '>': case '<=': case '>=': case '=':
-				$sqlquery = '(i.`key` = ? AND i.`value` '.$op.' ?)';
+				$sqlquery = (
+					'(EXISTS (SELECT 1 FROM '.
+					$this->cm_db->table_name($this->index_table_name).' '.$exid.
+					' WHERE '.$exid.'.`id` = i.`id`'.
+					' AND '.$exid.'.`key` = ?'.
+					' AND '.$exid.'.`value` '.$op.' ?'.
+					' LIMIT 1))'
+				);
 				$bindtype = 'ss';
 				$bindvalue = array($key, $value);
 				break;
@@ -118,7 +135,7 @@ class cm_lists_db {
 
 	public function list_query_to_sql($listquery, $key = '', $op = ':') {
 		if (!$listquery) {
-			$sqlquery = '(i.`key` = \'\')';
+			$sqlquery = 'TRUE';
 			$bindtype = '';
 			$bindvalue = array();
 		} else if ($listquery[0] == '"') {
@@ -205,7 +222,7 @@ class cm_lists_db {
 		}
 		$sqlquery .= ' FROM ' . $this->cm_db->table_name($this->index_table_name) . ' i';
 		if ($query_sqlquery) {
-			$sqlquery .= ' WHERE ' . $query_sqlquery;
+			$sqlquery .= ' WHERE i.`key` = \'\' AND ' . $query_sqlquery;
 			$bindtype .= $query_bindtype;
 			$bindvalue = array_merge($bindvalue, $query_bindvalue);
 		}
@@ -255,7 +272,8 @@ class cm_lists_db {
 		return array(
 			'ok' => true,
 			'ids' => $ids,
-			'match-count' => $match_count
+			'match-count' => $match_count,
+			'sql-query' => $sqlquery
 		);
 	}
 
