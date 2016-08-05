@@ -906,7 +906,7 @@ echo '<div class="dialog room-table-select-dialog hidden">';
 		echo '<div class="spacing">';
 			echo '<div class="tag-map">';
 				echo '<div class="tags">';
-					$tags = $apdb->list_rooms_and_tables();
+					$tags = $apdb->list_rooms_and_tables(true);
 					if ($tags) {
 						foreach ($tags as $tag) {
 							echo '<div class="tag" style="';
@@ -916,8 +916,14 @@ echo '<div class="dialog room-table-select-dialog hidden">';
 							echo 'bottom:' . ((1 - max($tag['y1'], $tag['y2'])) * 100) . '%;';
 							echo '">';
 								echo '<div class="tag-button-container">';
-									echo '<button class="confirm-select-button">';
-										echo htmlspecialchars($tag['id']);
+									if ($tag['assignments']) {
+										$app_names = array_column_simple($tag['assignments'], 'application-name');
+										echo '<button class="confirm-select-button assigned" ';
+										echo 'title="' . htmlspecialchars(implode("\n", $app_names)) . '">';
+									} else {
+										echo '<button class="confirm-select-button">';
+									}
+									echo htmlspecialchars($tag['id']);
 									echo '</button>';
 								echo '</div>';
 							echo '</div>';

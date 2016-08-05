@@ -127,8 +127,18 @@
 						for (var i = 0, n = tags.length; i < n; ++i) {
 							var tag = $('<div/>').addClass('tag');
 							setRect(tag, tags[i]['x1'], tags[i]['y1'], tags[i]['x2'], tags[i]['y2']);
-							tag.append($('<label/>').addClass('stroke').text(tags[i]['id']));
-							tag.append($('<label/>').addClass('fill').text(tags[i]['id']));
+							var stroke = $('<label/>').addClass('stroke').text(tags[i]['id']);
+							tag.append(stroke);
+							var fill = $('<label/>').addClass('fill').text(tags[i]['id']);
+							tag.append(fill);
+							if (tags[i]['assignments'] && tags[i]['assignments'].length) {
+								fill.addClass('assigned');
+								var title = tags[i]['assignments'][0]['application-name'];
+								for (var j = 1, m = tags[i]['assignments'].length; j < m; ++j) {
+									title += '\n' + tags[i]['assignments'][j]['application-name'];
+								}
+								fill.attr('title', title);
+							}
 							tagArea.append(tag);
 							tagsMouseBind(tag, tags[i]);
 						}

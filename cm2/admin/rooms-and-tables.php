@@ -83,7 +83,7 @@ if (isset($_POST['action'])) {
 			break;
 		case 'list-tags':
 			header('Content-type: text/plain');
-			$tags = $apdb->list_rooms_and_tables();
+			$tags = $apdb->list_rooms_and_tables(true);
 			$response = array('ok' => true, 'tags' => $tags);
 			echo json_encode($response);
 			exit(0);

@@ -218,7 +218,7 @@ class cm_application_db {
 		}
 	}
 
-	public function get_room_or_table($id) {
+	public function get_room_or_table($id, $expand = false) {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(
 			'SELECT `id`, `x1`, `y1`, `x2`, `y2`'.
@@ -237,13 +237,17 @@ class cm_application_db {
 				'y2' => $y2
 			);
 			$stmt->close();
+			if ($expand) {
+				$assignments = $this->list_room_and_table_assignments($id);
+				$result['assignments'] = $assignments;
+			}
 			return $result;
 		}
 		$stmt->close();
 		return false;
 	}
 
-	public function list_rooms_and_tables() {
+	public function list_rooms_and_tables($expand = false) {
 		$rooms_and_tables = array();
 		$stmt = $this->cm_db->connection->prepare(
 			'SELECT `id`, `x1`, `y1`, `x2`, `y2`'.
@@ -261,10 +265,66 @@ class cm_application_db {
 			);
 		}
 		$stmt->close();
+		if ($expand) {
+			foreach ($rooms_and_tables as $i => $room_or_table) {
+				$id = $room_or_table['id'];
+				$assignments = $this->list_room_and_table_assignments($id);
+				$rooms_and_tables[$i]['assignments'] = $assignments;
+			}
+		}
 		usort($rooms_and_tables, function($a, $b) {
 			return strnatcasecmp($a['id'], $b['id']);
 		});
 		return $rooms_and_tables;
+	}
+
+	public function list_room_and_table_assignments($id = null) {
+		$assignments = array();
+		$query = (
+			'SELECT `context`, `context_id`, `room_or_table_id`, `start_time`, `end_time`'.
+			' FROM '.$this->cm_db->table_name('room_and_table_assignments')
+		);
+		if ($id) $query .= ' WHERE `room_or_table_id` = ?';
+		$stmt = $this->cm_db->connection->prepare($query);
+		if ($id) $stmt->bind_param('s', $id);
+		$stmt->execute();
+		$stmt->bind_result(
+			$context, $context_id, $room_or_table_id, $start_time, $end_time
+		);
+		while ($stmt->fetch()) {
+			$assignments[] = array(
+				'context' => $context,
+				'context-id' => $context_id,
+				'room-or-table-id' => $room_or_table_id,
+				'start-time' => $start_time,
+				'end-time' => $end_time
+			);
+		}
+		$stmt->close();
+		foreach ($assignments as $i => $assignment) {
+			$table_name = 'applications_'.strtolower($assignment['context']);
+			$stmt = $this->cm_db->connection->prepare(
+				'SELECT `business_name`, `application_name`'.
+				' FROM '.$this->cm_db->table_name($table_name).
+				' WHERE `id` = ? LIMIT 1'
+			);
+			$stmt->bind_param('i', $assignment['context-id']);
+			$stmt->execute();
+			$stmt->bind_result($business_name, $application_name);
+			if ($stmt->fetch()) {
+				$assignments[$i]['business-name'] = $business_name;
+				$assignments[$i]['application-name'] = $application_name;
+			}
+			$stmt->close();
+		}
+		usort($assignments, function($a, $b) {
+			if (($cmp = strnatcasecmp($a['room-or-table-id'], $b['room-or-table-id']))) return $cmp;
+			if (($cmp = strnatcasecmp($a['start-time'], $b['start-time']))) return $cmp;
+			if (($cmp = strnatcasecmp($a['end-time'], $b['end-time']))) return $cmp;
+			if (($cmp = strnatcasecmp($a['context'], $b['context']))) return $cmp;
+			return $a['context-id'] - $b['context-id'];
+		});
+		return $assignments;
 	}
 
 	public function create_room_or_table($rt) {

@@ -38,6 +38,7 @@
 	max-height: 80%;
 	margin-left: -400px;
 }
+
 .tag-map {
 	position: relative;
 	width: 100%;
@@ -77,4 +78,7 @@
 	padding: 1px 2px;
 	height: 18px;
 	font-weight: bold;
+}
+.tag-button-container button.assigned {
+	color: blue;
 }

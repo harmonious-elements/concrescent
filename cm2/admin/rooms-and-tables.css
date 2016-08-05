@@ -31,6 +31,15 @@
 	margin-left: -10px;
 	line-height: 20px;
 	cursor: pointer;
+	color: black;
+}
+.tag label.assigned {
+	color: blue;
+}
+.tag label.stroke {
+	-webkit-text-stroke: 5px rgba(255, 255, 255, 0.8);
+	text-stroke: 5px rgba(255, 255, 255, 0.8);
+	color: rgba(255, 255, 255, 0.8);
 }
 .tag label:before {
 	content: "";
@@ -39,11 +48,6 @@
 .tag label:after {
 	content: "";
 	margin-right: -1000px;
-}
-.tag label.stroke {
-	-webkit-text-stroke: 5px rgba(255, 255, 255, 0.8);
-	text-stroke: 5px rgba(255, 255, 255, 0.8);
-	color: rgba(255, 255, 255, 0.8);
 }
 .tag-marquee,
 .tag-editor {
