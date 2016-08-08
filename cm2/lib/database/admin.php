@@ -16,6 +16,17 @@ class cm_admin_db {
 			'`password` VARCHAR(255) NOT NULL,'.
 			'`permissions` TEXT NOT NULL'
 		));
+		$this->cm_db->table_def('admin_access_log', (
+			'`timestamp` DATETIME NOT NULL,'.
+			'`username` VARCHAR(255) NOT NULL,'.
+			'`remote_addr` VARCHAR(255) NOT NULL,'.
+			'`remote_host` VARCHAR(255) NOT NULL,'.
+			'`request_method` VARCHAR(255) NOT NULL,'.
+			'`request_uri` VARCHAR(255) NOT NULL,'.
+			'`query_string` VARCHAR(255) NOT NULL,'.
+			'`http_referer` VARCHAR(255) NOT NULL,'.
+			'`http_user_agent` VARCHAR(255) NOT NULL'
+		));
 		if ($this->cm_db->table_is_empty('admin_users')) {
 			$config = $GLOBALS['cm_config']['default_admin'];
 			$password = password_hash($config['password'], PASSWORD_DEFAULT);
@@ -76,6 +87,33 @@ class cm_admin_db {
 		unset($_SESSION['admin_username']);
 		unset($_SESSION['admin_password']);
 		session_destroy();
+	}
+
+	public function log_access() {
+		$username = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : '';
+		$remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+		$remote_host = isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '';
+		$request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '';
+		$request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+		$query_string = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+		$http_referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+		$http_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('admin_access_log').' SET '.
+			'`timestamp` = NOW(), `username` = ?, '.
+			'`remote_addr` = ?, `remote_host` = ?, '.
+			'`request_method` = ?, `request_uri` = ?, `query_string` = ?, '.
+			'`http_referer` = ?, `http_user_agent` = ?'
+		);
+		$stmt->bind_param(
+			'ssssssss',
+			$username, $remote_addr, $remote_host,
+			$request_method, $request_uri, $query_string,
+			$http_referer, $http_user_agent
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
 	}
 
 	public function user_has_permission($user, $permission) {

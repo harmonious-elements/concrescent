@@ -14,6 +14,7 @@ $db = new cm_db();
 $adb = new cm_admin_db($db);
 if (isset($_POST['username']) && isset($_POST['password'])) {
 	if ($adb->log_in($_POST['username'], $_POST['password'])) {
+		$adb->log_access();
 		if ($page) {
 			header('Location: ' . $page);
 		} else {

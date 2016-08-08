@@ -19,6 +19,13 @@ if (!$admin_user) {
 	exit(0);
 }
 
+if (
+	(!isset($_SERVER['HTTP_X_REQUESTED_WITH'])) ||
+	(strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest')
+) {
+	$adb->log_access();
+}
+
 function cm_admin_head($title) {
 	echo '<!DOCTYPE HTML>';
 	echo '<html>';

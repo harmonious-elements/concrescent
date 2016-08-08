@@ -9,6 +9,7 @@ require_once dirname(__FILE__).'/../lib/util/res.php';
 
 $db = new cm_db();
 $adb = new cm_admin_db($db);
+$adb->log_access();
 $adb->log_out();
 
 echo '<!DOCTYPE HTML>';
