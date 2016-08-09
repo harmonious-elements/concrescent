@@ -23,7 +23,6 @@ class cm_admin_db {
 			'`remote_host` VARCHAR(255) NOT NULL,'.
 			'`request_method` VARCHAR(255) NOT NULL,'.
 			'`request_uri` VARCHAR(255) NOT NULL,'.
-			'`query_string` VARCHAR(255) NOT NULL,'.
 			'`http_referer` VARCHAR(255) NOT NULL,'.
 			'`http_user_agent` VARCHAR(255) NOT NULL'
 		));
@@ -95,20 +94,19 @@ class cm_admin_db {
 		$remote_host = isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : '';
 		$request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '';
 		$request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-		$query_string = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 		$http_referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
 		$http_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 		$stmt = $this->cm_db->connection->prepare(
 			'INSERT INTO '.$this->cm_db->table_name('admin_access_log').' SET '.
 			'`timestamp` = NOW(), `username` = ?, '.
 			'`remote_addr` = ?, `remote_host` = ?, '.
-			'`request_method` = ?, `request_uri` = ?, `query_string` = ?, '.
+			'`request_method` = ?, `request_uri` = ?, '.
 			'`http_referer` = ?, `http_user_agent` = ?'
 		);
 		$stmt->bind_param(
-			'ssssssss',
+			'sssssss',
 			$username, $remote_addr, $remote_host,
-			$request_method, $request_uri, $query_string,
+			$request_method, $request_uri,
 			$http_referer, $http_user_agent
 		);
 		$success = $stmt->execute();
