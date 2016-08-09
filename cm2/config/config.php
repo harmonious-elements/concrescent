@@ -165,6 +165,17 @@ $cm_config = array(
 
 	),
 
+	/* Review Mode Configuration */
+	'review_mode' => array(
+
+		/* Show street address in review mode. */
+		'show_address' => true,
+
+		/* Show emergency contact information in review mode. */
+		'show_ice' => true,
+
+	),
+
 	/* Badge Printing Configuration */
 	'badge_printing' => array(
 
