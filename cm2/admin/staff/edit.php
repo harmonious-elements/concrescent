@@ -1,5 +1,6 @@
 <?php
 
+require_once dirname(__FILE__).'/../../config/config.php';
 require_once dirname(__FILE__).'/../../lib/database/staff.php';
 require_once dirname(__FILE__).'/../../lib/database/forms.php';
 require_once dirname(__FILE__).'/../../lib/database/attendee.php';
@@ -29,7 +30,6 @@ $questions = $fdb->list_questions();
 
 $atdb = new cm_attendee_db($db);
 $mdb = new cm_mail_db($db);
-
 $midb = new cm_misc_db($db);
 $domain = $midb->getval('mail-default-domain', $_SERVER['SERVER_NAME']);
 
@@ -478,65 +478,69 @@ echo '<article>';
 					}
 				echo '</tr>';
 
-				echo '<tr>';
-					echo '<th><label for="address-1">Street Address</label></th>';
-					$value = isset($item['address-1']) ? htmlspecialchars($item['address-1']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="address-1" name="address-1" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+				if (!$review_mode || $cm_config['review_mode']['show_address']) {
 
-				echo '<tr>';
-					echo '<th>&nbsp;</th>';
-					$value = isset($item['address-2']) ? htmlspecialchars($item['address-2']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="address-2" name="address-2" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th><label for="address-1">Street Address</label></th>';
+						$value = isset($item['address-1']) ? htmlspecialchars($item['address-1']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="address-1" name="address-1" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
 
-				echo '<tr>';
-					echo '<th><label for="city">City</label></th>';
-					$value = isset($item['city']) ? htmlspecialchars($item['city']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="city" name="city" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th>&nbsp;</th>';
+						$value = isset($item['address-2']) ? htmlspecialchars($item['address-2']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="address-2" name="address-2" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
 
-				echo '<tr>';
-					echo '<th><label for="state">State or Province</label></th>';
-					$value = isset($item['state']) ? htmlspecialchars($item['state']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="state" name="state" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th><label for="city">City</label></th>';
+						$value = isset($item['city']) ? htmlspecialchars($item['city']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="city" name="city" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
 
-				echo '<tr>';
-					echo '<th><label for="zip-code">ZIP or Postal Code</label></th>';
-					$value = isset($item['zip-code']) ? htmlspecialchars($item['zip-code']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="zip-code" name="zip-code" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th><label for="state">State or Province</label></th>';
+						$value = isset($item['state']) ? htmlspecialchars($item['state']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="state" name="state" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
 
-				echo '<tr>';
-					echo '<th><label for="country">Country</label></th>';
-					$value = isset($item['country']) ? htmlspecialchars($item['country']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="country" name="country" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th><label for="zip-code">ZIP or Postal Code</label></th>';
+						$value = isset($item['zip-code']) ? htmlspecialchars($item['zip-code']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="zip-code" name="zip-code" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+					echo '<tr>';
+						echo '<th><label for="country">Country</label></th>';
+						$value = isset($item['country']) ? htmlspecialchars($item['country']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="country" name="country" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+				}
 
 				$first = true;
 				function my_question_is_visible($question) {
@@ -582,48 +586,52 @@ echo '<article>';
 					}
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
-				echo '<tr><td colspan="2"><h2>Emergency Contact Information</h2></td></tr>';
+				if (!$review_mode || $cm_config['review_mode']['show_ice']) {
 
-				echo '<tr>';
-					echo '<th><label for="ice-name">Emergency Contact Name</label></th>';
-					$value = isset($item['ice-name']) ? htmlspecialchars($item['ice-name']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="ice-name" name="ice-name" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2"><h2>Emergency Contact Information</h2></td></tr>';
 
-				echo '<tr>';
-					echo '<th><label for="ice-relationship">Emergency Contact Relationship</label></th>';
-					$value = isset($item['ice-relationship']) ? htmlspecialchars($item['ice-relationship']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="ice-relationship" name="ice-relationship" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th><label for="ice-name">Emergency Contact Name</label></th>';
+						$value = isset($item['ice-name']) ? htmlspecialchars($item['ice-name']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="ice-name" name="ice-name" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
 
-				echo '<tr>';
-					echo '<th><label for="ice-email-address">Emergency Contact Email Address</label></th>';
-					$value = isset($item['ice-email-address']) ? htmlspecialchars($item['ice-email-address']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="email" id="ice-email-address" name="ice-email-address" value="' . $value . '"></td>';
-					} else {
-						echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th><label for="ice-relationship">Emergency Contact Relationship</label></th>';
+						$value = isset($item['ice-relationship']) ? htmlspecialchars($item['ice-relationship']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="ice-relationship" name="ice-relationship" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
 
-				echo '<tr>';
-					echo '<th><label for="ice-phone-number">Emergency Contact Phone Number</label></th>';
-					$value = isset($item['ice-phone-number']) ? htmlspecialchars($item['ice-phone-number']) : '';
-					if ($can_edit_info) {
-						echo '<td><input type="text" id="ice-phone-number" name="ice-phone-number" value="' . $value . '"></td>';
-					} else {
-						echo '<td>' . $value . '</td>';
-					}
-				echo '</tr>';
+					echo '<tr>';
+						echo '<th><label for="ice-email-address">Emergency Contact Email Address</label></th>';
+						$value = isset($item['ice-email-address']) ? htmlspecialchars($item['ice-email-address']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="email" id="ice-email-address" name="ice-email-address" value="' . $value . '"></td>';
+						} else {
+							echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';
+						}
+					echo '</tr>';
+
+					echo '<tr>';
+						echo '<th><label for="ice-phone-number">Emergency Contact Phone Number</label></th>';
+						$value = isset($item['ice-phone-number']) ? htmlspecialchars($item['ice-phone-number']) : '';
+						if ($can_edit_info) {
+							echo '<td><input type="text" id="ice-phone-number" name="ice-phone-number" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+				}
 
 				echo '<tr><td colspan="2"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Application Information</h2></td></tr>';
