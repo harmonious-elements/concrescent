@@ -1,0 +1,160 @@
+.tag-map {
+	position: relative;
+	width: 100%;
+	height: 0;
+	background: url('../rooms-and-tables-image.php') no-repeat center;
+	background-size: 100% 100%;
+}
+.tags {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.tag {
+	position: absolute;
+	background: rgba(204, 204, 204, 0.2);
+	border: solid 1px rgba(204, 204, 204, 0.4);
+	font-weight: bold;
+	text-align: center;
+	cursor: pointer;
+}
+.tag label {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 20px;
+	height: 20px;
+	margin-top: -10px;
+	margin-left: -10px;
+	line-height: 20px;
+	cursor: pointer;
+	color: black;
+}
+.tag label.assigned {
+	color: blue;
+}
+.tag label.stroke {
+	-webkit-text-stroke: 5px rgba(255, 255, 255, 0.8);
+	text-stroke: 5px rgba(255, 255, 255, 0.8);
+	color: rgba(255, 255, 255, 0.8);
+}
+.tag label:before {
+	content: "";
+	margin-left: -1000px;
+}
+.tag label:after {
+	content: "";
+	margin-right: -1000px;
+}
+
+.calendar {
+	position: relative;
+	width: 100%;
+	height: 1477px;
+}
+.calendar-header {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 160px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.calendar-body {
+	position: absolute;
+	top: 0;
+	left: 160px;
+	right: 0;
+	bottom: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	overflow-x: auto;
+}
+.calendar-column {
+	display: inline-block;
+	position: relative;
+	width: 120px;
+	height: 1461px;
+	vertical-align: top;
+}
+.calendar-header .calendar-column {
+	width: 40px;
+}
+.calendar-header .calendar-column:first-child {
+	width: 80px;
+}
+.calendar-column-header {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+	font-weight: bold;
+}
+.calendar-column-body {
+	position: absolute;
+	top: 20px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	border-right: 1px solid #ddd;
+}
+.calendar-header .calendar-column-body {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA8CAAAAACCmo8mAAAADklEQVR4AWO4y/B/ICAA8107oxkexpMAAAAASUVORK5CYII=');
+}
+.calendar-body .calendar-column-body {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAA8CAAAAABgRpRfAAAAHklEQVR4AWO8ywAG/8GAptTd/0BEB4vu/gfBYeQjACz3YJ5mSWYQAAAAAElFTkSuQmCC');
+}
+.calendar-day-label {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 20px;
+	line-height: 20px;
+	text-align: left;
+	font-weight: bold;
+}
+.calendar-hour-label {
+	position: absolute;
+	top: 0;
+	left: 2px;
+	right: 2px;
+	height: 20px;
+	line-height: 20px;
+	text-align: right;
+}
+.calendar-event {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 60px;
+	cursor: pointer;
+}
+.calendar-event-content {
+	position: absolute;
+	top: 0;
+	left: 1px;
+	right: 1px;
+	bottom: -1px;
+	background: #cdf;
+	border: 1px solid #9bc;
+	padding: 2px 3px;
+	color: black;
+	white-space: normal;
+	overflow: hidden;
+}
+.calendar-event-content a,
+.calendar-event-content a:link,
+.calendar-event-content a:focus,
+.calendar-event-content a:hover,
+.calendar-event-content a:active,
+.calendar-event-content a:visited {
+	color: black;
+}

@@ -278,15 +278,29 @@ class cm_application_db {
 		return $rooms_and_tables;
 	}
 
-	public function list_room_and_table_assignments($id = null) {
+	public function list_room_and_table_assignments($id = null, $context = null) {
 		$assignments = array();
 		$query = (
 			'SELECT `context`, `context_id`, `room_or_table_id`, `start_time`, `end_time`'.
 			' FROM '.$this->cm_db->table_name('room_and_table_assignments')
 		);
-		if ($id) $query .= ' WHERE `room_or_table_id` = ?';
+		$first = true;
+		$bind = array('');
+		if ($id) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `room_or_table_id` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$id;
+		}
+		if ($context) {
+			$ctx_uc = strtoupper($context);
+			$query .= ($first ? ' WHERE' : ' AND') . ' `context` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$ctx_uc;
+		}
 		$stmt = $this->cm_db->connection->prepare($query);
-		if ($id) $stmt->bind_param('s', $id);
+		if (!$first) call_user_func_array(array($stmt, 'bind_param'), $bind);
 		$stmt->execute();
 		$stmt->bind_result(
 			$context, $context_id, $room_or_table_id, $start_time, $end_time
@@ -322,6 +336,10 @@ class cm_application_db {
 			if (($cmp = strnatcasecmp($a['start-time'], $b['start-time']))) return $cmp;
 			if (($cmp = strnatcasecmp($a['end-time'], $b['end-time']))) return $cmp;
 			if (($cmp = strnatcasecmp($a['context'], $b['context']))) return $cmp;
+			if (($cmp = strnatcasecmp(
+				(isset($a['application-name']) ? $a['application-name'] : ''),
+				(isset($b['application-name']) ? $b['application-name'] : '')
+			))) return $cmp;
 			return $a['context-id'] - $b['context-id'];
 		});
 		return $assignments;

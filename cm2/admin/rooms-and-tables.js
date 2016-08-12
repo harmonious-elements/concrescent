@@ -133,9 +133,19 @@
 							tag.append(fill);
 							if (tags[i]['assignments'] && tags[i]['assignments'].length) {
 								fill.addClass('assigned');
-								var title = tags[i]['assignments'][0]['application-name'];
+								var title = (
+									tags[i]['assignments'][0]['application-name'] || (
+										'[' + tags[i]['assignments'][0]['context'] + 'A' +
+										tags[i]['assignments'][0]['context-id'] + ']'
+									)
+								);
 								for (var j = 1, m = tags[i]['assignments'].length; j < m; ++j) {
-									title += '\n' + tags[i]['assignments'][j]['application-name'];
+									title += '\n' + (
+										tags[i]['assignments'][j]['application-name'] || (
+											'[' + tags[i]['assignments'][j]['context'] + 'A' +
+											tags[i]['assignments'][j]['context-id'] + ']'
+										)
+									);
 								}
 								fill.attr('title', title);
 							}

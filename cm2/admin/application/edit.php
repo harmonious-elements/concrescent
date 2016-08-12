@@ -917,7 +917,17 @@ echo '<div class="dialog room-table-select-dialog hidden">';
 							echo '">';
 								echo '<div class="tag-button-container">';
 									if ($tag['assignments']) {
-										$app_names = array_column_simple($tag['assignments'], 'application-name');
+										$app_names = array();
+										foreach ($tag['assignments'] as $a) {
+											if (isset($a['application-name']) && $a['application-name']) {
+												$app_names[] = $a['application-name'];
+											} else {
+												$app_names[] = (
+													'[' . $a['context'] . 'A' .
+													$a['context-id'] . ']'
+												);
+											}
+										}
 										echo '<button class="confirm-select-button assigned" ';
 										echo 'title="' . htmlspecialchars(implode("\n", $app_names)) . '">';
 									} else {
