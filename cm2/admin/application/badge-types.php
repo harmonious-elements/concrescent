@@ -268,6 +268,16 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 		echo '<td><input type="number" name="ea-max-assignment-count" id="ea-max-assignment-count" min="1" max="999">';
 	echo '</tr>';
 	echo '<tr>';
+		echo '<th></th>';
+		echo '<td>';
+			echo (
+				'(Leave blank or set to 0 for no maximum. Set to 1 for ' . strtolower($ctx_info['assignment_term'][1]) .
+				' to not appear on the application. In addition, set Price Per ' . $ctx_info['assignment_term'][0] . ' to 0 for ' .
+				strtolower($ctx_info['assignment_term'][1]) . ' to not appear in the shopping cart during confirmation and payment.)'
+			);
+		echo '</td>';
+	echo '</tr>';
+	echo '<tr>';
 		echo '<th><label for="ea-max-applicant-count">Max Badges<br>Requestable:</label></th>';
 		echo '<td><input type="number" name="ea-max-applicant-count" id="ea-max-applicant-count" min="1" max="999">';
 	echo '</tr>';

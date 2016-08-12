@@ -464,7 +464,7 @@ echo '<article>';
 				if ($value) {
 					echo '<tr>';
 						echo '<th><label>Unsubscribe Link</label></th>';
-						echo '<td><a href="' . $value . '">' . $value . '</a></td>';
+						echo '<td><a href="' . $value . '" target="_blank">' . $value . '</a></td>';
 					echo '</tr>';
 				}
 
@@ -889,7 +889,7 @@ echo '<article>';
 					if ($value) {
 						echo '<tr>';
 							echo '<th><label>Review Order Link</label></th>';
-							echo '<td><a href="' . $value . '">' . $value . '</a></td>';
+							echo '<td><a href="' . $value . '" target="_blank">' . $value . '</a></td>';
 						echo '</tr>';
 					}
 

@@ -1858,14 +1858,16 @@ class cm_application_db {
 			}
 		} else {
 			$count = $application['assignment-count'];
-			for ($index = 0; $index < $count; $index++) {
-				$assignments[] = array(
-					'application-id' => $application['id'],
-					'name' => $ctx_info['nav_prefix'] . ' ' . $ctx_info['assignment_term'][0] . ' Fee',
-					'details' => '(' . ($index + 1) . ' of ' . $count . ')',
-					'price' => ($index < $free_assignments) ? 0 : $badge['price-per-assignment'],
-					'price-string' => ($index < $free_assignments) ? 'INCLUDED' : price_string($badge['price-per-assignment'])
-				);
+			if ((float)$badge['price-per-assignment']) {
+				for ($index = 0; $index < $count; $index++) {
+					$assignments[] = array(
+						'application-id' => $application['id'],
+						'name' => $ctx_info['nav_prefix'] . ' ' . $ctx_info['assignment_term'][0] . ' Fee',
+						'details' => '(' . ($index + 1) . ' of ' . $count . ')',
+						'price' => ($index < $free_assignments) ? 0 : $badge['price-per-assignment'],
+						'price-string' => ($index < $free_assignments) ? 'INCLUDED' : price_string($badge['price-per-assignment'])
+					);
+				}
 			}
 		}
 
@@ -1883,14 +1885,16 @@ class cm_application_db {
 			}
 		} else {
 			$count = $application['applicant-count'];
-			for ($index = 0; $index < $count; $index++) {
-				$applicants[] = array(
-					'application-id' => $application['id'],
-					'name' => $ctx_info['nav_prefix'] . ' Badge Fee',
-					'details' => '(' . ($index + 1) . ' of ' . $count . ')',
-					'price' => ($index < $free_applicants) ? 0 : $badge['price-per-applicant'],
-					'price-string' => ($index < $free_applicants) ? 'INCLUDED' : price_string($badge['price-per-applicant'])
-				);
+			if ((float)$badge['price-per-applicant']) {
+				for ($index = 0; $index < $count; $index++) {
+					$applicants[] = array(
+						'application-id' => $application['id'],
+						'name' => $ctx_info['nav_prefix'] . ' Badge Fee',
+						'details' => '(' . ($index + 1) . ' of ' . $count . ')',
+						'price' => ($index < $free_applicants) ? 0 : $badge['price-per-applicant'],
+						'price-string' => ($index < $free_applicants) ? 'INCLUDED' : price_string($badge['price-per-applicant'])
+					);
+				}
 			}
 		}
 
