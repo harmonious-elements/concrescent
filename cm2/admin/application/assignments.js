@@ -27,6 +27,22 @@
 		return aa.length - bb.length;
 	};
 
+	var dateTimeReformat = function(s) {
+		if (s) {
+			var f = s.split(/[^0-9]+/g);
+			if (f[0] && f[1] && f[2] && f[3] && f[4]) {
+				var yr  = ('0000'+f[0]).substr(-4);
+				var mon = ('00' + f[1]).substr(-2);
+				var day = ('00' + f[2]).substr(-2);
+				var hr  = ('00' + f[3]).substr(-2);
+				var min = ('00' + f[4]).substr(-2);
+				var date = yr + '-' + mon + '-' + day;
+				var time = hr + ':' + min;
+				return date + 'T' + time;
+			}
+		}
+		return '';
+	};
 	var dateTimeMinuteDiff = function(a, b) {
 		var aa = String(a).split(/[^0-9]+/g);
 		var bb = String(b).split(/[^0-9]+/g);
@@ -81,6 +97,18 @@
 		element.css('bottom', ((1 - Math.max(y1, y2)) * 100) + '%');
 	};
 
+	var makeApplicationLink = function(assignment) {
+		var contextUC = assignment['context'].toUpperCase();
+		var contextLC = assignment['context'].toLowerCase();
+		var contextID = assignment['context-id'];
+		var appName = assignment['application-name'];
+		var link = $('<a/>');
+		link.attr('href', 'edit.php?c=' + contextLC + '&id=' + contextID);
+		link.attr('target', '_blank');
+		link.text(appName || ('[' + contextUC + 'A' + contextID + ']'));
+		return link;
+	};
+
 	var doAjax = function(request, done, message, errorMessage) {
 		cmui.showButterbar(message);
 		$.post(
@@ -98,7 +126,7 @@
 	};
 
 	$(document).ready(function() {
-		var tagArea = $('.tags');
+		var tagArea = $('.card-content .tags');
 		var tbodyByRT = $('.cm-assignments-by-room-or-table');
 		var tbodyByAN = $('.cm-assignments-by-application-name');
 		var calendarArea = $('.calendar-body');
@@ -157,13 +185,13 @@
 			);
 		};
 
-		var calendarMouseBind = function(element, assignment) {
-			var calendarMouseEvent = function(event) {
+		var assignmentsMouseBind = function(element, assignment) {
+			var assignmentsMouseEvent = function(event) {
 				console.log(assignment);
 				event.stopPropagation();
 				event.preventDefault();
 			};
-			element.bind('mousedown', calendarMouseEvent);
+			element.bind('mousedown', assignmentsMouseEvent);
 			var calendarLinkMouseEvent = function(event) {
 				event.stopPropagation();
 			};
@@ -197,18 +225,11 @@
 								)
 							));
 							var linkCell = $('<td/>');
-							var link = $('<a/>').attr('href',
-								'edit.php?c=' + assignment['context'].toLowerCase() +
-								'&id=' + assignment['context-id']
-							).attr('target', '_blank').text(
-								assignment['application-name'] || (
-									'[' + assignment['context'] + 'A' +
-									assignment['context-id'] + ']'
-								)
-							);
+							var link = makeApplicationLink(assignment);
 							linkCell.append(link);
 							row.append(linkCell);
 							tbodyByRT.append(row);
+							assignmentsMouseBind(row, assignment);
 						}
 
 						var calendarRTID = null;
@@ -229,15 +250,7 @@
 							}
 							var calendarEvent = $('<div/>').addClass('calendar-event');
 							var calendarEventContent = $('<div/>').addClass('calendar-event-content');
-							var link = $('<a/>').attr('href',
-								'edit.php?c=' + assignment['context'].toLowerCase() +
-								'&id=' + assignment['context-id']
-							).attr('target', '_blank').text(
-								assignment['application-name'] || (
-									'[' + assignment['context'] + 'A' +
-									assignment['context-id'] + ']'
-								)
-							);
+							var link = makeApplicationLink(assignment);
 							calendarEventContent.append(link);
 							calendarEvent.append(calendarEventContent);
 							calendarEvent.css('top', dateTimeMinuteDiff(
@@ -249,7 +262,7 @@
 								assignment['start-time'] || eventStartTime
 							) + 'px');
 							calendarColumnBody.append(calendarEvent);
-							calendarMouseBind(calendarEvent, assignment);
+							assignmentsMouseBind(calendarEvent, assignment);
 						}
 
 						assignments.sort(function(a, b) {
@@ -271,15 +284,7 @@
 							} else {
 								lastCtxID = assignment['context-id'];
 								var linkCell = $('<td/>');
-								var link = $('<a/>').attr('href',
-									'edit.php?c=' + assignment['context'].toLowerCase() +
-									'&id=' + assignment['context-id']
-								).attr('target', '_blank').text(
-									assignment['application-name'] || (
-										'[' + assignment['context'] + 'A' +
-										assignment['context-id'] + ']'
-									)
-								);
+								var link = makeApplicationLink(assignment);
 								linkCell.append(link);
 								row.append(linkCell);
 							}
@@ -291,6 +296,7 @@
 								)
 							));
 							tbodyByAN.append(row);
+							assignmentsMouseBind(row, assignment);
 						}
 
 					}

@@ -1,3 +1,5 @@
+/* Rooms and Tables */
+
 .tag-map {
 	position: relative;
 	width: 100%;
@@ -14,10 +16,15 @@
 }
 .tag {
 	position: absolute;
+	text-align: center;
+}
+
+/* Rooms and Tables - In Page */
+
+.card-content .tag {
 	background: rgba(204, 204, 204, 0.2);
 	border: solid 1px rgba(204, 204, 204, 0.4);
 	font-weight: bold;
-	text-align: center;
 	cursor: pointer;
 }
 .tag label {
@@ -48,6 +55,47 @@
 	content: "";
 	margin-right: -1000px;
 }
+
+/* Rooms and Tables - In Dialog */
+
+.tag-button-container {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	margin-top: -9px;
+	text-align: center;
+}
+.tag-button-container:before {
+	content: "";
+	margin-left: -1000px;
+}
+.tag-button-container:after {
+	content: "";
+	margin-right: -1000px;
+}
+.tag-button-container button {
+	margin: 0;
+	padding: 1px 2px;
+	height: 18px;
+	font-weight: bold;
+}
+.tag-button-container button.assigned {
+	color: blue;
+}
+
+/* Tables */
+
+.cm-assignments-by-room-or-table tr,
+.cm-assignments-by-application-name tr {
+	cursor: pointer;
+}
+.cm-assignments-by-room-or-table tr:hover,
+.cm-assignments-by-application-name tr:hover {
+	background: rgba(204, 221, 255, 0.5);
+}
+
+/* Calendar */
 
 .calendar {
 	position: relative;
@@ -157,4 +205,24 @@
 .calendar-event-content a:active,
 .calendar-event-content a:visited {
 	color: black;
+}
+
+/* Dialogs */
+
+.edit-assignment-dialog td input[type=text] {
+	width: 120px;
+	margin-right: 6px;
+}
+.edit-assignment-dialog td button {
+	width: 50px;
+}
+.select-application-dialog {
+	width: 800px;
+	margin-left: -400px;
+}
+.select-room-table-dialog {
+	top: 10%;
+	width: 800px;
+	max-height: 80%;
+	margin-left: -400px;
 }
