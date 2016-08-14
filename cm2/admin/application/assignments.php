@@ -71,14 +71,6 @@ $list_def = array(
 	'name-key' => 'application-name',
 	'row-actions' => array('select')
 );
-$list_def['select-function'] = <<<END
-	function(id) {
-		$('#ea-context').val(cm_app_context_info['ctx_uc']);
-		$('#ea-context-id').val(id);
-		$('#ea-context-id-string').val(cm_app_context_info['ctx_uc'] + 'A' + id);
-		cmui.showDialog('edit-assignment');
-	}
-END;
 
 if (isset($_POST['cm-list-action'])) {
 	header('Content-type: text/plain');
@@ -189,10 +181,12 @@ if (!$image_size) $image_size = array(640, 480);
 $image_ratio = $image_size[1] * 100 / $image_size[0];
 
 $event_dates = array();
+$event_dates_iso = array();
 $start_time = strtotime($cm_config['event']['start_date']);
 $end_time = strtotime($cm_config['event']['end_date']);
 while ($start_time <= $end_time) {
 	$event_dates[] = date('D M j', $start_time);
+	$event_dates_iso[] = date('Y-m-d', $start_time);
 	$start_time = strtotime('+1 day', $start_time);
 }
 
@@ -207,7 +201,11 @@ echo '<style>';
 echo '</style>';
 
 echo '<script type="text/javascript">';
-	echo 'cm_app_event_info = ('.json_encode($cm_config['event']).');';
+	$js_event_info = (
+		$cm_config['event'] +
+		array('dates' => $event_dates_iso)
+	);
+	echo 'cm_app_event_info = ('.json_encode($js_event_info).');';
 	$js_ctx_info = (
 		array('ctx_lc' => $ctx_lc, 'ctx_uc' => $ctx_uc) + $ctx_info +
 		array('ctx_name' => $ctx_name, 'ctx_name_lc' => $ctx_name_lc)
@@ -428,5 +426,27 @@ echo '<div class="dialog select-room-table-dialog hidden">';
 	echo '</div>';
 echo '</div>';
 
-cm_list_dialogs($list_def);
+echo '<div class="dialog shortcuts-dialog hidden">';
+	echo '<div class="dialog-title">Keyboard Shortcuts</div>';
+	echo '<div class="dialog-content">';
+		echo '<table border="0" cellpadding="0" cellspacing="0">';
+			echo '<tr><th colspan="2">Edit Assignment</th></tr>';
+			echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Cancel</td></tr>';
+			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">A</span></td><td>Select Application</td></tr>';
+			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">R</span></td><td>Select Room or Table</td></tr>';
+			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">D</span></td><td>Delete</td></tr>';
+			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Save</td></tr>';
+			echo '<tr><th colspan="2">Select Application</th></tr>';
+			echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Cancel</td></tr>';
+			echo '<tr><td><span class="kbd kbdw">home</span></td><td>Go to first page of results</td></tr>';
+			echo '<tr><td><span class="kbd kbdw">pgup</span></td><td>Go to previous page of results</td></tr>';
+			echo '<tr><td><span class="kbd kbdw">pgdn</span></td><td>Go to next page of results</td></tr>';
+			echo '<tr><td><span class="kbd kbdw">end</span></td><td>Go to last page of results</td></tr>';
+			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Select (single search result)</td></tr>';
+			echo '<tr><th colspan="2">Miscellaneous</th></tr>';
+			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">/</span></td><td>Show keyboard shortcuts</td></tr>';
+		echo '</table>';
+	echo '</div>';
+echo '</div>';
+
 cm_admin_tail();

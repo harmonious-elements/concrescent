@@ -1,30 +1,35 @@
-(function($,window,document,cmui,eventInfo,ctxInfo){
-
-	var naturalTokenize = function(text) {
-		var tokens = [];
-		var re = /[0-9]+|[^0-9]+/g;
-		var m = re.exec(text);
-		while (m) {
-			tokens.push(m[0]);
-			m = re.exec(text);
-		}
-		return tokens;
-	};
-	var naturalCompare = function(a, b) {
-		var aa = naturalTokenize(String(a).toLowerCase());
-		var bb = naturalTokenize(String(b).toLowerCase());
-		for (var i = 0; aa[i] && bb[i]; ++i) {
-			if (aa[i] != bb[i]) {
-				var an = Number(aa[i]);
-				var bn = Number(bb[i]);
-				if (isFinite(an) && isFinite(bn)) {
-					return (an < bn) ? -1 : 1;
+(function($,window,document,cmui,listdef,eventInfo,ctxInfo){
+	var doAjax = function(request, done, message, errorMessage) {
+		cmui.showButterbar(message);
+		$.post(
+			'', request,
+			function(response) {
+				if (!response['ok']) {
+					cmui.showButterbarPersistent(errorMessage);
 				} else {
-					return (aa[i] < bb[i]) ? -1 : 1;
+					if (done) done(response);
+					cmui.hideButterbar();
 				}
-			}
-		}
-		return aa.length - bb.length;
+			},
+			'json'
+		);
+	};
+	var setRect = function(element, x1, y1, x2, y2) {
+		element.css('top', (Math.min(y1, y2) * 100) + '%');
+		element.css('left', (Math.min(x1, x2) * 100) + '%');
+		element.css('right', ((1 - Math.max(x1, x2)) * 100) + '%');
+		element.css('bottom', ((1 - Math.max(y1, y2)) * 100) + '%');
+	};
+	var makeApplicationLink = function(assignment) {
+		var contextUC = assignment['context'].toUpperCase();
+		var contextLC = assignment['context'].toLowerCase();
+		var contextID = assignment['context-id'];
+		var appName = assignment['application-name'];
+		var link = $('<a/>');
+		link.attr('href', 'edit.php?c=' + contextLC + '&id=' + contextID);
+		link.attr('target', '_blank');
+		link.text(appName || ('[' + contextUC + 'A' + contextID + ']'));
+		return link;
 	};
 
 	var dateTimeReformat = function(s) {
@@ -83,6 +88,18 @@
 				return startTime[0] + ' \u2014 ' + endTime[0];
 			}
 		}
+		var startTime1 = startTime[1].split(/:/g);
+		var endTime1 = endTime[1].split(/:/g);
+		startTime[1] = (
+			startTime1[0] + ':' + startTime1[1] + ' (' +
+			((startTime1[0] % 12) ? (startTime1[0] % 12) : 12) + ':' +
+			startTime1[1] + ((startTime1[0] < 12) ? ' AM' : ' PM') + ')'
+		);
+		endTime[1] = (
+			endTime1[0] + ':' + endTime1[1] + ' (' +
+			((endTime1[0] % 12) ? (endTime1[0] % 12) : 12) + ':' +
+			endTime1[1] + ((endTime1[0] < 12) ? ' AM' : ' PM') + ')'
+		);
 		if (dateTimeCompare(startTime[0], endTime[0]) == 0) {
 			return startTime[0] + ' ' + startTime[1] + ' \u2014 ' + endTime[1];
 		} else {
@@ -90,39 +107,31 @@
 		}
 	};
 
-	var setRect = function(element, x1, y1, x2, y2) {
-		element.css('top', (Math.min(y1, y2) * 100) + '%');
-		element.css('left', (Math.min(x1, x2) * 100) + '%');
-		element.css('right', ((1 - Math.max(x1, x2)) * 100) + '%');
-		element.css('bottom', ((1 - Math.max(y1, y2)) * 100) + '%');
+	var naturalTokenize = function(text) {
+		var tokens = [];
+		var re = /[0-9]+|[^0-9]+/g;
+		var m = re.exec(text);
+		while (m) {
+			tokens.push(m[0]);
+			m = re.exec(text);
+		}
+		return tokens;
 	};
-
-	var makeApplicationLink = function(assignment) {
-		var contextUC = assignment['context'].toUpperCase();
-		var contextLC = assignment['context'].toLowerCase();
-		var contextID = assignment['context-id'];
-		var appName = assignment['application-name'];
-		var link = $('<a/>');
-		link.attr('href', 'edit.php?c=' + contextLC + '&id=' + contextID);
-		link.attr('target', '_blank');
-		link.text(appName || ('[' + contextUC + 'A' + contextID + ']'));
-		return link;
-	};
-
-	var doAjax = function(request, done, message, errorMessage) {
-		cmui.showButterbar(message);
-		$.post(
-			'', request,
-			function(response) {
-				if (!response['ok']) {
-					cmui.showButterbarPersistent(errorMessage);
+	var naturalCompare = function(a, b) {
+		var aa = naturalTokenize(String(a).toLowerCase());
+		var bb = naturalTokenize(String(b).toLowerCase());
+		for (var i = 0; aa[i] && bb[i]; ++i) {
+			if (aa[i] != bb[i]) {
+				var an = Number(aa[i]);
+				var bn = Number(bb[i]);
+				if (isFinite(an) && isFinite(bn)) {
+					return (an < bn) ? -1 : 1;
 				} else {
-					if (done) done(response);
-					cmui.hideButterbar();
+					return (aa[i] < bb[i]) ? -1 : 1;
 				}
-			},
-			'json'
-		);
+			}
+		}
+		return aa.length - bb.length;
 	};
 
 	$(document).ready(function() {
@@ -130,19 +139,119 @@
 		var tbodyByRT = $('.cm-assignments-by-room-or-table');
 		var tbodyByAN = $('.cm-assignments-by-application-name');
 		var calendarArea = $('.calendar-body');
+		var tagsLoad, assignmentsLoad;
+		var pageKeyEvent, editorKeyEvent, selectAppKeyEvent, selectRTKeyEvent;
+
+		var openEditor = function(assignment) {
+			$('#ea-old-context').val(assignment['context'] || '');
+			$('#ea-old-context-id').val(assignment['context-id'] || '');
+			$('#ea-context').val(assignment['context'] || '');
+			$('#ea-context-id').val(assignment['context-id'] || '');
+			$('#ea-context-id-string').val(
+				(assignment['context'] && assignment['context-id']) ?
+				(assignment['context'] + 'A' + assignment['context-id']) : ''
+			);
+			$('#ea-old-room-or-table-id').val(assignment['room-or-table-id'] || '');
+			$('#ea-old-start-time').val(assignment['start-time'] || '');
+			$('#ea-old-end-time').val(assignment['end-time'] || '');
+			$('#ea-room-or-table-id').val(assignment['room-or-table-id'] || '');
+			$('#ea-start-time').val(dateTimeReformat(assignment['start-time']));
+			$('#ea-end-time').val(dateTimeReformat(assignment['end-time']));
+			cmui.showDialog('edit-assignment');
+			$('body').unbind('keydown').bind('keydown', editorKeyEvent);
+		};
+		var pullFromEditor = function(doDelete, doCreate) {
+			return {
+				'action': 'update-assignment',
+				'old-context': (doDelete && $('#ea-old-context').val() || ''),
+				'old-context-id': (doDelete && $('#ea-old-context-id').val() || ''),
+				'old-room-or-table-id': (doDelete && $('#ea-old-room-or-table-id').val() || ''),
+				'old-start-time': (doDelete && $('#ea-old-start-time').val() || ''),
+				'old-end-time': (doDelete && $('#ea-old-end-time').val() || ''),
+				'context': (doCreate && $('#ea-context').val() || ''),
+				'context-id': (doCreate && $('#ea-context-id').val() || ''),
+				'room-or-table-id': (doCreate && $('#ea-room-or-table-id').val() || ''),
+				'start-time': (doCreate && $('#ea-start-time').val() || ''),
+				'end-time': (doCreate && $('#ea-end-time').val() || '')
+			};
+		};
+		$('.edit-dialog-select-application-button').bind('click', function() {
+			cmui.showDialog('select-application');
+			$('#cm-search-input').focus();
+			$('body').unbind('keydown').bind('keydown', selectAppKeyEvent);
+		});
+		$('.edit-dialog-select-room-or-table-button').bind('click', function() {
+			cmui.showDialog('select-room-table');
+			$('body').unbind('keydown').bind('keydown', selectRTKeyEvent);
+		});
+		$('.edit-dialog-delete-button').bind('click', function() {
+			doAjax(
+				pullFromEditor(true, false),
+				function() {
+					cmui.hideDialog();
+					tagsLoad();
+					assignmentsLoad();
+					$('body').unbind('keydown').bind('keydown', pageKeyEvent);
+				},
+				'Deleting assignment...',
+				'An error occurred. Please reload the page.'
+			);
+		});
+		$('.edit-dialog-cancel-button').bind('click', function() {
+			cmui.hideDialog();
+			$('body').unbind('keydown').bind('keydown', pageKeyEvent);
+		});
+		$('.edit-dialog-save-button').bind('click', function() {
+			doAjax(
+				pullFromEditor(true, true),
+				function() {
+					cmui.hideDialog();
+					tagsLoad();
+					assignmentsLoad();
+					$('body').unbind('keydown').bind('keydown', pageKeyEvent);
+				},
+				'Updating assignment...',
+				'An error occurred. Please reload the page.'
+			);
+		});
+		listdef['select-function'] = function(id) {
+			$('#ea-context').val(ctxInfo['ctx_uc']);
+			$('#ea-context-id').val(id);
+			$('#ea-context-id-string').val(ctxInfo['ctx_uc'] + 'A' + id);
+			cmui.showDialog('edit-assignment');
+			$('body').unbind('keydown').bind('keydown', editorKeyEvent);
+		};
+		$('.select-application-dialog-cancel-button').bind('click', function() {
+			cmui.showDialog('edit-assignment');
+			$('body').unbind('keydown').bind('keydown', editorKeyEvent);
+		});
+		$('.select-room-table-dialog-select-button').each(function() {
+			var self = $(this);
+			self.bind('click', function() {
+				$('#ea-room-or-table-id').val(self.text());
+				cmui.showDialog('edit-assignment');
+				$('body').unbind('keydown').bind('keydown', editorKeyEvent);
+			});
+		});
+		$('.select-room-table-dialog-cancel-button').bind('click', function() {
+			cmui.showDialog('edit-assignment');
+			$('body').unbind('keydown').bind('keydown', editorKeyEvent);
+		});
 
 		var tagsMouseBind = function(element, tag) {
 			var tagsMouseEvent = function(event) {
-				tagId = tag['id'];
-				console.log(tagId);
+				openEditor({
+					'room-or-table-id': tag['id'],
+					'start-time': eventInfo['start_date'] + ' 00:00:00',
+					'end-time': eventInfo['end_date'] + ' 23:59:59'
+				});
 				event.stopPropagation();
 				event.preventDefault();
 			};
 			element.bind('mousedown', tagsMouseEvent);
 			element.find('label').bind('mousedown', tagsMouseEvent);
 		};
-
-		var tagsLoad = function(done) {
+		tagsLoad = function(done) {
 			doAjax(
 				{'action': 'list-tags'},
 				function(response) {
@@ -186,19 +295,82 @@
 		};
 
 		var assignmentsMouseBind = function(element, assignment) {
-			var assignmentsMouseEvent = function(event) {
-				console.log(assignment);
+			element.bind('mousedown', function(event) {
+				openEditor(assignment);
+				event.stopPropagation();
+				event.preventDefault();
+			});
+			element.find('a').bind('mousedown', function(event) {
+				event.stopPropagation();
+			});
+		};
+		var calendarDayMouseBind = function(element, rtid) {
+			var tempEvent = null;
+			var tempEventContent = null;
+			var firstClickY = 0;
+			var maxTime = 1440 * eventInfo['dates'].length;
+			var calendarDayMouseEvent = function(event) {
+				if (tempEvent && tempEventContent) {
+					var lastClickY = event.pageY - element.offset().top;
+					var startTime = 15 * Math.floor(Math.min(firstClickY, lastClickY) / 15);
+					var endTime = 15 * Math.ceil(Math.max(firstClickY, lastClickY) / 15);
+					if (startTime < 0) startTime = 0;
+					if (!(startTime % 1440)) startTime++;
+					if (startTime > maxTime) startTime = maxTime;
+					if (endTime > maxTime) endTime = maxTime;
+					if (!(endTime % 1440)) endTime--;
+					if (endTime < 0) endTime = 0;
+					var startTimeString = (
+						eventInfo['dates'][Math.floor(startTime / 1440)] + ' ' +
+						('00' + Math.floor((startTime % 1440) / 60)).substr(-2) + ':' +
+						('00' + (startTime % 60)).substr(-2) + ':00'
+					);
+					var endTimeString = (
+						eventInfo['dates'][Math.floor(endTime / 1440)] + ' ' +
+						('00' + Math.floor((endTime % 1440) / 60)).substr(-2) + ':' +
+						('00' + (endTime % 60)).substr(-2) + ':00'
+					);
+					tempEvent.css('top', startTime + 'px');
+					tempEvent.css('height', (endTime - startTime) + 'px');
+					tempEventContent.text(assignmentTimeString(startTimeString, endTimeString));
+					return [startTimeString, endTimeString];
+				}
+			};
+			var calendarDayMouseDown, calendarDayMouseDrag, calendarDayMouseUp;
+			calendarDayMouseDown = function(event) {
+				tempEvent = $('<div/>').addClass('calendar-event');
+				tempEventContent = $('<div/>').addClass('calendar-event-content');
+				firstClickY = event.pageY - element.offset().top;
+				calendarDayMouseEvent(event);
+				tempEvent.append(tempEventContent);
+				element.append(tempEvent);
+				$(document).unbind('mousemove').bind('mousemove', calendarDayMouseDrag);
+				$(document).unbind('mouseup').bind('mouseup', calendarDayMouseUp);
 				event.stopPropagation();
 				event.preventDefault();
 			};
-			element.bind('mousedown', assignmentsMouseEvent);
-			var calendarLinkMouseEvent = function(event) {
+			calendarDayMouseDrag = function(event) {
+				calendarDayMouseEvent(event);
 				event.stopPropagation();
+				event.preventDefault();
 			};
-			element.find('a').bind('mousedown', calendarLinkMouseEvent);
+			calendarDayMouseUp = function(event) {
+				var time = calendarDayMouseEvent(event);
+				if (tempEvent) { tempEvent.remove(); tempEvent = null; }
+				if (tempEventContent) { tempEventContent.remove(); tempEventContent = null; }
+				openEditor({
+					'room-or-table-id': rtid,
+					'start-time': time[0],
+					'end-time': time[1]
+				});
+				$(document).unbind('mousemove');
+				$(document).unbind('mouseup');
+				event.stopPropagation();
+				event.preventDefault();
+			};
+			element.bind('mousedown', calendarDayMouseDown);
 		};
-
-		var assignmentsLoad = function(done) {
+		assignmentsLoad = function(done) {
 			doAjax(
 				{'action': 'list-assignments'},
 				function(response) {
@@ -247,6 +419,7 @@
 								calendarColumn.append(calendarColumnHeader);
 								calendarColumn.append(calendarColumnBody);
 								calendarArea.append(calendarColumn);
+								calendarDayMouseBind(calendarColumnBody, calendarRTID);
 							}
 							var calendarEvent = $('<div/>').addClass('calendar-event');
 							var calendarEventContent = $('<div/>').addClass('calendar-event-content');
@@ -307,8 +480,87 @@
 			);
 		};
 
+		pageKeyEvent = function(event) {
+			switch (event.which) {
+				case 191:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					cmui.showDialog('shortcuts');
+					break;
+				default:
+					return;
+			}
+			event.stopPropagation();
+			event.preventDefault();
+		};
+		editorKeyEvent = function(event) {
+			switch (event.which) {
+				case 27:
+					$('.edit-dialog-cancel-button').click();
+					break;
+				case 65:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					$('.edit-dialog-select-application-button').click();
+					break;
+				case 68:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					$('.edit-dialog-delete-button').click();
+					break;
+				case 82:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					$('.edit-dialog-select-room-or-table-button').click();
+					break;
+				case 83:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					$('.edit-dialog-save-button').click();
+					break;
+				default:
+					return;
+			}
+			event.stopPropagation();
+			event.preventDefault();
+		};
+		selectAppKeyEvent = function(event) {
+			switch (event.which) {
+				case 27:
+					$('.select-application-dialog-cancel-button').click();
+					break;
+				case 33:
+					$('.cm-search-prev-page').click();
+					break;
+				case 34:
+					$('.cm-search-next-page').click();
+					break;
+				case 35:
+					$('.cm-search-last-page').click();
+					break;
+				case 36:
+					$('.cm-search-first-page').click();
+					break;
+				case 83:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					var e = $('.select-button');
+					if (e.length == 1) e.click();
+					break;
+				default:
+					return;
+			}
+			event.stopPropagation();
+			event.preventDefault();
+		};
+		selectRTKeyEvent = function(event) {
+			switch (event.which) {
+				case 27:
+					$('.select-room-table-dialog-cancel-button').click();
+					break;
+				default:
+					return;
+			}
+			event.stopPropagation();
+			event.preventDefault();
+		};
+
 		tagsLoad();
 		assignmentsLoad();
+		$('body').unbind('keydown').bind('keydown', pageKeyEvent);
 	});
-
-})(jQuery,window,document,cmui,cm_app_event_info,cm_app_context_info);
+})(jQuery,window,document,cmui,cm_list_def,cm_app_event_info,cm_app_context_info);
