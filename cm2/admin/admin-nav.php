@@ -118,6 +118,13 @@ function cm_admin_nav_application($context, $ctx_info) {
 			)
 		),
 		array(
+			'id' => 'application-assignments-'.$ctx_lc,
+			'href' => '/admin/application/assignments.php?c='.$ctx_lc,
+			'name' => $ctx_name.' Assignments',
+			'description' => 'View and edit '.strtolower($ctx_info['assignment_term'][1]).' assigned to '.$ctx_name_lc.' applications.',
+			'permission' => 'application-assignments-'.$ctx_lc
+		),
+		array(
 			'id' => 'application-badge-types-'.$ctx_lc,
 			'href' => '/admin/application/badge-types.php?c='.$ctx_lc,
 			'name' => $ctx_name.' Badge Types',

@@ -149,6 +149,11 @@ function cm_admin_perms_application_config($context, $ctx_info) {
 	$ctx_name_lc = strtolower($ctx_name);
 	return array(
 		array(
+			'id' => 'application-assignments-'.$ctx_lc,
+			'name' => $ctx_name.' Assignments',
+			'description' => 'View and edit '.strtolower($ctx_info['assignment_term'][1]).' assigned to '.$ctx_name_lc.' applications.'
+		),
+		array(
 			'id' => 'application-badge-types-'.$ctx_lc,
 			'name' => $ctx_name.' Badge Types',
 			'description' => 'Create or modify the types of badges available on the '.$ctx_name_lc.' application form.'
