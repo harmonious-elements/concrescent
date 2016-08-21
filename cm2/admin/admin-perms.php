@@ -66,7 +66,7 @@ $cm_admin_perms_attendee_config = (
 		),
 		array(
 			'id' => 'attendee-csv',
-			'name' => 'Attendee CSV',
+			'name' => 'Attendee CSV Export',
 			'description' => 'Download a CSV file of attendee registration records.'
 		),
 	)
@@ -180,7 +180,7 @@ function cm_admin_perms_application_config($context, $ctx_info) {
 		),
 		array(
 			'id' => 'application-csv-'.$ctx_lc,
-			'name' => $ctx_name.' CSV',
+			'name' => $ctx_name.' CSV Export',
 			'description' => 'Download a CSV file of '.$ctx_name_lc.' applications or badge registration records.'
 		),
 	);
@@ -260,7 +260,7 @@ $cm_admin_perms_staff_config = (
 		),
 		array(
 			'id' => 'staff-csv',
-			'name' => 'Staff CSV',
+			'name' => 'Staff CSV Export',
 			'description' => 'Download a CSV file of staff application records.'
 		),
 	)
@@ -300,7 +300,7 @@ $cm_admin_perms_payment = (
 		),
 		array(
 			'id' => 'payment-csv',
-			'name' => 'Payment CSV',
+			'name' => 'Payment CSV Export',
 			'description' => 'Download a CSV file of payment request records.'
 		),
 	)

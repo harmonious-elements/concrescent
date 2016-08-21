@@ -81,8 +81,8 @@ if (isset($_POST['download-attendees'])) {
 	cm_output_csv($columns, $entities, 'attendees.csv');
 }
 
-cm_admin_head('Attendee CSV');
-cm_admin_body('Attendee CSV');
+cm_admin_head('Attendee CSV Export');
+cm_admin_body('Attendee CSV Export');
 cm_admin_nav('attendee-csv');
 
 echo '<article>';

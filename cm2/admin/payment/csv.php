@@ -38,8 +38,8 @@ if (isset($_POST['download-payments'])) {
 	cm_output_csv($columns, $entities, 'payments.csv');
 }
 
-cm_admin_head('Payment Request CSV');
-cm_admin_body('Payment Request CSV');
+cm_admin_head('Payment Request CSV Export');
+cm_admin_body('Payment Request CSV Export');
 cm_admin_nav('payment-csv');
 
 echo '<article>';

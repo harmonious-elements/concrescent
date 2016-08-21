@@ -155,8 +155,8 @@ if (isset($_POST['download-applicants'])) {
 	cm_output_csv($columns, $entities, 'badges.csv');
 }
 
-cm_admin_head($ctx_name.' CSV');
-cm_admin_body($ctx_name.' CSV');
+cm_admin_head($ctx_name.' CSV Export');
+cm_admin_body($ctx_name.' CSV Export');
 cm_admin_nav('application-csv-'.$ctx_lc);
 
 echo '<article>';

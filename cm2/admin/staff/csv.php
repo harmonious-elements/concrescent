@@ -93,8 +93,8 @@ if (isset($_POST['download-staff'])) {
 	cm_output_csv($columns, $entities, 'staff.csv');
 }
 
-cm_admin_head('Staff CSV');
-cm_admin_body('Staff CSV');
+cm_admin_head('Staff CSV Export');
+cm_admin_body('Staff CSV Export');
 cm_admin_nav('staff-csv');
 
 echo '<article>';

@@ -68,7 +68,7 @@ $cm_admin_nav_attendee = (
 		array(
 			'id' => 'attendee-csv',
 			'href' => '/admin/attendee/csv.php',
-			'name' => 'Attendee CSV',
+			'name' => 'Attendee CSV Export',
 			'description' => 'Download a CSV file of attendee registration records.',
 			'permission' => 'attendee-csv'
 		),
@@ -162,7 +162,7 @@ function cm_admin_nav_application($context, $ctx_info) {
 		array(
 			'id' => 'application-csv-'.$ctx_lc,
 			'href' => '/admin/application/csv.php?c='.$ctx_lc,
-			'name' => $ctx_name.' CSV',
+			'name' => $ctx_name.' CSV Export',
 			'description' => 'Download a CSV file of '.$ctx_name_lc.' applications or badge registration records.',
 			'permission' => 'application-csv-'.$ctx_lc
 		),
@@ -235,7 +235,7 @@ $cm_admin_nav_staff = (
 		array(
 			'id' => 'staff-csv',
 			'href' => '/admin/staff/csv.php',
-			'name' => 'Staff CSV',
+			'name' => 'Staff CSV Export',
 			'description' => 'Download a CSV file of staff application records.',
 			'permission' => 'staff-csv'
 		),
@@ -268,7 +268,7 @@ $cm_admin_nav_payment = (
 		array(
 			'id' => 'payment-csv',
 			'href' => '/admin/payment/csv.php',
-			'name' => 'Payment CSV',
+			'name' => 'Payment CSV Export',
 			'description' => 'Download a CSV file of payment request records.',
 			'permission' => 'payment-csv'
 		),
