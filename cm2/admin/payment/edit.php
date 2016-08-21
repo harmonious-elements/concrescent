@@ -162,7 +162,7 @@ echo '<article>';
 				echo '</tr>';
 
 				echo '<tr>';
-					echo '<th><label for="payment-price">Payment Amount</label></th>';
+					echo '<th><label for="payment-price">Requested Amount</label></th>';
 					if ($can_edit) {
 						$value = isset($item['payment-price']) ? htmlspecialchars($item['payment-price']) : '';
 						echo '<td><input type="number" id="payment-price" name="payment-price" value="' . $value . '" min="0" step="0.01"></td>';

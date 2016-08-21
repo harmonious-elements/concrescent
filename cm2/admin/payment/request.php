@@ -28,7 +28,7 @@ if (isset($_POST['submit'])) {
 	if (!$item['payment-name']) $errors['payment-name'] = 'Payment For is required.';
 	$item['payment-description'] = trim($_POST['payment-description']);
 	$item['payment-price'] = (float)trim($_POST['payment-price']);
-	if ($item['payment-price'] <= 0) $errors['payment-price'] = 'Payment amount is required.';
+	if ($item['payment-price'] <= 0) $errors['payment-price'] = 'Requested amount is required.';
 
 	$item['payment-status'] = 'Incomplete';
 
@@ -137,7 +137,7 @@ echo '<article>';
 				echo '<tr>';
 					$value = isset($item['payment-price']) ? htmlspecialchars($item['payment-price']) : '';
 					$error = isset($errors['payment-price']) ? htmlspecialchars($errors['payment-price']) : '';
-					echo '<th><label for="payment-price">Payment Amount</label></th>';
+					echo '<th><label for="payment-price">Requested Amount</label></th>';
 					echo '<td><input type="number" id="payment-price" name="payment-price" value="' . $value . '" min="0" step="0.01">';
 					if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
 				echo '</tr>';

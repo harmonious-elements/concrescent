@@ -242,6 +242,39 @@ $cm_admin_nav_staff = (
 	)
 );
 
+$cm_admin_nav_payment = (
+	array(
+		array(
+			'id' => 'payment-request',
+			'href' => '/admin/payment/request.php',
+			'name' => 'Request Payment',
+			'description' => 'Request payments from individuals for purposes not covered elsewhere.',
+			'permission' => 'payment-request'
+		),
+		array(
+			'id' => 'payments',
+			'href' => '/admin/payment/index.php',
+			'name' => 'Payment Requests',
+			'description' => 'View and modify payment request records.',
+			'permission' => array('||', 'payments', 'payments-view', 'payments-edit', 'payments-delete')
+		),
+		array(
+			'id' => 'payment-mail',
+			'href' => '/admin/payment/mail-index.php',
+			'name' => 'Payment Form Letters',
+			'description' => 'Write form letters to be emailed upon requesting payment.',
+			'permission' => 'payment-mail'
+		),
+		array(
+			'id' => 'payment-csv',
+			'href' => '/admin/payment/csv.php',
+			'name' => 'Payment CSV',
+			'description' => 'Download a CSV file of payment request records.',
+			'permission' => 'payment-csv'
+		),
+	)
+);
+
 $cm_admin_nav_admin = (
 	array(
 		array(
@@ -272,4 +305,5 @@ foreach ($cm_config['application_types'] as $context => $ctx_info) {
 
 $cm_admin_nav[] = $cm_admin_nav_staff_departments;
 $cm_admin_nav[] = $cm_admin_nav_staff;
+$cm_admin_nav[] = $cm_admin_nav_payment;
 $cm_admin_nav[] = $cm_admin_nav_admin;

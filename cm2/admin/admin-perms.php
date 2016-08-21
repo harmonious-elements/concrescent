@@ -266,6 +266,46 @@ $cm_admin_perms_staff_config = (
 	)
 );
 
+$cm_admin_perms_payment = (
+	array(
+		array(
+			'id' => 'payment-request',
+			'name' => 'Request Payment',
+			'description' => 'Request payments from individuals for purposes not covered elsewhere.'
+		),
+		array(
+			'id' => 'payments',
+			'name' => 'Payment Requests',
+			'description' => 'View the list of payment request records.'
+		),
+		array(
+			'id' => 'payments-view',
+			'name' => 'Payment Requests - View',
+			'description' => 'View individual payment request records.'
+		),
+		array(
+			'id' => 'payments-edit',
+			'name' => 'Payment Requests - Edit',
+			'description' => 'Modify payment request records.'
+		),
+		array(
+			'id' => 'payments-delete',
+			'name' => 'Payment Requests - Delete',
+			'description' => 'Delete payment request records.'
+		),
+		array(
+			'id' => 'payment-mail',
+			'name' => 'Payment Form Letters',
+			'description' => 'Write form letters to be emailed upon requesting payment.'
+		),
+		array(
+			'id' => 'payment-csv',
+			'name' => 'Payment CSV',
+			'description' => 'Download a CSV file of payment request records.'
+		),
+	)
+);
+
 $cm_admin_perms_admin = (
 	array(
 		array(
@@ -301,5 +341,6 @@ foreach ($cm_config['application_types'] as $context => $ctx_info) {
 $cm_admin_perms[] = $cm_admin_perms_staff_departments;
 $cm_admin_perms[] = $cm_admin_perms_staff;
 $cm_admin_perms[] = $cm_admin_perms_staff_config;
+$cm_admin_perms[] = $cm_admin_perms_payment;
 $cm_admin_perms[] = $cm_admin_perms_admin;
 $cm_admin_perms[] = $cm_admin_perms_all;

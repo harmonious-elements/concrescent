@@ -39,7 +39,7 @@ $list_def = array(
 			'type' => 'text'
 		),
 		array(
-			'name' => 'Payment Amount',
+			'name' => 'Requested Amount',
 			'key' => 'payment-price',
 			'type' => 'price'
 		),
