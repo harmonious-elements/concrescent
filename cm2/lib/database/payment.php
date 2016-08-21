@@ -6,6 +6,14 @@ require_once dirname(__FILE__).'/database.php';
 
 class cm_payment_db {
 
+	public $payment_statuses = array(
+		'Incomplete',
+		'Cancelled',
+		'Rejected',
+		'Completed',
+		'Refunded'
+	);
+
 	public $cm_db;
 
 	public function __construct($cm_db) {

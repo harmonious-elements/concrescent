@@ -85,9 +85,9 @@ if (isset($_POST['cm-list-action'])) {
 	exit(0);
 }
 
-cm_admin_head('Payment Form Letters');
+cm_admin_head('Payment Request Form Letters');
 cm_list_head($list_def);
-cm_admin_body('Payment Form Letters');
+cm_admin_body('Payment Request Form Letters');
 cm_admin_nav('payment-mail');
 
 echo '<article>';

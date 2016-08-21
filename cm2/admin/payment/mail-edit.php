@@ -70,9 +70,9 @@ if (isset($_POST['cm-mail-action'])) {
 	$succeeded = true;
 }
 
-cm_admin_head('Payment Form Letters');
+cm_admin_head('Payment Request Form Letters');
 cm_mail_head();
-cm_admin_body('Payment Form Letters');
+cm_admin_body('Payment Request Form Letters');
 cm_admin_nav('payment-mail');
 
 echo '<article>';
