@@ -27,7 +27,7 @@ $list_def = array(
 	'row-actions' => array('edit', 'delete'),
 	'table-actions' => array('add'),
 	'add-label' => 'Upload',
-	'edit-url' => get_site_url(false) . '/admin/badge/edit.php?name=',
+	'edit-url' => get_site_url(false) . '/admin/badge/artwork-edit.php?name=',
 	'add-title' => 'Upload Badge Artwork',
 	'delete-title' => 'Delete Badge Artwork'
 );
@@ -64,10 +64,12 @@ if ($submitted) {
 		$image_type = ($image_path ? exif_imagetype($image_path) : null);
 		$mime_type = ($image_type ? image_type_to_mime_type($image_type) : null);
 		$file_name = (isset($_POST['file-name']) ? trim($_POST['file-name']) : null);
-		if (!$file_name) $file_name = (isset($image_file['name']) ? $image_file['name'] : null);
+		if (!$file_name) $file_name = (isset($image_file['name']) ? trim($image_file['name']) : null);
 		if ($badb->upload_badge_artwork($file_name, $mime_type, $image_w, $image_h, $image_path)) {
 			$message = 'Image upload succeeded.';
 			$success = true;
+
+			$badb->delete_badge_artwork_fields($file_name);
 
 			$fields_file = (isset($_FILES['fields-file']) ? $_FILES['fields-file'] : null);
 			if ($fields_file && (!isset($fields_file['error']) || !$fields_file['error'])) {
@@ -122,7 +124,7 @@ echo '<form action="artwork.php" method="post" enctype="multipart/form-data" cla
 				echo '<td>(Optional. If left blank, the name of the image file will be used.)</td>';
 			echo '</tr>';
 			echo '<tr>';
-				echo '<th><label for="image-file">Upload Image:</label></th>';
+				echo '<th><label for="image-file">Image File:</label></th>';
 				echo '<td><input type="file" id="image-file" name="image-file"></td>';
 			echo '</tr>';
 			echo '<tr>';
@@ -130,12 +132,12 @@ echo '<form action="artwork.php" method="post" enctype="multipart/form-data" cla
 				echo '<td>(Required. Select an image file containing badge artwork.)</td>';
 			echo '</tr>';
 			echo '<tr>';
-				echo '<th><label for="fields-file">Upload Fields:</label></th>';
+				echo '<th><label for="fields-file">Layout File:</label></th>';
 				echo '<td><input type="file" id="fields-file" name="fields-file"></td>';
 			echo '</tr>';
 			echo '<tr>';
 				echo '<th></th>';
-				echo '<td>(Optional. Select a CSV file containing field specifications.)</td>';
+				echo '<td>(Optional. Select a CSV file containing field layout.)</td>';
 			echo '</tr>';
 			echo '<tr>';
 				echo '<th><label for="copy-from">Copy From:</label></th>';
@@ -154,7 +156,7 @@ echo '<form action="artwork.php" method="post" enctype="multipart/form-data" cla
 			echo '</tr>';
 			echo '<tr>';
 				echo '<th></th>';
-				echo '<td>(Optional. Select existing badge artwork to copy fields from.)</td>';
+				echo '<td>(Optional. Select existing badge artwork to copy layout from.)</td>';
 			echo '</tr>';
 		echo '</table>';
 	echo '</div>';

@@ -480,12 +480,30 @@ class cm_badge_artwork_db {
 	}
 
 	public function clear_badge_artwork_map($context, $context_id, $file_name) {
-		if (!$context || !$context_id || !$file_name) return false;
-		$stmt = $this->cm_db->connection->prepare(
-			'DELETE FROM '.$this->cm_db->table_name('badge_artwork_map').
-			' WHERE `context` = ? AND `context_id` = ? AND `file_name` = ?'
-		);
-		$stmt->bind_param('sis', $context, $context_id, $file_name);
+		if (!$context && !$context_id && !$file_name) return false;
+		$query = 'DELETE FROM '.$this->cm_db->table_name('badge_artwork_map');
+		$first = true;
+		$bind = array('');
+		if ($context) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `context` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$context;
+		}
+		if ($context_id) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `context_id` = ?';
+			$first = false;
+			$bind[0] .= 'i';
+			$bind[] = &$context_id;
+		}
+		if ($file_name) {
+			$query .= ($first ? ' WHERE' : ' AND') . ' `file_name` = ?';
+			$first = false;
+			$bind[0] .= 's';
+			$bind[] = &$file_name;
+		}
+		$stmt = $this->cm_db->connection->prepare($query);
+		if (!$first) call_user_func_array(array($stmt, 'bind_param'), $bind);
 		$success = $stmt->execute();
 		$stmt->close();
 		return $success;

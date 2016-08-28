@@ -1,0 +1,148 @@
+.badge-artwork-container {
+	padding: 30px 0 30px 0;
+}
+.badge-artwork-container-inner {
+	position: relative;
+	width: 60%;
+	margin: auto;
+	border: solid 1px gray;
+	box-shadow: 0 2px 2px gray;
+}
+.badge-artwork-container-inner.vertical {
+	width: 40%;
+}
+.badge-artwork {
+	position: relative;
+	width: 100%;
+	height: 0;
+	cursor: crosshair;
+}
+.badge-artwork,
+.badge-artwork * {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.badge-artwork-fields {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.badge-artwork-field {
+	position: absolute;
+	border: solid 1px gray;
+	opacity: 0.5;
+	text-align: center;
+	overflow: visible;
+	cursor: pointer;
+	/* Center vertically! */
+	display: -webkit-flex;
+	display: flex;
+	-webkit-align-content: center;
+	align-content: center;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+.badge-artwork-field-marquee {
+	position: absolute;
+	background: rgba(204, 204, 255, 0.4);
+	border: solid 1px rgba(204, 204, 255, 0.8);
+}
+.badge-artwork-field-editor {
+	position: absolute;
+	border: solid 1px #ccf;
+	text-align: center;
+	overflow: visible;
+	cursor: default;
+	/* Center vertically! */
+	display: -webkit-flex;
+	display: flex;
+	-webkit-align-content: center;
+	align-content: center;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+.badge-artwork-field-editor-handle {
+	position: absolute;
+	width: 5px;
+	height: 5px;
+	background: blue;
+	border: solid 1px black;
+}
+.badge-artwork-field-editor-handle-n,
+.badge-artwork-field-editor-handle-nw,
+.badge-artwork-field-editor-handle-ne {
+	top: -4px;
+}
+.badge-artwork-field-editor-handle-s,
+.badge-artwork-field-editor-handle-sw,
+.badge-artwork-field-editor-handle-se {
+	bottom: -4px;
+}
+.badge-artwork-field-editor-handle-w,
+.badge-artwork-field-editor-handle-nw,
+.badge-artwork-field-editor-handle-sw {
+	left: -4px;
+}
+.badge-artwork-field-editor-handle-e,
+.badge-artwork-field-editor-handle-ne,
+.badge-artwork-field-editor-handle-se {
+	right: -4px;
+}
+.badge-artwork-field-editor-handle-n,
+.badge-artwork-field-editor-handle-s,
+.badge-artwork-field-editor-handle-center {
+	left: 50%;
+	margin-left: -4px;
+}
+.badge-artwork-field-editor-handle-w,
+.badge-artwork-field-editor-handle-e,
+.badge-artwork-field-editor-handle-center {
+	top: 50%;
+	margin-top: -4px;
+}
+.badge-artwork-field-editor-handle-n,
+.badge-artwork-field-editor-handle-s {
+	cursor: ns-resize;
+}
+.badge-artwork-field-editor-handle-w,
+.badge-artwork-field-editor-handle-e {
+	cursor: ew-resize;
+}
+.badge-artwork-field-editor-handle-nw,
+.badge-artwork-field-editor-handle-se {
+	cursor: nwse-resize;
+}
+.badge-artwork-field-editor-handle-ne,
+.badge-artwork-field-editor-handle-sw {
+	cursor: nesw-resize;
+}
+.badge-artwork-field-editor-handle-center {
+	cursor: move;
+}
+.badge-artwork-actions td {
+	padding: 2px;
+}
+.badge-artwork-actions label {
+	padding-right: 1em;
+}
+.badge-artwork-actions input[type=submit] {
+	margin: 0;
+	width: 120px;
+}
+.badge-types td {
+	padding: 0 2em 0 0;
+}
+.badge-types td input {
+	position: relative;
+	top: -1px;
+}
