@@ -181,6 +181,7 @@
 				];
 			}
 			setRect(fieldRectEditor, fieldRect[0], fieldRect[1], fieldRect[2], fieldRect[3]);
+			cmui.fitText(fieldRectEditor);
 			window.setTimeout(function() { cmui.fitText(fieldRectEditor); }, 1);
 		};
 		var updateEditor = function() {
@@ -391,7 +392,6 @@
 			if (!next.length) next = $('.badge-artwork-field:first');
 			next.mousedown();
 		};
-
 		$('body').bind('keydown', function(event) {
 			if (!$('.dialog-cover').hasClass('hidden')) return;
 			switch (event.which) {
