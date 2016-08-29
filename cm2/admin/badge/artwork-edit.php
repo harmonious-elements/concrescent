@@ -163,8 +163,8 @@ if (isset($_POST['action'])) {
 				'field-key' => trim($_POST['field-key']),
 				'font-size' => (int)$_POST['font-size'],
 				'font-family' => trim($_POST['font-family']),
-				'font-weight-bold' => (isset($_POST['font-weight-bold']) && $_POST['font-weight-bold']),
-				'font-style-italic' => (isset($_POST['font-style-italic']) && $_POST['font-style-italic']),
+				'font-weight-bold' => !!$_POST['font-weight-bold'],
+				'font-style-italic' => !!$_POST['font-style-italic'],
 				'color' => trim($_POST['color']),
 				'background' => trim($_POST['background']),
 				'color-minors' => trim($_POST['color-minors']),
@@ -194,13 +194,11 @@ $action_url_html = htmlspecialchars($action_url);
 cm_admin_head('Edit Badge Artwork - ' . $file_name);
 
 echo '<link rel="stylesheet" href="artwork-edit.css">';
-
 if (isset($bp_config['stylesheet']) && $bp_config['stylesheet']) {
 	foreach ($bp_config['stylesheet'] as $stylesheet) {
 		echo '<link rel="stylesheet" href="' . htmlspecialchars($stylesheet) . '">';
 	}
 }
-
 echo '<style>';
 	echo '.badge-artwork {';
 		echo 'padding-bottom: ' . $artwork['aspect-ratio'] . '%;';
@@ -208,12 +206,6 @@ echo '<style>';
 		echo 'background-size: 100% 100%;';
 	echo '}';
 echo '</style>';
-
-echo '<script type="text/javascript">';
-	echo 'cm_badge_artwork_field_keys = (' . json_encode($badb->field_keys) . ');';
-	echo 'cm_badge_artwork = (' . json_encode($artwork) . ');';
-echo '</script>';
-
 echo '<script type="text/javascript" src="artwork-edit.js"></script>';
 
 cm_admin_body('Edit Badge Artwork');
@@ -259,6 +251,12 @@ echo '<div class="card">';
 				echo '</div>';
 			echo '</div>';
 		echo '</div>';
+	echo '</div>';
+echo '</div>';
+
+echo '<div class="card artwork-editor-card">';
+	echo '<div class="card-title">Edit Badge Artwork</div>';
+	echo '<div class="card-content">';
 		echo '<div class="spacing">';
 			echo '<form action="' . $action_url_html . '" method="post" enctype="multipart/form-data">';
 				echo '<table border="0" cellpadding="0" cellspacing="0" class="badge-artwork-actions">';
@@ -312,7 +310,7 @@ echo '<div class="card field-editor-card hidden">';
 			echo '<tr>';
 				echo '<th><label for="field-editor-field-key">Field Type:</label></th>';
 				echo '<td>';
-					echo '<select id="field-editor-field-key>">';
+					echo '<select id="field-editor-field-key">';
 						foreach ($badb->field_keys as $key => $name) {
 							echo '<option value="' . htmlspecialchars($key) . '">' . htmlspecialchars($name) . '</option>';
 						}

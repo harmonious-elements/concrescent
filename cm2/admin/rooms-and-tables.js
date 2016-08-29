@@ -53,11 +53,25 @@
 			tagArea.find('.tag').removeClass('hidden');
 			if (tag) tag.addClass('hidden');
 			tagEditorId.val(tagId);
+			tagRect = [
+				Math.min(tagRect[0], tagRect[2]),
+				Math.min(tagRect[1], tagRect[3]),
+				Math.max(tagRect[0], tagRect[2]),
+				Math.max(tagRect[1], tagRect[3])
+			];
 			setRect(tagEditor, tagRect[0], tagRect[1], tagRect[2], tagRect[3]);
 			tagEditor.removeClass('hidden');
 			tagEditorId.focus();
 		};
-		var resizeEditor = function() {
+		var resizeEditor = function(finalize) {
+			if (finalize) {
+				tagRect = [
+					Math.min(tagRect[0], tagRect[2]),
+					Math.min(tagRect[1], tagRect[3]),
+					Math.max(tagRect[0], tagRect[2]),
+					Math.max(tagRect[1], tagRect[3])
+				];
+			}
 			setRect(tagEditor, tagRect[0], tagRect[1], tagRect[2], tagRect[3]);
 		};
 		var closeEditor = function() {
@@ -208,7 +222,7 @@
 			handleMouseUp = function(event) {
 				var xy = getXY(tagMap, event);
 				doResize(xy);
-				resizeEditor();
+				resizeEditor(true);
 				$(document).unbind('mousemove');
 				$(document).unbind('mouseup');
 				event.stopPropagation();

@@ -266,6 +266,16 @@ $cm_admin_perms_staff_config = (
 	)
 );
 
+$cm_admin_perms_badge = (
+	array(
+		array(
+			'id' => 'badge-artwork',
+			'name' => 'Badge Artwork',
+			'description' => 'Upload badge artwork and add text fields for names and ID numbers.'
+		),
+	)
+);
+
 $cm_admin_perms_payment = (
 	array(
 		array(
@@ -341,6 +351,7 @@ foreach ($cm_config['application_types'] as $context => $ctx_info) {
 $cm_admin_perms[] = $cm_admin_perms_staff_departments;
 $cm_admin_perms[] = $cm_admin_perms_staff;
 $cm_admin_perms[] = $cm_admin_perms_staff_config;
+$cm_admin_perms[] = $cm_admin_perms_badge;
 $cm_admin_perms[] = $cm_admin_perms_payment;
 $cm_admin_perms[] = $cm_admin_perms_admin;
 $cm_admin_perms[] = $cm_admin_perms_all;

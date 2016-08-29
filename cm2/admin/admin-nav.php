@@ -242,6 +242,18 @@ $cm_admin_nav_staff = (
 	)
 );
 
+$cm_admin_nav_badge = (
+	array(
+		array(
+			'id' => 'badge-artwork',
+			'href' => '/admin/badge/artwork.php',
+			'name' => 'Badge Artwork',
+			'description' => 'Upload badge artwork and add text fields for names and ID numbers.',
+			'permission' => 'badge-artwork'
+		),
+	)
+);
+
 $cm_admin_nav_payment = (
 	array(
 		array(
@@ -305,5 +317,6 @@ foreach ($cm_config['application_types'] as $context => $ctx_info) {
 
 $cm_admin_nav[] = $cm_admin_nav_staff_departments;
 $cm_admin_nav[] = $cm_admin_nav_staff;
+$cm_admin_nav[] = $cm_admin_nav_badge;
 $cm_admin_nav[] = $cm_admin_nav_payment;
 $cm_admin_nav[] = $cm_admin_nav_admin;

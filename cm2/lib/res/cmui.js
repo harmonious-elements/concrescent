@@ -63,6 +63,72 @@ cmui = (function($,window,document){
 		event.preventDefault();
 	};
 
+	var calculateTextSize, fitText;
+	calculateTextSize = function(text, fontFamily, fontSize, fontWeight, fontStyle) {
+		var e = $('#calculateTextSize');
+		if (!e.length) {
+			e = $('<div id="calculateTextSize"/>');
+			e.css({
+				'position': 'absolute',
+				'top': '0',
+				'left': '0',
+				'visibility': 'hidden',
+				'white-space': 'nowrap'
+			});
+			$('body').append(e);
+		}
+		e.css({
+			'font-family': fontFamily,
+			'font-size': fontSize + 'px',
+			'font-weight': fontWeight,
+			'font-style': fontStyle
+		});
+		e.text(text);
+		return [e.width(), e.height()];
+	};
+	fitText = function(e) {
+		var text = e.text();
+		var fontFamily = e.css('font-family');
+		var fontWeight = e.css('font-weight');
+		var fontStyle = e.css('font-style');
+		var w = e.innerWidth() - 2;
+		var h = e.innerHeight() - 2;
+		var min = 0;
+		var cur = h;
+		var max = h*2;
+		while (Math.abs(max-min) > 0.01) {
+			var ts = calculateTextSize(text, fontFamily, cur, fontWeight, fontStyle);
+			var tw = ts[0];
+			var th = ts[1];
+			if (tw > w || th > h) {
+				// Too big, need to make it smaller.
+				max = cur;
+				cur = (min+max)/2;
+			} else if (tw < w && th < h) {
+				// Too small, need to make it bigger.
+				min = cur;
+				cur = (min+max)/2;
+			} else {
+				break;
+			}
+		}
+		e.css('font-size', cur + 'px');
+		return cur;
+	};
+
+	var focusedOnInput;
+	focusedOnInput = function() {
+		var e = document.activeElement;
+		if (e) {
+			var n = e.nodeName;
+			if (n) {
+				var nn = n.toLowerCase();
+				return (nn == 'input' || nn == 'textarea' || nn == 'select');
+			}
+		}
+		return false;
+	};
+
 	var htmlSpecialChars = function(s) {
 		s = s.replace(/&/g, '&amp;');
 		s = s.replace(/"/g, '&quot;');
@@ -122,6 +188,8 @@ cmui = (function($,window,document){
 		hideButterbar: hideButterbar,
 		showDialog: showDialog,
 		hideDialog: hideDialog,
+		fitText: fitText,
+		focusedOnInput: focusedOnInput,
 		htmlSpecialChars: htmlSpecialChars,
 		paragraphString: paragraphString,
 		safeHtmlString: safeHtmlString,
