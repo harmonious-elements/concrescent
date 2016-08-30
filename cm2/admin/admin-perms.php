@@ -273,6 +273,11 @@ $cm_admin_perms_badge = (
 			'name' => 'Badge Artwork',
 			'description' => 'Upload badge artwork and add text fields for names and ID numbers.'
 		),
+		array(
+			'id' => 'badge-printing-setup',
+			'name' => 'Badge Printing Setup',
+			'description' => 'Change badge size and other settings for badge printing.'
+		),
 	)
 );
 

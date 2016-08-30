@@ -251,6 +251,13 @@ $cm_admin_nav_badge = (
 			'description' => 'Upload badge artwork and add text fields for names and ID numbers.',
 			'permission' => 'badge-artwork'
 		),
+		array(
+			'id' => 'badge-printing-setup',
+			'href' => '/admin/badge/printing-setup.php',
+			'name' => 'Badge Printing Setup',
+			'description' => 'Change badge size and other settings for badge printing.',
+			'permission' => 'badge-printing-setup'
+		),
 	)
 );
 
