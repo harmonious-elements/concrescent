@@ -197,14 +197,16 @@
 		var artworkMouseBind = function(element) {
 			var artworkMouseDown, artworkMouseDrag, artworkMouseUp;
 			artworkMouseDown = function(event) {
-				var xy = getXY(artworkArea, event);
-				fieldId = null;
-				fieldRect[0] = fieldRect[2] = xy[0];
-				fieldRect[1] = fieldRect[3] = xy[1];
-				closeEditor();
-				openMarquee();
-				$(document).unbind('mousemove').bind('mousemove', artworkMouseDrag);
-				$(document).unbind('mouseup').bind('mouseup', artworkMouseUp);
+				if (fieldPropEditor.hasClass('hidden')) {
+					var xy = getXY(artworkArea, event);
+					fieldId = null;
+					fieldRect[0] = fieldRect[2] = xy[0];
+					fieldRect[1] = fieldRect[3] = xy[1];
+					closeEditor();
+					openMarquee();
+					$(document).unbind('mousemove').bind('mousemove', artworkMouseDrag);
+					$(document).unbind('mouseup').bind('mouseup', artworkMouseUp);
+				}
 				event.stopPropagation();
 				event.preventDefault();
 			};
@@ -241,7 +243,9 @@
 
 		var fieldsMouseBind = function(element, field) {
 			var fieldsMouseEvent = function(event) {
-				openEditor(field, element);
+				if (fieldPropEditor.hasClass('hidden')) {
+					openEditor(field, element);
+				}
 				event.stopPropagation();
 				event.preventDefault();
 			};

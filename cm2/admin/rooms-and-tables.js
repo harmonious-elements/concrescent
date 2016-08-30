@@ -82,14 +82,16 @@
 		var mapMouseBind = function(element) {
 			var mapMouseDown, mapMouseDrag, mapMouseUp;
 			mapMouseDown = function(event) {
-				var xy = getXY(tagMap, event);
-				tagId = null;
-				tagRect[0] = tagRect[2] = xy[0];
-				tagRect[1] = tagRect[3] = xy[1];
-				closeEditor();
-				openMarquee();
-				$(document).unbind('mousemove').bind('mousemove', mapMouseDrag);
-				$(document).unbind('mouseup').bind('mouseup', mapMouseUp);
+				if (tagEditor.hasClass('hidden')) {
+					var xy = getXY(tagMap, event);
+					tagId = null;
+					tagRect[0] = tagRect[2] = xy[0];
+					tagRect[1] = tagRect[3] = xy[1];
+					closeEditor();
+					openMarquee();
+					$(document).unbind('mousemove').bind('mousemove', mapMouseDrag);
+					$(document).unbind('mouseup').bind('mouseup', mapMouseUp);
+				}
 				event.stopPropagation();
 				event.preventDefault();
 			};
@@ -118,12 +120,14 @@
 
 		var tagsMouseBind = function(element, tag) {
 			var tagsMouseEvent = function(event) {
-				tagId = tag['id'];
-				tagRect[0] = tag['x1'];
-				tagRect[1] = tag['y1'];
-				tagRect[2] = tag['x2'];
-				tagRect[3] = tag['y2'];
-				openEditor(element);
+				if (tagEditor.hasClass('hidden')) {
+					tagId = tag['id'];
+					tagRect[0] = tag['x1'];
+					tagRect[1] = tag['y1'];
+					tagRect[2] = tag['x2'];
+					tagRect[3] = tag['y2'];
+					openEditor(element);
+				}
 				event.stopPropagation();
 				event.preventDefault();
 			};

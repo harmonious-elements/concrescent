@@ -185,6 +185,22 @@ class cm_badge_artwork_db {
 		return false;
 	}
 
+	public function list_badge_artwork_names() {
+		$names = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `file_name`'.
+			' FROM '.$this->cm_db->table_name('badge_artwork_files').
+			' ORDER BY `file_name`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($name);
+		while ($stmt->fetch()) {
+			$names[] = $name;
+		}
+		$stmt->close();
+		return $names;
+	}
+
 	public function list_badge_artwork() {
 		$badge_artwork = array();
 		$stmt = $this->cm_db->connection->prepare(

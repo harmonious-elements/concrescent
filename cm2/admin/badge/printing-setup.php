@@ -8,7 +8,7 @@ cm_admin_check_permission('badge-printing-setup', 'badge-printing-setup');
 
 $bp_config = $cm_config['badge_printing'];
 $badb = new cm_badge_artwork_db($db);
-$artwork = $badb->list_badge_artwork();
+$names = $badb->list_badge_artwork_names();
 
 if (isset($_POST['action'])) {
 	$custom_size = (isset($_POST['custom-size']) && (int)$_POST['custom-size']);
@@ -36,14 +36,13 @@ if (isset($_POST['action'])) {
 	$only_print = (isset($_POST['only-print']) && (int)$_POST['only-print']);
 	if ($only_print) {
 		$only_print = array();
-		foreach ($artwork as $ba) {
-			$name = $ba['file-name'];
+		foreach ($names as $name) {
 			$post_name = preg_replace('/[^A-Za-z0-9]+/', '-', $name);
 			if (isset($_POST['only-print-'.$post_name]) && (int)$_POST['only-print-'.$post_name]) {
 				$only_print[] = $name;
 			}
 		}
-		setcookie('badge_printing_only_print', implode(',', $only_print), time()+60*60*24*30, '/');
+		setcookie('badge_printing_only_print', implode("\n", $only_print), time()+60*60*24*30, '/');
 	} else {
 		setcookie('badge_printing_only_print', '', time()-3600, '/');
 	}
@@ -75,7 +74,7 @@ if (isset($_POST['action'])) {
 	);
 	$only_print = (
 		isset($_COOKIE['badge_printing_only_print']) ?
-		explode(',', $_COOKIE['badge_printing_only_print']) :
+		explode("\n", $_COOKIE['badge_printing_only_print']) :
 		false
 	);
 	$message = null;
@@ -181,8 +180,7 @@ echo '<article>';
 				echo '</div>';
 			echo '</div>';
 			echo '<div class="spacing" style="padding-left: 84px;">';
-				foreach ($artwork as $ba) {
-					$name = $ba['file-name'];
+				foreach ($names as $name) {
 					$post_name = preg_replace('/[^A-Za-z0-9]+/', '-', $name);
 					echo '<div>';
 						echo '<label>';
