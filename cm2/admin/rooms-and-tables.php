@@ -236,6 +236,8 @@ echo '<div class="dialog shortcuts-dialog hidden">';
 		echo '<table border="0" cellpadding="0" cellspacing="0">';
 			echo '<tr><th colspan="2">Rooms &amp; Tables</th></tr>';
 			echo '<tr><td><span class="kbd kbdw">esc</span></td><td>Cancel tag editing</td></tr>';
+			echo '<tr><td><span class="kbd kbdw">&larr;</span></td><td>Select previous tag</td></tr>';
+			echo '<tr><td><span class="kbd kbdw">&rarr;</span></td><td>Select next tag</td></tr>';
 			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">/</span></td><td>Show keyboard shortcuts</td></tr>';
 			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">D</span></td><td>Delete tag</td></tr>';
 			echo '<tr><td><span class="kbd">ctrl</span> <span class="kbd">shift</span> <span class="kbd">S</span></td><td>Save tag</td></tr>';

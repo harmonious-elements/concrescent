@@ -84,6 +84,7 @@
 		var fieldRectEditorContent = $('.badge-artwork-field-editor-content');
 		var fieldPropEditor = $('.field-editor-card');
 		var artworkEditor = $('.artwork-editor-card');
+		var changesMade = false;
 
 		var fieldKey = $('#field-editor-field-key');
 		var fieldFontFamily = $('#field-editor-font-family');
@@ -170,6 +171,7 @@
 			fieldRectEditor.removeClass('hidden');
 			fieldPropEditor.removeClass('hidden');
 			artworkEditor.addClass('hidden');
+			changesMade = false;
 		};
 		var resizeEditor = function(finalize) {
 			if (finalize) {
@@ -183,21 +185,24 @@
 			setRect(fieldRectEditor, fieldRect[0], fieldRect[1], fieldRect[2], fieldRect[3]);
 			cmui.fitText(fieldRectEditor);
 			window.setTimeout(function() { cmui.fitText(fieldRectEditor); }, 1);
+			changesMade = true;
 		};
 		var updateEditor = function() {
 			pushModelToView(pullFromEditor(), fieldRectEditor, fieldRectEditorContent);
+			changesMade = true;
 		};
 		var closeEditor = function() {
 			fieldArea.find('.badge-artwork-field').removeClass('hidden');
 			fieldRectEditor.addClass('hidden');
 			fieldPropEditor.addClass('hidden');
 			artworkEditor.removeClass('hidden');
+			changesMade = false;
 		};
 
 		var artworkMouseBind = function(element) {
 			var artworkMouseDown, artworkMouseDrag, artworkMouseUp;
 			artworkMouseDown = function(event) {
-				if (fieldPropEditor.hasClass('hidden')) {
+				if (!changesMade) {
 					var xy = getXY(artworkArea, event);
 					fieldId = null;
 					fieldRect[0] = fieldRect[2] = xy[0];
@@ -243,7 +248,7 @@
 
 		var fieldsMouseBind = function(element, field) {
 			var fieldsMouseEvent = function(event) {
-				if (fieldPropEditor.hasClass('hidden')) {
+				if (!changesMade) {
 					openEditor(field, element);
 				}
 				event.stopPropagation();
@@ -396,6 +401,7 @@
 			if (!next.length) next = $('.badge-artwork-field:first');
 			next.mousedown();
 		};
+
 		$('body').bind('keydown', function(event) {
 			if (!$('.dialog-cover').hasClass('hidden')) return;
 			switch (event.which) {
@@ -403,11 +409,11 @@
 					closeEditor();
 					break;
 				case 37: case 38:
-					if (cmui.focusedOnInput()) return;
+					if (cmui.focusedOnInput() && (!event.shiftKey || !(event.ctrlKey || event.metaKey))) return;
 					editorPrev();
 					break;
 				case 39: case 40:
-					if (cmui.focusedOnInput()) return;
+					if (cmui.focusedOnInput() && (!event.shiftKey || !(event.ctrlKey || event.metaKey))) return;
 					editorNext();
 					break;
 				case 68:
@@ -427,6 +433,12 @@
 			}
 			event.stopPropagation();
 			event.preventDefault();
+		});
+
+		$(window).bind('beforeunload', function() {
+			if (changesMade) {
+				return 'This page has unsaved changes.';
+			}
 		});
 
 		fieldsLoad();

@@ -38,6 +38,7 @@
 		var tagMarquee = $('.tag-marquee');
 		var tagEditor = $('.tag-editor');
 		var tagEditorId = tagEditor.find('.tag-editor-id');
+		var changesMade = false;
 
 		var openMarquee = function() {
 			setRect(tagMarquee, tagRect[0], tagRect[1], tagRect[2], tagRect[3]);
@@ -49,6 +50,7 @@
 		var closeMarquee = function() {
 			tagMarquee.addClass('hidden');
 		};
+
 		var openEditor = function(tag) {
 			tagArea.find('.tag').removeClass('hidden');
 			if (tag) tag.addClass('hidden');
@@ -62,6 +64,7 @@
 			setRect(tagEditor, tagRect[0], tagRect[1], tagRect[2], tagRect[3]);
 			tagEditor.removeClass('hidden');
 			tagEditorId.focus();
+			changesMade = false;
 		};
 		var resizeEditor = function(finalize) {
 			if (finalize) {
@@ -73,16 +76,21 @@
 				];
 			}
 			setRect(tagEditor, tagRect[0], tagRect[1], tagRect[2], tagRect[3]);
+			changesMade = true;
+		};
+		var updateEditor = function() {
+			changesMade = true;
 		};
 		var closeEditor = function() {
 			tagEditor.addClass('hidden');
 			tagArea.find('.tag').removeClass('hidden');
+			changesMade = false;
 		};
 
 		var mapMouseBind = function(element) {
 			var mapMouseDown, mapMouseDrag, mapMouseUp;
 			mapMouseDown = function(event) {
-				if (tagEditor.hasClass('hidden')) {
+				if (!changesMade) {
 					var xy = getXY(tagMap, event);
 					tagId = null;
 					tagRect[0] = tagRect[2] = xy[0];
@@ -120,7 +128,7 @@
 
 		var tagsMouseBind = function(element, tag) {
 			var tagsMouseEvent = function(event) {
-				if (tagEditor.hasClass('hidden')) {
+				if (!changesMade) {
 					tagId = tag['id'];
 					tagRect[0] = tag['x1'];
 					tagRect[1] = tag['y1'];
@@ -253,6 +261,21 @@
 		editorMouseBind(tagEditor.find('.tag-editor-input'));
 		editorMouseBind(tagEditor.find('.tag-editor-buttons'));
 
+		var editorIdBind = function(element) {
+			var editorIdEvent = function(event) {
+				if (!(
+					(event.which >= 16 && event.which <= 20) ||
+					(event.which >= 33 && event.which <= 40)
+				)) {
+					updateEditor();
+				}
+			};
+			element.bind('change', editorIdEvent);
+			element.bind('keydown', editorIdEvent);
+			element.bind('keyup', editorIdEvent);
+		};
+		editorIdBind(tagEditorId);
+
 		var editorSave = function() {
 			if (tagEditor.hasClass('hidden')) return;
 			var request = {
@@ -290,6 +313,17 @@
 		tagEditor.find('.tag-editor-cancel').bind('click', closeEditor);
 		tagEditor.find('.tag-editor-delete').bind('click', editorDelete);
 
+		var editorPrev = function() {
+			var prev = $('.tag.hidden').prev('.tag');
+			if (!prev.length) prev = $('.tag:last');
+			prev.mousedown();
+		};
+		var editorNext = function() {
+			var next = $('.tag.hidden').next('.tag');
+			if (!next.length) next = $('.tag:first');
+			next.mousedown();
+		};
+
 		$('body').bind('keydown', function(event) {
 			if (!$('.dialog-cover').hasClass('hidden')) return;
 			switch (event.which) {
@@ -299,6 +333,14 @@
 					break;
 				case 27:
 					closeEditor();
+					break;
+				case 37: case 38:
+					if (cmui.focusedOnInput() && (!event.shiftKey || !(event.ctrlKey || event.metaKey))) return;
+					editorPrev();
+					break;
+				case 39: case 40:
+					if (cmui.focusedOnInput() && (!event.shiftKey || !(event.ctrlKey || event.metaKey))) return;
+					editorNext();
 					break;
 				case 68:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
@@ -317,6 +359,12 @@
 			}
 			event.stopPropagation();
 			event.preventDefault();
+		});
+
+		$(window).bind('beforeunload', function() {
+			if (changesMade) {
+				return 'This page has unsaved changes.';
+			}
 		});
 
 		tagsLoad();
