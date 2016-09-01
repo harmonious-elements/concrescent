@@ -57,4 +57,22 @@ class cm_badge_holder_db {
 		return $badge_types;
 	}
 
+	public function get_badge_holder($context, $context_id) {
+		if ($context == 'attendee') {
+			return $this->cm_atdb->get_attendee($context_id);
+		} else if (substr($context, 0, 10) == 'applicant-') {
+			$context = substr($context, 10);
+			foreach ($this->cm_apdb as $ctx => $apdb) {
+				if ($context == strtolower($ctx)) {
+					return $apdb->get_applicant($context_id);
+				}
+			}
+			return false;
+		} else if ($context == 'staff') {
+			return $this->cm_sdb->get_staff_member($context_id);
+		} else {
+			return false;
+		}
+	}
+
 }
