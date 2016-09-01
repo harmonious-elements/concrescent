@@ -38,8 +38,9 @@ $height = get_config('height', 'h', 'badge_printing_height', 'height');
 $vertical = !!get_config('vertical', 'v', 'badge_printing_vertical', 'vertical');
 $blank = !!get_config('blank', 'b', 'badge_printing_blank', false);
 $only_print = get_config('only-print', 'o', 'badge_printing_only_print', false);
-if ($only_print) $only_print = explode("\n", $only_print);
+$only_print = $only_print ? explode("\n", $only_print) : false;
 $post_url = get_config('post-url', 'u', 'badge_printing_post_url', 'post_url');
+$post_url = $post_url ? $post_url : false;
 
 $bp_config = $cm_config['badge_printing'];
 $badb = new cm_badge_artwork_db($db);
@@ -142,6 +143,7 @@ echo '<html>';
 			echo 'cm_print_artwork = (' . json_encode($artwork) . ');';
 			echo 'cm_print_entity = (' . json_encode($entity) . ');';
 		echo '</script>';
+
 		echo '<script type="text/javascript" src="print.js"></script>';
 
 	echo '</head>';
