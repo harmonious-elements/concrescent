@@ -187,6 +187,10 @@ $cm_config = array(
 		/* Any external stylesheets to load. */
 		'stylesheet' => array(),
 
+		/* URL to receive a POST request when a badge is printed.
+		   This happens in place of sending a job to the printer. */
+		'post_url' => '',
+
 	),
 
 	/* Default Admin User Configuration */
