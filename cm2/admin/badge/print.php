@@ -62,10 +62,12 @@ if ($only_print && !in_array($artwork_name, $only_print)) {
 if (isset($_POST['entity'])) {
 	$entity = json_decode($_POST['entity'], true);
 } else if (isset($_POST['context']) && isset($_POST['context-id'])) {
+	$bhdb->badge_holder_printed($_POST['context'], $_POST['context-id']);
 	$entity = $bhdb->get_badge_holder($_POST['context'], $_POST['context-id']);
 } else if (isset($_GET['e'])) {
 	$entity = json_decode($_GET['e'], true);
 } else if (isset($_GET['c']) && isset($_GET['i'])) {
+	$bhdb->badge_holder_printed($_GET['c'], $_GET['i']);
 	$entity = $bhdb->get_badge_holder($_GET['c'], $_GET['i']);
 } else {
 	$entity = null;

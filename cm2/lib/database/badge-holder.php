@@ -75,4 +75,40 @@ class cm_badge_holder_db {
 		}
 	}
 
+	public function badge_holder_printed($context, $context_id) {
+		if ($context == 'attendee') {
+			return $this->cm_atdb->attendee_printed($context_id);
+		} else if (substr($context, 0, 10) == 'applicant-') {
+			$context = substr($context, 10);
+			foreach ($this->cm_apdb as $ctx => $apdb) {
+				if ($context == strtolower($ctx)) {
+					return $apdb->applicant_printed($context_id);
+				}
+			}
+			return false;
+		} else if ($context == 'staff') {
+			return $this->cm_sdb->staff_printed($context_id);
+		} else {
+			return false;
+		}
+	}
+
+	public function badge_holder_checked_in($context, $context_id) {
+		if ($context == 'attendee') {
+			return $this->cm_atdb->attendee_checked_in($context_id);
+		} else if (substr($context, 0, 10) == 'applicant-') {
+			$context = substr($context, 10);
+			foreach ($this->cm_apdb as $ctx => $apdb) {
+				if ($context == strtolower($ctx)) {
+					return $apdb->applicant_checked_in($context_id);
+				}
+			}
+			return false;
+		} else if ($context == 'staff') {
+			return $this->cm_sdb->staff_checked_in($context_id);
+		} else {
+			return false;
+		}
+	}
+
 }
