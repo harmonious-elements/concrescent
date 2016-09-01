@@ -46,6 +46,25 @@ if (isset($_POST['action'])) {
 	} else {
 		setcookie('badge_printing_only_print', '', time()-3600, '/');
 	}
+	$use_post_url = (isset($_POST['use-post-url']) ? (int)$_POST['use-post-url'] : 0);
+	switch ($use_post_url) {
+		case 2:
+			$post_url = trim($_POST['post-url']);
+			if ($post_url) {
+				setcookie('badge_printing_post_url', $post_url, time()+60*60*24*30, '/');
+				break;
+			} else {
+				$use_post_url = 1;
+			}
+		case 1:
+			$post_url = $bp_config['post_url'];
+			setcookie('badge_printing_post_url', '0', time()+60*60*24*30, '/');
+			break;
+		case 0:
+			$post_url = $bp_config['post_url'];
+			setcookie('badge_printing_post_url', '', time()-3600, '/');
+			break;
+	}
 	$message = 'Changes saved.';
 } else {
 	$custom_size = (
@@ -77,6 +96,18 @@ if (isset($_POST['action'])) {
 		explode("\n", $_COOKIE['badge_printing_only_print']) :
 		false
 	);
+	if (isset($_COOKIE['badge_printing_post_url'])) {
+		if ($_COOKIE['badge_printing_post_url']) {
+			$use_post_url = 2;
+			$post_url = $_COOKIE['badge_printing_post_url'];
+		} else {
+			$use_post_url = 1;
+			$post_url = $bp_config['post_url'];
+		}
+	} else {
+		$use_post_url = 0;
+		$post_url = $bp_config['post_url'];
+	}
 	$message = null;
 }
 
@@ -191,6 +222,39 @@ echo '<article>';
 						echo '</label>';
 					echo '</div>';
 				}
+			echo '</div>';
+			echo '<hr>';
+
+			echo '<h3>Destination</h3>';
+			echo '<div class="spacing">';
+				echo '<div style="line-height: 24px;">';
+					echo '<label>';
+						echo '<input type="radio" name="use-post-url" value="0"';
+						if ($use_post_url == 0) echo ' checked'; echo '>';
+						echo 'Default (';
+						echo (
+							$bp_config['post_url'] ?
+							('send to URL: ' . htmlspecialchars($bp_config['post_url'])) :
+							'send to printer'
+						);
+						echo ')';
+					echo '</label>';
+				echo '</div>';
+				echo '<div style="line-height: 24px;">';
+					echo '<label>';
+						echo '<input type="radio" name="use-post-url" value="1"';
+						if ($use_post_url == 1) echo ' checked'; echo '>Send to printer';
+					echo '</label>';
+				echo '</div>';
+				echo '<div style="line-height: 24px;">';
+					echo '<label>';
+						echo '<input type="radio" name="use-post-url" value="2"';
+						if ($use_post_url == 2) echo ' checked'; echo '>Send to URL:';
+						echo '&nbsp;&nbsp;&nbsp;&nbsp;';
+					echo '</label>';
+					echo '<input type="url" name="post-url" value="';
+					echo htmlspecialchars($post_url); echo '">';
+				echo '</div>';
 			echo '</div>';
 
 		echo '</div>';
