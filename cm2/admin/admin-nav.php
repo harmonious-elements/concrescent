@@ -252,6 +252,13 @@ $cm_admin_nav_badge = (
 			'permission' => 'badge-artwork'
 		),
 		array(
+			'id' => 'badge-oneoff-printing',
+			'href' => '/admin/badge/oneoff-printing.php',
+			'name' => 'One-Off Badge Printing',
+			'description' => 'Print one-off badges for badge holders not in CONcrescent.',
+			'permission' => 'badge-oneoff-printing'
+		),
+		array(
 			'id' => 'badge-printing-setup',
 			'href' => '/admin/badge/printing-setup.php',
 			'name' => 'Badge Printing Setup',

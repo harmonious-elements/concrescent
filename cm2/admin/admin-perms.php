@@ -274,6 +274,11 @@ $cm_admin_perms_badge = (
 			'description' => 'Upload badge artwork and add text fields for names and ID numbers.'
 		),
 		array(
+			'id' => 'badge-oneoff-printing',
+			'name' => 'One-Off Badge Printing',
+			'description' => 'Print one-off badges for badge holders not in CONcrescent.'
+		),
+		array(
 			'id' => 'badge-printing-setup',
 			'name' => 'Badge Printing Setup',
 			'description' => 'Change badge size and other settings for badge printing.'
