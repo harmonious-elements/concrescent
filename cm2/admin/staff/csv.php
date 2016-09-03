@@ -32,6 +32,7 @@ if (isset($_POST['download-staff'])) {
 			array('key' => 'date-of-birth',             'name' => 'Date of Birth',                   'type' => 'text' ),
 			array('key' => 'age',                       'name' => 'Age (Start of Event)',            'type' => 'int'  ),
 			array('key' => 'badge-type-id',             'name' => 'Badge Type ID',                   'type' => 'int'  ),
+			array('key' => 'badge-type-id-string',      'name' => 'Badge Type ID String',            'type' => 'text' ),
 			array('key' => 'badge-type-name',           'name' => 'Badge Type Name',                 'type' => 'text' ),
 			array('key' => 'email-address',             'name' => 'Email Address',                   'type' => 'text' ),
 			array('key' => 'email-address-subscribed',  'name' => 'Email Address (Subscribed)',      'type' => 'text' ),

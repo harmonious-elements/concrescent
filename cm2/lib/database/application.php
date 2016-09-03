@@ -468,6 +468,7 @@ class cm_application_db {
 			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
 			$result = array(
 				'id' => $id,
+				'id-string' => $this->ctx_uc . 'B' . $id,
 				'order' => $order,
 				'name' => $name,
 				'description' => $description,
@@ -580,6 +581,7 @@ class cm_application_db {
 			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
 			$badge_types[] = array(
 				'id' => $id,
+				'id-string' => $this->ctx_uc . 'B' . $id,
 				'order' => $order,
 				'name' => $name,
 				'description' => $description,
@@ -1286,6 +1288,7 @@ class cm_application_db {
 			$id_string = $this->ctx_uc . 'A' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
+			$badge_type_id_string = $this->ctx_uc . 'B' . $badge_type_id;
 			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
 			$contact_real_name = trim(trim($contact_first_name) . ' ' . trim($contact_last_name));
 			$contact_email_address_subscribed = ($contact_subscribed ? $contact_email_address : null);
@@ -1312,6 +1315,7 @@ class cm_application_db {
 			);
 			$result = array(
 				'type' => 'application',
+				'app-ctx' => $this->ctx_uc,
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -1320,6 +1324,7 @@ class cm_application_db {
 				'date-created' => $date_created,
 				'date-modified' => $date_modified,
 				'badge-type-id' => $badge_type_id,
+				'badge-type-id-string' => $badge_type_id_string,
 				'badge-type-name' => $badge_type_name,
 				'notes' => $notes,
 				'contact-first-name' => $contact_first_name,
@@ -1469,6 +1474,7 @@ class cm_application_db {
 			$id_string = $this->ctx_uc . 'A' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = $qr_base_url . $qr_data;
+			$badge_type_id_string = $this->ctx_uc . 'B' . $badge_type_id;
 			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
 			$contact_real_name = trim(trim($contact_first_name) . ' ' . trim($contact_last_name));
 			$contact_email_address_subscribed = ($contact_subscribed ? $contact_email_address : null);
@@ -1495,6 +1501,7 @@ class cm_application_db {
 			);
 			$applications[] = array(
 				'type' => 'application',
+				'app-ctx' => $this->ctx_uc,
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -1503,6 +1510,7 @@ class cm_application_db {
 				'date-created' => $date_created,
 				'date-modified' => $date_modified,
 				'badge-type-id' => $badge_type_id,
+				'badge-type-id-string' => $badge_type_id_string,
 				'badge-type-name' => $badge_type_name,
 				'notes' => $notes,
 				'contact-first-name' => $contact_first_name,
@@ -2082,6 +2090,7 @@ class cm_application_db {
 			);
 			$result = array(
 				'type' => 'applicant',
+				'app-ctx' => $this->ctx_uc,
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -2228,6 +2237,7 @@ class cm_application_db {
 			);
 			$applicants[] = array(
 				'type' => 'applicant',
+				'app-ctx' => $this->ctx_uc,
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,

@@ -28,18 +28,25 @@
 			$('.cm-badge-artwork').attr('href', '');
 		};
 
-		var loadBadgeType = function(badgeContext, badgeContextId, badgeName, criteria) {
+		var loadBadgeType = function(badgeContext, badgeContextId, criteria) {
 			cmui.showButterbar('Loading badge holders...');
-			var query = ['&', ['=', 'badge-type-name', ['"', badgeName]]];
-			switch (criteria) {
-				case 'paid':
-					query.push(['=', 'payment-status', ['"', 'Completed']]);
-					break;
-				case 'accepted':
-					if (badgeContext == 'attendee') break;
-					query.push(['=', 'application-status', ['"', 'Accepted']]);
-					break;
+			var query = ['&'];
+
+			if (badgeContext.substring(0, 12) == 'application-') {
+				query.push(['=', 'type', ['"', 'applicant']]);
+				query.push(['=', 'app-ctx', ['"', badgeContext.substring(12)]]);
+				query.push(['=', 'badge-type-id', ['"', badgeContextId]]);
+			} else {
+				query.push(['=', 'type', ['"', badgeContext]]);
+				query.push(['=', 'badge-type-id', ['"', badgeContextId]]);
 			}
+
+			if (criteria == 'paid') {
+				query.push(['=', 'payment-status', ['"', 'Completed']]);
+			} else if (criteria == 'accepted' && badgeContext != 'attendee') {
+				query.push(['=', 'application-status', ['"', 'Accepted']]);
+			}
+
 			var request = {
 				'cm-list-action': 'list',
 				'cm-list-search-query': JSON.stringify(query),
@@ -85,9 +92,8 @@
 			var badgeType = $('input[name=badge-type]:checked');
 			var badgeContext = badgeType.attr('data-context');
 			var badgeContextId = badgeType.attr('data-context-id');
-			var badgeName = badgeType.attr('data-badge-name');
 			var criteria = $('input[name=criteria]:checked').val();
-			loadBadgeType(badgeContext, badgeContextId, badgeName, criteria);
+			loadBadgeType(badgeContext, badgeContextId, criteria);
 			unloadBadgeHolder();
 		};
 

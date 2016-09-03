@@ -158,6 +158,7 @@ class cm_attendee_db {
 			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
 			$result = array(
 				'id' => $id,
+				'id-string' => 'AB' . $id,
 				'order' => $order,
 				'name' => $name,
 				'description' => $description,
@@ -257,6 +258,7 @@ class cm_attendee_db {
 			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
 			$badge_types[] = array(
 				'id' => $id,
+				'id-string' => 'AB' . $id,
 				'order' => $order,
 				'name' => $name,
 				'description' => $description,
@@ -1030,6 +1032,7 @@ class cm_attendee_db {
 			$id_string = 'A' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
+			$badge_type_id_string = 'AB' . $badge_type_id;
 			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
 			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
 			$only_name = $real_name;
@@ -1078,6 +1081,7 @@ class cm_attendee_db {
 				$display_name, $address, $csz, $address_full
 			);
 			$result = array(
+				'type' => 'attendee',
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -1092,6 +1096,7 @@ class cm_attendee_db {
 				'checkin-first-time' => $checkin_first_time,
 				'checkin-last-time' => $checkin_last_time,
 				'badge-type-id' => $badge_type_id,
+				'badge-type-id-string' => $badge_type_id_string,
 				'badge-type-name' => $badge_type_name,
 				'notes' => $notes,
 				'first-name' => $first_name,
@@ -1213,6 +1218,7 @@ class cm_attendee_db {
 			$id_string = 'A' . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = $qr_base_url . $qr_data;
+			$badge_type_id_string = 'AB' . $badge_type_id;
 			$badge_type_name = (isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id);
 			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
 			$only_name = $real_name;
@@ -1261,6 +1267,7 @@ class cm_attendee_db {
 				$display_name, $address, $csz, $address_full
 			);
 			$attendees[] = array(
+				'type' => 'attendee',
 				'id' => $id,
 				'id-string' => $id_string,
 				'uuid' => $uuid,
@@ -1275,6 +1282,7 @@ class cm_attendee_db {
 				'checkin-first-time' => $checkin_first_time,
 				'checkin-last-time' => $checkin_last_time,
 				'badge-type-id' => $badge_type_id,
+				'badge-type-id-string' => $badge_type_id_string,
 				'badge-type-name' => $badge_type_name,
 				'notes' => $notes,
 				'first-name' => $first_name,
