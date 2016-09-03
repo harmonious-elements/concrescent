@@ -64,7 +64,7 @@ class cm_badge_holder_db {
 			$context = substr($context, 10);
 			foreach ($this->cm_apdb as $ctx => $apdb) {
 				if ($context == strtolower($ctx)) {
-					return $apdb->get_applicant($context_id);
+					return $apdb->get_applicant($context_id, false, true);
 				}
 			}
 			return false;
@@ -73,6 +73,40 @@ class cm_badge_holder_db {
 		} else {
 			return false;
 		}
+	}
+
+	public function list_indexes(&$list_def, $query = null, $sort_order = null, $offset = null, $length = null) {
+		if (is_null($query)) $query = json_decode($_POST['cm-list-search-query'], true);
+		if (is_null($sort_order)) $sort_order = json_decode($_POST['cm-list-sort-order'], true);
+		if (is_null($offset)) $offset = (int)$_POST['cm-list-page-offset'];
+		if (is_null($length)) $length = (int)$_POST['cm-list-page-length'];
+
+		$ids = array();
+
+		$results = $this->cm_atdb->cm_ldb->list_indexes($list_def, $query, $sort_order, 0, 0);
+		foreach ($results['ids'] as $id) {
+			$ids[] = array('context' => 'attendee', 'context-id' => $id);
+		}
+		foreach ($this->cm_apdb as $ctx => $apdb) {
+			$context = 'applicant-' . strtolower($ctx);
+			$results = $apdb->cm_atldb->list_indexes($list_def, $query, $sort_order, 0, 0);
+			foreach ($results['ids'] as $id) {
+				$ids[] = array('context' => $context, 'context-id' => $id);
+			}
+		}
+		$results = $this->cm_sdb->cm_ldb->list_indexes($list_def, $query, $sort_order, 0, 0);
+		foreach ($results['ids'] as $id) {
+			$ids[] = array('context' => 'staff', 'context-id' => $id);
+		}
+
+		$match_count = count($ids);
+		if ($length) $ids = array_slice($ids, $offset, $length);
+
+		return array(
+			'ok' => true,
+			'ids' => $ids,
+			'match-count' => $match_count
+		);
 	}
 
 	public function badge_holder_printed($context, $context_id) {

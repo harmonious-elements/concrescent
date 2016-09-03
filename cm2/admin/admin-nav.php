@@ -252,6 +252,13 @@ $cm_admin_nav_badge = (
 			'permission' => 'badge-artwork'
 		),
 		array(
+			'id' => 'badge-preprinting',
+			'href' => '/admin/badge/preprinting.php',
+			'name' => 'Badge Pre-Printing',
+			'description' => 'Print badges by badge type.',
+			'permission' => 'badge-preprinting'
+		),
+		array(
 			'id' => 'badge-oneoff-printing',
 			'href' => '/admin/badge/oneoff-printing.php',
 			'name' => 'One-Off Badge Printing',
