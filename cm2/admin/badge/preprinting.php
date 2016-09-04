@@ -2,7 +2,6 @@
 
 require_once dirname(__FILE__).'/../../lib/database/badge-artwork.php';
 require_once dirname(__FILE__).'/../../lib/database/badge-holder.php';
-require_once dirname(__FILE__).'/../../lib/util/res.php';
 require_once dirname(__FILE__).'/../../lib/util/cmlists.php';
 require_once dirname(__FILE__).'/../admin.php';
 
@@ -92,8 +91,7 @@ echo '<div class="card badge-preprinting-types">';
 				echo '<label title="' . htmlspecialchars($badge['id-string']) . '">';
 					echo '<input type="radio" name="badge-type" value="' . $value . '"';
 					echo ' data-context="' . htmlspecialchars($badge['context']) . '"';
-					echo ' data-context-id="' . htmlspecialchars($badge['context-id']) . '"';
-					echo ' data-badge-name="' . htmlspecialchars($badge['name']) . '">';
+					echo ' data-context-id="' . htmlspecialchars($badge['context-id']) . '">';
 					echo htmlspecialchars($badge['name']);
 				echo '</label>';
 			}

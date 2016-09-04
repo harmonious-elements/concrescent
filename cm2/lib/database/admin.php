@@ -28,21 +28,23 @@ class cm_admin_db {
 		));
 		if ($this->cm_db->table_is_empty('admin_users')) {
 			$config = $GLOBALS['cm_config']['default_admin'];
-			$password = password_hash($config['password'], PASSWORD_DEFAULT);
-			$permissions = '*';
-			$stmt = $this->cm_db->connection->prepare(
-				'INSERT INTO '.$this->cm_db->table_name('admin_users').' SET '.
-				'`name` = ?, `username` = ?, `password` = ?, `permissions` = ?'
-			);
-			$stmt->bind_param(
-				'ssss',
-				$config['name'],
-				$config['username'],
-				$password,
-				$permissions
-			);
-			$stmt->execute();
-			$stmt->close();
+			if ($config['name'] && $config['username'] && $config['password']) {
+				$password = password_hash($config['password'], PASSWORD_DEFAULT);
+				$permissions = '*';
+				$stmt = $this->cm_db->connection->prepare(
+					'INSERT INTO '.$this->cm_db->table_name('admin_users').' SET '.
+					'`name` = ?, `username` = ?, `password` = ?, `permissions` = ?'
+				);
+				$stmt->bind_param(
+					'ssss',
+					$config['name'],
+					$config['username'],
+					$password,
+					$permissions
+				);
+				$stmt->execute();
+				$stmt->close();
+			}
 		}
 	}
 
