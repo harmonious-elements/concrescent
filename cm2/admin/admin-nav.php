@@ -245,6 +245,13 @@ $cm_admin_nav_staff = (
 $cm_admin_nav_badge = (
 	array(
 		array(
+			'id' => 'badge-checkin',
+			'href' => '/admin/badge/checkin.php',
+			'name' => 'Registration Check-In',
+			'description' => 'Check in people at registration.',
+			'permission' => 'badge-checkin'
+		),
+		array(
 			'id' => 'badge-artwork',
 			'href' => '/admin/badge/artwork.php',
 			'name' => 'Badge Artwork',

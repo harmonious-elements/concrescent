@@ -57,6 +57,55 @@ class cm_badge_holder_db {
 		return $badge_types;
 	}
 
+	public function list_badge_types() {
+		$badge_types = array();
+		$bts = $this->cm_atdb->list_badge_types();
+		foreach ($bts as $bt) {
+			$badge_types[] = array(
+				'context' => 'attendee',
+				'context-id' => $bt['id']
+			) + $bt;
+		}
+		foreach ($this->cm_apdb as $ctx => $apdb) {
+			$bts = $apdb->list_badge_types();
+			foreach ($bts as $bt) {
+				$badge_types[] = array(
+					'context' => 'application-' . strtolower($ctx),
+					'context-id' => $bt['id']
+				) + $bt;
+			}
+		}
+		$bts = $this->cm_sdb->list_badge_types();
+		foreach ($bts as $bt) {
+			$badge_types[] = array(
+				'context' => 'staff',
+				'context-id' => $bt['id']
+			) + $bt;
+		}
+		return $badge_types;
+	}
+
+	public function is_blacklisted($context, $holder) {
+		$blacklisted = array();
+		$entry = $this->cm_atdb->is_blacklisted($holder);
+		if ($entry) $blacklisted['attendee'] = $entry;
+		if (substr($context, 0, 10) == 'applicant-') {
+			$context = substr($context, 10);
+			foreach ($this->cm_apdb as $ctx => $apdb) {
+				if ($context == strtolower($ctx)) {
+					$entry = $apdb->is_applicant_blacklisted($holder);
+					if ($entry) $blacklisted['applicant-'.$context] = $entry;
+					$entry = $apdb->is_application_blacklisted($holder);
+					if ($entry) $blacklisted['application-'.$context] = $entry;
+				}
+			}
+		} else if ($context == 'staff') {
+			$entry = $this->cm_sdb->is_blacklisted($holder);
+			if ($entry) $blacklisted['staff'] = $entry;
+		}
+		return $blacklisted ? $blacklisted : false;
+	}
+
 	public function get_badge_holder($context, $context_id) {
 		if ($context == 'attendee') {
 			return $this->cm_atdb->get_attendee($context_id);
@@ -107,6 +156,27 @@ class cm_badge_holder_db {
 			'ids' => $ids,
 			'match-count' => $match_count
 		);
+	}
+
+	public function update_badge_holder($context, $context_id, $holder) {
+		if ($context == 'attendee') {
+			$holder['id'] = $context_id;
+			return $this->cm_atdb->update_attendee($holder);
+		} else if (substr($context, 0, 10) == 'applicant-') {
+			$context = substr($context, 10);
+			foreach ($this->cm_apdb as $ctx => $apdb) {
+				if ($context == strtolower($ctx)) {
+					$holder['id'] = $context_id;
+					return $apdb->update_applicant($holder);
+				}
+			}
+			return false;
+		} else if ($context == 'staff') {
+			$holder['id'] = $context_id;
+			return $this->cm_sdb->update_staff_member($holder);
+		} else {
+			return false;
+		}
 	}
 
 	public function badge_holder_printed($context, $context_id) {

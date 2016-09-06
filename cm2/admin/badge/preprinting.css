@@ -37,6 +37,6 @@
 .badge-preprinting-print a:hover,
 .badge-preprinting-print a:active,
 .badge-preprinting-print a:visited {
-	color: black;
+	color: inherit;
 	text-decoration: none;
 }

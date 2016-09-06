@@ -269,6 +269,11 @@ $cm_admin_perms_staff_config = (
 $cm_admin_perms_badge = (
 	array(
 		array(
+			'id' => 'badge-checkin',
+			'name' => 'Registration Check-In',
+			'description' => 'Check in people at registration.'
+		),
+		array(
 			'id' => 'badge-artwork',
 			'name' => 'Badge Artwork',
 			'description' => 'Upload badge artwork and add text fields for names and ID numbers.'

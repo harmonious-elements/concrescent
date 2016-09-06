@@ -1,0 +1,14 @@
+.checkin-state-new-attendee span.error,
+.checkin-state-payment-incomplete span.error,
+.checkin-state-verify-info span.error {
+	margin-left: 1em;
+}
+.checkin-state-badge-printing a,
+.checkin-state-badge-printing a:link,
+.checkin-state-badge-printing a:focus,
+.checkin-state-badge-printing a:hover,
+.checkin-state-badge-printing a:active,
+.checkin-state-badge-printing a:visited {
+	color: inherit;
+	text-decoration: none;
+}
