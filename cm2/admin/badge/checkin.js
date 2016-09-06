@@ -390,7 +390,7 @@
 		var paymentCollected = function() {
 			completePayment(holderContext, holderContextId, function(response) {
 				if (response['ok']) {
-					if ($('#checkin-payment-incomplete-badge-type-id') != badgeContextId) {
+					if ($('#checkin-payment-incomplete-badge-type-id').val() != badgeContextId) {
 						badgeContextId = $('#checkin-payment-incomplete-badge-type-id').val();
 						holder['print-count'] = 0;
 					}
