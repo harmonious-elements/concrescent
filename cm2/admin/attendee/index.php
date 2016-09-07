@@ -64,9 +64,11 @@ $columns = array_merge(
 		),
 	)
 );
+
 $list_def = array(
 	'loader' => 'server-side',
 	'ajax-url' => get_site_url(false) . '/admin/attendee/index.php',
+	'reindex-url' => get_site_url(false) . '/admin/attendee/reindex.php',
 	'entity-type' => 'attendee',
 	'entity-type-pl' => 'attendees',
 	'search-criteria' => 'name, badge type, contact info, or transaction ID',

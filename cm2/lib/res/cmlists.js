@@ -878,6 +878,34 @@
 				case 36:
 					firstPageButton.click();
 					break;
+				case 48:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					if (listdef['reindex-url']) window.location.href = listdef['reindex-url'];
+					break;
+				case 54:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					window.localStorage.qr = 'off';
+					qrBind();
+					cmui.showButterbarPersistent('QR Code support forced off.');
+					break;
+				case 55:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					window.localStorage.qr = 'on';
+					qrBind();
+					cmui.showButterbarPersistent('QR Code support forced on.');
+					break;
+				case 56:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					window.localStorage.qr = 'auto';
+					qrBind();
+					cmui.showButterbarPersistent('QR Code support turned on.');
+					break;
+				case 57:
+					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
+					window.localStorage.clear('qr');
+					qrBind();
+					cmui.showButterbarPersistent('QR Code support turned off.');
+					break;
 				case 65:
 					if (!event.shiftKey || !(event.ctrlKey || event.metaKey)) return;
 					var e = $('.add-button');
@@ -928,33 +956,37 @@
 		});
 
 		/* QR Code Support */
-		if (qrEnabled()) {
-			var qrState = 0;
-			$('body').bind('keypress', function(event) {
-				switch (qrState) {
-					case 0:
-						if (event.which == 67) qrState = 1;
-						break;
-					case 1:
-						if (event.which == 77) qrState = 2;
-						else qrState = 0;
-						break;
-					case 2:
-						if (event.which == 42) {
-							searchField.val('qr-data:CM*');
-							searchFieldChanged();
-							searchField.focus();
-							event.stopPropagation();
-							event.preventDefault();
-						}
-						qrState = 0;
-						break;
-				}
-			});
-		}
+		var qrState = 0;
+		var qrEvent = function(event) {
+			switch (qrState) {
+				case 0:
+					if (event.which == 67) qrState = 1;
+					break;
+				case 1:
+					if (event.which == 77) qrState = 2;
+					else qrState = 0;
+					break;
+				case 2:
+					if (event.which == 42) {
+						searchField.val('qr-data=CM*');
+						searchFieldChanged();
+						searchField.focus();
+						event.stopPropagation();
+						event.preventDefault();
+					}
+					qrState = 0;
+					break;
+			}
+		};
+		var qrBind = function() {
+			qrState = 0;
+			$('body').unbind('keypress', qrEvent);
+			if (qrEnabled()) $('body').bind('keypress', qrEvent);
+		};
 
 		/* Load */
 		doLoad();
+		qrBind();
 	});
 
 })(jQuery,window,document,cmui,cm_list_def);

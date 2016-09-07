@@ -80,9 +80,11 @@ $columns = array_merge(
 		),
 	)
 );
+
 $list_def = array(
 	'loader' => 'server-side',
 	'ajax-url' => get_site_url(false) . '/admin/staff/index.php',
+	'reindex-url' => get_site_url(false) . '/admin/staff/reindex.php',
 	'entity-type' => 'staff application',
 	'entity-type-pl' => 'staff applications',
 	'search-criteria' => 'name, badge type, contact info, or transaction ID',

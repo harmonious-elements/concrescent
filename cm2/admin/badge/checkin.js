@@ -4,6 +4,7 @@
 		/* RPCs */
 
 		var createAttendee = function(done) {
+			cmui.showButterbar('Working...');
 			var request = {
 				'action': 'create-attendee',
 				'first-name': $('#checkin-new-attendee-first-name').val(),
@@ -27,20 +28,24 @@
 				$('#checkin-new-attendee-email-address-error').text(errors && errors['email-address'] || '');
 				$('#checkin-new-attendee-phone-number-error').text(errors && errors['phone-number'] || '');
 				$('#checkin-new-attendee-notes-error').text(errors && errors['notes'] || '');
+				cmui.hideButterbar();
 				if (done) done(response);
 			}, 'json');
 		};
 		var getBadgeHolder = function(context, contextId, done) {
+			cmui.showButterbar('Working...');
 			var request = {
 				'action': 'get-badge-holder',
 				'context': context,
 				'context-id': contextId
 			};
 			$.post('checkin.php', request, function(response) {
+				cmui.hideButterbar();
 				if (done) done(response);
 			}, 'json');
 		};
 		var completePayment = function(context, contextId, done) {
+			cmui.showButterbar('Working...');
 			var request = {
 				'action': 'complete-payment',
 				'context': context,
@@ -50,10 +55,12 @@
 			$.post('checkin.php', request, function(response) {
 				var errors = response['errors'];
 				$('#checkin-payment-incomplete-badge-type-id-error').text(errors && errors['badge-type-id'] || '');
+				cmui.hideButterbar();
 				if (done) done(response);
 			}, 'json');
 		};
 		var updateInfo = function(context, contextId, done) {
+			cmui.showButterbar('Working...');
 			var request = {
 				'action': 'update-info',
 				'context': context,
@@ -73,16 +80,19 @@
 				$('#checkin-verify-info-name-on-badge-error').text(errors && errors['name-on-badge'] || '');
 				$('#checkin-verify-info-date-of-birth-error').text(errors && errors['date-of-birth'] || '');
 				$('#checkin-verify-info-notes-error').text(errors && errors['notes'] || '');
+				cmui.hideButterbar();
 				if (done) done(response);
 			}, 'json');
 		};
 		var checkedIn = function(context, contextId, done) {
+			cmui.showButterbar('Working...');
 			var request = {
 				'action': 'checked-in',
 				'context': context,
 				'context-id': contextId
 			};
 			$.post('checkin.php', request, function(response) {
+				cmui.hideButterbar();
 				if (done) done(response);
 			}, 'json');
 		};

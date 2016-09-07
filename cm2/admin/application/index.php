@@ -106,9 +106,11 @@ $columns = array_merge(
 		),
 	)
 );
+
 $list_def = array(
 	'loader' => 'server-side',
 	'ajax-url' => get_site_url(false) . '/admin/application/index.php?c='.$ctx_lc,
+	'reindex-url' => get_site_url(false) . '/admin/application/reindex.php?c='.$ctx_lc,
 	'entity-type' => $ctx_name_lc.' application',
 	'entity-type-pl' => $ctx_name_lc.' applications',
 	'search-criteria' => 'name, badge type, contact info, or transaction ID',

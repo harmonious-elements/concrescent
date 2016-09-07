@@ -82,9 +82,11 @@ $columns = array(
 		'type' => 'bool'
 	),
 );
+
 $list_def = array(
 	'loader' => 'server-side',
 	'ajax-url' => get_site_url(false) . '/admin/application/badge-index.php?c='.$ctx_lc,
+	'reindex-url' => get_site_url(false) . '/admin/application/reindex.php?c='.$ctx_lc,
 	'entity-type' => $ctx_name_lc.' badge',
 	'entity-type-pl' => $ctx_name_lc.' badges',
 	'search-criteria' => 'name, badge type, contact info, or transaction ID',
