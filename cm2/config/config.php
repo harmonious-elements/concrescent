@@ -200,10 +200,10 @@ $cm_config = array(
 		'name' => 'Administrator',
 
 		/* User name of the default admin user, which is created if no users exist. */
-		'username' => 'admin',
+		'username' => '',
 
 		/* Password for the default admin user, which is created if no users exist. */
-		'password' => 'password',
+		'password' => '',
 
 	),
 
