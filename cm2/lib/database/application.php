@@ -2050,6 +2050,8 @@ class cm_application_db {
 			$id_string = $this->ctx_uc . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = resource_file_url('barcode.php', true) . '?s=qr&w=300&h=300&d=' . $qr_data;
+			$application_id_string = $application_id ? ($this->ctx_uc . 'A' . $application_id) : null;
+			$attendee_id_string = $attendee_id ? ('A' . $attendee_id) : null;
 			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
 			$only_name = $real_name;
 			$large_name = '';
@@ -2105,7 +2107,9 @@ class cm_application_db {
 				'checkin-first-time' => $checkin_first_time,
 				'checkin-last-time' => $checkin_last_time,
 				'application-id' => $application_id,
+				'application-id-string' => $application_id_string,
 				'attendee-id' => $attendee_id,
+				'attendee-id-string' => $attendee_id_string,
 				'notes' => $notes,
 				'first-name' => $first_name,
 				'last-name' => $last_name,
@@ -2197,6 +2201,8 @@ class cm_application_db {
 			$id_string = $this->ctx_uc . $id;
 			$qr_data = 'CM*' . $id_string . '*' . strtoupper($uuid);
 			$qr_url = $qr_base_url . $qr_data;
+			$application_id_string = $application_id ? ($this->ctx_uc . 'A' . $application_id) : null;
+			$attendee_id_string = $attendee_id ? ('A' . $attendee_id) : null;
 			$real_name = trim(trim($first_name) . ' ' . trim($last_name));
 			$only_name = $real_name;
 			$large_name = '';
@@ -2252,7 +2258,9 @@ class cm_application_db {
 				'checkin-first-time' => $checkin_first_time,
 				'checkin-last-time' => $checkin_last_time,
 				'application-id' => $application_id,
+				'application-id-string' => $application_id_string,
 				'attendee-id' => $attendee_id,
+				'attendee-id-string' => $attendee_id_string,
 				'notes' => $notes,
 				'first-name' => $first_name,
 				'last-name' => $last_name,
