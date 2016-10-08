@@ -47,3 +47,33 @@ You may rename the `cm2` directory to anything you like, move it to a subdirecto
 or even move the contents of the `cm2` directory into the root of your web server.
 CONcrescent will figure out where it is installed and generate appropriate URLs
 without needing to be told.
+
+## Troubleshooting
+Once set up, CONcrescent should work without issues under most web hosting configurations.
+If you encounter any issues, check the following.
+
+### The application is completely broken or I can't log in.
+*   Make sure you're running PHP 5 or later. PHP 5.5 or later is recommended. CONcrescent will not run under PHP 4.
+*   Make sure the configuration file is syntactically correct and contains the correct values.
+*   Make sure the database section of the configuration file is correct.
+*   Make sure the default admin password is set.
+
+### There is a blank screen or the error message "500 Internal Server Error" or "Communication Failure" when registering, submitting an application, or accepting an application.
+*   Make sure the cURL extension for PHP is installed.
+*   Make sure OpenSSL is up to date.
+*   Make sure sendmail and PHP are correctly configured to send email.
+*   Make sure the PayPal section of the configuration file is correct.
+
+### Some images, such as QR codes, the Rooms & Tables map, or badge artwork, do not appear.
+*   Make sure the GD library for PHP is installed.
+*   Make sure the badge printing section of the configuration file is correct.
+*   Make sure the settings on the Badge Printing Setup page are correct.
+
+### Search pages do not return the correct search results, or return search results with incorrect or incomplete information.
+The search index may be out of date. Press Ctrl-Shift-Zero on the search page with the issue to access the "rebuild search index" page. Rebuilding the search index may take several minutes, and if the rebuilding process fails, you will have to start it all over again, so do not make a habit out of doing this.
+
+### I'm using a QR code scanner to check people in.
+Press Ctrl-Shift-8 on the check-in page to enable check-in with QR codes. When a QR code is scanned that was produced by CONcrescent, the check-in page will immediately display that person's record.
+
+### I'm not using a QR code scanner to check people in.
+Press Ctrl-Shift-9 on the check-in page to disable check-in with QR codes.
