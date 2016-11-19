@@ -258,7 +258,7 @@ if (isset($_POST['submit'])) {
 		} else {
 			if ($slack->get_hook_url(array('application-submitted', $ctx_uc))) {
 				$body = 'A new '.$ctx_name_lc.' application has been submitted: ';
-				$body .= $slack->make_link(get_site_url(true).'/admin/application/edit.php?c='.$ctx_lc.'&review&id='.$id, $item['application-name']);
+				$body .= $slack->make_link(get_site_url(true).'/admin/application/edit.php?c='.$ctx_lc.'&review&id='.$id, $item['application-name'].' ('.$ctx_uc.'A'.$id.')');
 				$slack->post_message(array('application-submitted', $ctx_uc), $body);
 			}
 		}

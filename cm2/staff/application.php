@@ -118,7 +118,7 @@ if (isset($_POST['submit'])) {
 		} else {
 			if ($slack->get_hook_url('staff-submitted')) {
 				$body = 'A new staff application has been submitted: ';
-				$body .= $slack->make_link(get_site_url(true).'/admin/staff/edit.php?review&id='.$id, $item['display-name']);
+				$body .= $slack->make_link(get_site_url(true).'/admin/staff/edit.php?review&id='.$id, $item['display-name'].' (S'.$id.')');
 				$slack->post_message('staff-submitted', $body);
 			}
 		}

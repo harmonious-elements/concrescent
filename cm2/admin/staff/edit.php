@@ -181,7 +181,7 @@ if ($submitted) {
 					$body = 'The staff application for ';
 					$body .= $slack->make_link(
 						get_site_url(true).'/admin/staff/edit.php?review&id='.$id,
-						$item['display-name']
+						$item['display-name'].' ('.$item['id-string'].')'
 					);
 					$body .= ' has been '.$application_status;
 					if ($admin_user['name']) {

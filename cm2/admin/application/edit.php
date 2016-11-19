@@ -252,7 +252,7 @@ if ($submitted) {
 					$body = 'The ' . $ctx_name_lc . ' application for ';
 					$body .= $slack->make_link(
 						get_site_url(true).'/admin/application/edit.php?c='.$ctx_lc.'&review&id='.$id,
-						$item['application-name']
+						$item['application-name'].' ('.$item['id-string'].')'
 					);
 					$body .= ' has been '.$application_status;
 					if ($admin_user['name']) {
