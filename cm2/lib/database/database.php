@@ -76,9 +76,9 @@ class cm_db {
 	public function now() {
 		$result = $this->connection->query('SELECT NOW()');
 		$row = $result->fetch_row();
-		$uuid = $row[0];
+		$now = $row[0];
 		$result->close();
-		return $uuid;
+		return $now;
 	}
 
 	public function uuid() {
@@ -87,6 +87,24 @@ class cm_db {
 		$uuid = $row[0];
 		$result->close();
 		return $uuid;
+	}
+
+	public function curdatetime() {
+		$result = $this->connection->query('SELECT CURDATE(), CURTIME()');
+		$row = $result->fetch_row();
+		$date = $row[0];
+		$time = $row[1];
+		$result->close();
+		return array($date, $time);
+	}
+
+	public function timezone() {
+		$result = $this->connection->query('SELECT @@global.time_zone, @@session.time_zone');
+		$row = $result->fetch_row();
+		$global = $row[0];
+		$session = $row[1];
+		$result->close();
+		return array($global, $session);
 	}
 
 }
