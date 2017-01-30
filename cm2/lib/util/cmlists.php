@@ -189,8 +189,8 @@ function cm_list_row(&$list_def, &$entity) {
 					$value2 = htmlspecialchars(quantity_string($value2)); if ($value2 == 'unlimited') $value2 = '&#x221E;';
 					$value3 = htmlspecialchars(quantity_string($value3)); if ($value3 == 'unlimited') $value3 = '&#x221E;';
 					$out .= '<td class="td-numeric">';
-					$out .= '<span title="' . $term1 . '">' . $value1 . '</span> / ';
-					$out .= '<span title="' . $term2 . '">' . $value2 . '</span> / ';
+					$out .= '<span title="' . $term1 . '">' . $value1 . '</span>&nbsp;/&nbsp;';
+					$out .= '<span title="' . $term2 . '">' . $value2 . '</span>&nbsp;/&nbsp;';
 					$out .= '<span title="' . $term3 . '">' . $value3 . '</span>';
 					$out .= '</td>';
 					break;

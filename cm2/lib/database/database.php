@@ -107,4 +107,14 @@ class cm_db {
 		return array($global, $session);
 	}
 
+	public function characterset() {
+		$results = array();
+		$result = $this->connection->query('SHOW VARIABLES LIKE \'character\\_set\\_%\'');
+		while ($row = $result->fetch_row()) {
+			$results[$row[0]] = $row[1];
+		}
+		$result->close();
+		return $results;
+	}
+
 }
