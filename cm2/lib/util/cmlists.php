@@ -101,7 +101,8 @@ function cm_list_table(&$list_def) {
 						$key  = (isset($column['key' ]) && $column['key' ]) ? $column['key' ] : '';
 						$key1 = (isset($column['key1']) && $column['key1']) ? $column['key1'] : '';
 						$key2 = (isset($column['key2']) && $column['key2']) ? $column['key2'] : '';
-						$keys = implode(', ', array_filter(array($key, $key1, $key2)));
+						$key3 = (isset($column['key3']) && $column['key3']) ? $column['key3'] : '';
+						$keys = implode(', ', array_filter(array($key, $key1, $key2, $key3)));
 						echo '<th';
 						if ($keys) {
 							echo ' title="';
@@ -112,6 +113,7 @@ function cm_list_table(&$list_def) {
 							case 'html-numeric':
 							case 'numeric':
 							case 'quantity':
+							case 'quantity3':
 							case 'price':
 								echo ' class="td-numeric"';
 								break;
@@ -159,6 +161,7 @@ function cm_list_row(&$list_def, &$entity) {
 			$value = (isset($column['key']) && $column['key'] && isset($entity[$column['key']])) ? $entity[$column['key']] : '';
 			$value1 = (isset($column['key1']) && $column['key1'] && isset($entity[$column['key1']])) ? $entity[$column['key1']] : '';
 			$value2 = (isset($column['key2']) && $column['key2'] && isset($entity[$column['key2']])) ? $entity[$column['key2']] : '';
+			$value3 = (isset($column['key3']) && $column['key3'] && isset($entity[$column['key3']])) ? $entity[$column['key3']] : '';
 			$type = (isset($column['type']) && $column['type']) ? $column['type'] : '?';
 			switch ($type) {
 				case 'html'        : $out .= '<td>' . $value                   . '</td>'; break;
@@ -178,6 +181,19 @@ function cm_list_row(&$list_def, &$entity) {
 				case 'html-numeric': $out .= '<td class="td-numeric">' . $value                                    . '</td>'; break;
 				case 'numeric'     : $out .= '<td class="td-numeric">' . htmlspecialchars($value)                  . '</td>'; break;
 				case 'quantity'    : $out .= '<td class="td-numeric">' . htmlspecialchars(quantity_string($value)) . '</td>'; break;
+				case 'quantity3':
+					$term1 = (isset($column['term1']) && $column['term1']) ? htmlspecialchars($column['term1']) : 'Applications';
+					$term2 = (isset($column['term2']) && $column['term2']) ? htmlspecialchars($column['term2']) : 'Applicants';
+					$term3 = (isset($column['term3']) && $column['term3']) ? htmlspecialchars($column['term3']) : 'Assignments';
+					$value1 = htmlspecialchars(quantity_string($value1)); if ($value1 == 'unlimited') $value1 = '&#x221E;';
+					$value2 = htmlspecialchars(quantity_string($value2)); if ($value2 == 'unlimited') $value2 = '&#x221E;';
+					$value3 = htmlspecialchars(quantity_string($value3)); if ($value3 == 'unlimited') $value3 = '&#x221E;';
+					$out .= '<td class="td-numeric">';
+					$out .= '<span title="' . $term1 . '">' . $value1 . '</span> / ';
+					$out .= '<span title="' . $term2 . '">' . $value2 . '</span> / ';
+					$out .= '<span title="' . $term3 . '">' . $value3 . '</span>';
+					$out .= '</td>';
+					break;
 				case 'price'       : $out .= '<td class="td-numeric">' . htmlspecialchars(price_string($value))    . '</td>'; break;
 				default            : $out .= '<td>?</td>'; break;
 			}

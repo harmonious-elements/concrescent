@@ -33,12 +33,17 @@ $list_def = array(
 			'type' => 'age-range'
 		),
 		array(
+			'name' => '# Accepted',
+			'key' => 'quantity-accepted',
+			'type' => 'quantity'
+		),
+		array(
 			'name' => '# Sold',
 			'key' => 'quantity-sold',
 			'type' => 'quantity'
 		),
 		array(
-			'name' => '# Left',
+			'name' => '# Remaining',
 			'key' => 'quantity-remaining',
 			'type' => 'quantity'
 		),

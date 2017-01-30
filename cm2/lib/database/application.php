@@ -444,8 +444,18 @@ class cm_application_db {
 			' b.`max_prereg_discount`, b.`use_permit`, b.`require_permit`,'.
 			' b.`require_contract`, b.`active`, b.`quantity`,'.
 			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
-			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a'.
-			' WHERE a.`badge_type_id` = b.`id` AND a.`payment_status` = \'Completed\') c'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a1'.
+			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a2'.
+			' WHERE a2.`badge_type_id` = b.`id` AND a2.`payment_status` = \'Completed\') c2,'.
+			' (SELECT SUM(a3.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a3'.
+			' WHERE a3.`badge_type_id` = b.`id` AND a3.`application_status` = \'Accepted\') c3,'.
+			' (SELECT SUM(a4.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a4'.
+			' WHERE a4.`badge_type_id` = b.`id` AND a4.`payment_status` = \'Completed\') c4,'.
+			' (SELECT SUM(a5.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a5'.
+			' WHERE a5.`badge_type_id` = b.`id` AND a5.`application_status` = \'Accepted\') c5,'.
+			' (SELECT SUM(a6.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a6'.
+			' WHERE a6.`badge_type_id` = b.`id` AND a6.`payment_status` = \'Completed\') c6'.
 			' FROM '.$this->cm_db->table_name('application_badge_types_'.$this->ctx_lc).' b'.
 			' WHERE `id` = ? LIMIT 1'
 		);
@@ -459,7 +469,9 @@ class cm_application_db {
 			$max_prereg_discount, $use_permit, $require_permit,
 			$require_contract, $active, $quantity,
 			$start_date, $end_date, $min_age, $max_age,
-			$quantity_sold
+			$quantity_accepted, $quantity_sold,
+			$applicants_accepted, $applicants_sold,
+			$assignments_accepted, $assignments_sold
 		);
 		if ($stmt->fetch()) {
 			$event_start_date = $this->event_info['start_date'];
@@ -486,8 +498,15 @@ class cm_application_db {
 				'require-contract' => !!$require_contract,
 				'active' => !!$active,
 				'quantity' => $quantity,
+				'quantity-accepted' => $quantity_accepted,
 				'quantity-sold' => $quantity_sold,
 				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
+				'applicants-accepted' => ($applicants_accepted ? $applicants_accepted : 0),
+				'applicants-sold' => ($applicants_sold ? $applicants_sold : 0),
+				'applicants-remaining' => (is_null($quantity) ? null : ($quantity - $applicants_sold)),
+				'assignments-accepted' => ($assignments_accepted ? $assignments_accepted : 0),
+				'assignments-sold' => ($assignments_sold ? $assignments_sold : 0),
+				'assignments-remaining' => (is_null($quantity) ? null : ($quantity - $assignments_sold)),
 				'start-date' => $start_date,
 				'end-date' => $end_date,
 				'min-age' => $min_age,
@@ -548,8 +567,18 @@ class cm_application_db {
 			' b.`max_prereg_discount`, b.`use_permit`, b.`require_permit`,'.
 			' b.`require_contract`, b.`active`, b.`quantity`,'.
 			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
-			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a'.
-			' WHERE a.`badge_type_id` = b.`id` AND a.`payment_status` = \'Completed\') c'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a1'.
+			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a2'.
+			' WHERE a2.`badge_type_id` = b.`id` AND a2.`payment_status` = \'Completed\') c2,'.
+			' (SELECT SUM(a3.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a3'.
+			' WHERE a3.`badge_type_id` = b.`id` AND a3.`application_status` = \'Accepted\') c3,'.
+			' (SELECT SUM(a4.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a4'.
+			' WHERE a4.`badge_type_id` = b.`id` AND a4.`payment_status` = \'Completed\') c4,'.
+			' (SELECT SUM(a5.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a5'.
+			' WHERE a5.`badge_type_id` = b.`id` AND a5.`application_status` = \'Accepted\') c5,'.
+			' (SELECT SUM(a6.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a6'.
+			' WHERE a6.`badge_type_id` = b.`id` AND a6.`payment_status` = \'Completed\') c6'.
 			' FROM '.$this->cm_db->table_name('application_badge_types_'.$this->ctx_lc).' b'
 		);
 		$first = true;
@@ -571,7 +600,9 @@ class cm_application_db {
 			$max_prereg_discount, $use_permit, $require_permit,
 			$require_contract, $active, $quantity,
 			$start_date, $end_date, $min_age, $max_age,
-			$quantity_sold
+			$quantity_accepted, $quantity_sold,
+			$applicants_accepted, $applicants_sold,
+			$assignments_accepted, $assignments_sold
 		);
 		$event_start_date = $this->event_info['start_date'];
 		$event_end_date   = $this->event_info['end_date'  ];
@@ -599,8 +630,15 @@ class cm_application_db {
 				'require-contract' => !!$require_contract,
 				'active' => !!$active,
 				'quantity' => $quantity,
+				'quantity-accepted' => $quantity_accepted,
 				'quantity-sold' => $quantity_sold,
 				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
+				'applicants-accepted' => ($applicants_accepted ? $applicants_accepted : 0),
+				'applicants-sold' => ($applicants_sold ? $applicants_sold : 0),
+				'applicants-remaining' => (is_null($quantity) ? null : ($quantity - $applicants_sold)),
+				'assignments-accepted' => ($assignments_accepted ? $assignments_accepted : 0),
+				'assignments-sold' => ($assignments_sold ? $assignments_sold : 0),
+				'assignments-remaining' => (is_null($quantity) ? null : ($quantity - $assignments_sold)),
 				'start-date' => $start_date,
 				'end-date' => $end_date,
 				'min-age' => $min_age,

@@ -52,14 +52,31 @@ $list_def = array(
 			'type' => 'age-range'
 		),
 		array(
-			'name' => '# Sold',
-			'key' => 'quantity-sold',
-			'type' => 'quantity'
+			'name' => '# Accepted',
+			'key1' => 'quantity-accepted',
+			'key2' => 'applicants-accepted',
+			'key3' => 'assignments-accepted',
+			'term2' => 'Badges',
+			'term3' => $ctx_info['assignment_term'][1],
+			'type' => 'quantity3'
 		),
 		array(
-			'name' => '# Left',
-			'key' => 'quantity-remaining',
-			'type' => 'quantity'
+			'name' => '# Sold',
+			'key1' => 'quantity-sold',
+			'key2' => 'applicants-sold',
+			'key3' => 'assignments-sold',
+			'term2' => 'Badges',
+			'term3' => $ctx_info['assignment_term'][1],
+			'type' => 'quantity3'
+		),
+		array(
+			'name' => '# Remaining',
+			'key1' => 'quantity-remaining',
+			'key2' => 'applicants-remaining',
+			'key3' => 'assignments-remaining',
+			'term2' => 'Badges',
+			'term3' => $ctx_info['assignment_term'][1],
+			'type' => 'quantity3'
 		),
 		array(
 			'name' => '# Total',

@@ -608,8 +608,10 @@ class cm_staff_db {
 			'SELECT b.`id`, b.`order`, b.`name`, b.`description`, b.`rewards`,'.
 			' b.`price`, b.`active`, b.`quantity`,'.
 			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
-			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('staff').' a'.
-			' WHERE a.`badge_type_id` = b.`id` AND a.`payment_status` = \'Completed\') c'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('staff').' a1'.
+			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('staff').' a2'.
+			' WHERE a2.`badge_type_id` = b.`id` AND a2.`payment_status` = \'Completed\') c2'.
 			' FROM '.$this->cm_db->table_name('staff_badge_types').' b'.
 			' WHERE `id` = ? LIMIT 1'
 		);
@@ -619,7 +621,7 @@ class cm_staff_db {
 			$id, $order, $name, $description, $rewards,
 			$price, $active, $quantity,
 			$start_date, $end_date, $min_age, $max_age,
-			$quantity_sold
+			$quantity_accepted, $quantity_sold
 		);
 		if ($stmt->fetch()) {
 			$event_start_date = $this->event_info['start_date'];
@@ -636,6 +638,7 @@ class cm_staff_db {
 				'price' => $price,
 				'active' => !!$active,
 				'quantity' => $quantity,
+				'quantity-accepted' => $quantity_accepted,
 				'quantity-sold' => $quantity_sold,
 				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
 				'start-date' => $start_date,
@@ -694,8 +697,10 @@ class cm_staff_db {
 			'SELECT b.`id`, b.`order`, b.`name`, b.`description`, b.`rewards`,'.
 			' b.`price`, b.`active`, b.`quantity`,'.
 			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
-			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('staff').' a'.
-			' WHERE a.`badge_type_id` = b.`id` AND a.`payment_status` = \'Completed\') c'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('staff').' a1'.
+			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('staff').' a2'.
+			' WHERE a2.`badge_type_id` = b.`id` AND a2.`payment_status` = \'Completed\') c2'.
 			' FROM '.$this->cm_db->table_name('staff_badge_types').' b'
 		);
 		$first = true;
@@ -713,7 +718,7 @@ class cm_staff_db {
 			$id, $order, $name, $description, $rewards,
 			$price, $active, $quantity,
 			$start_date, $end_date, $min_age, $max_age,
-			$quantity_sold
+			$quantity_accepted, $quantity_sold
 		);
 		$event_start_date = $this->event_info['start_date'];
 		$event_end_date   = $this->event_info['end_date'  ];
@@ -731,6 +736,7 @@ class cm_staff_db {
 				'price' => $price,
 				'active' => !!$active,
 				'quantity' => $quantity,
+				'quantity-accepted' => $quantity_accepted,
 				'quantity-sold' => $quantity_sold,
 				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
 				'start-date' => $start_date,

@@ -38,7 +38,7 @@ $list_def = array(
 			'type' => 'quantity'
 		),
 		array(
-			'name' => '# Left',
+			'name' => '# Remaining',
 			'key' => 'quantity-remaining',
 			'type' => 'quantity'
 		),
