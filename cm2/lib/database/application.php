@@ -90,7 +90,9 @@ class cm_application_db {
 				'`require_permit` BOOLEAN NOT NULL,'.
 				'`require_contract` BOOLEAN NOT NULL,'.
 				'`active` BOOLEAN NOT NULL,'.
-				'`quantity` INTEGER NULL,'.
+				'`max_total_applications` INTEGER NULL,'.
+				'`max_total_applicants` INTEGER NULL,'.
+				'`max_total_assignments` INTEGER NULL,'.
 				'`start_date` DATE NULL,'.
 				'`end_date` DATE NULL,'.
 				'`min_age` INTEGER NULL,'.
@@ -442,7 +444,8 @@ class cm_application_db {
 			' b.`base_applicant_count`, b.`base_assignment_count`,'.
 			' b.`price_per_applicant`, b.`price_per_assignment`,'.
 			' b.`max_prereg_discount`, b.`use_permit`, b.`require_permit`,'.
-			' b.`require_contract`, b.`active`, b.`quantity`,'.
+			' b.`require_contract`, b.`active`, b.`max_total_applications`,'.
+			' b.`max_total_applicants`, b.`max_total_assignments`,'.
 			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
 			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a1'.
 			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
@@ -467,9 +470,10 @@ class cm_application_db {
 			$base_applicant_count, $base_assignment_count,
 			$price_per_applicant, $price_per_assignment,
 			$max_prereg_discount, $use_permit, $require_permit,
-			$require_contract, $active, $quantity,
+			$require_contract, $active, $max_total_applications,
+			$max_total_applicants, $max_total_assignments,
 			$start_date, $end_date, $min_age, $max_age,
-			$quantity_accepted, $quantity_sold,
+			$applications_accepted, $applications_sold,
 			$applicants_accepted, $applicants_sold,
 			$assignments_accepted, $assignments_sold
 		);
@@ -497,16 +501,18 @@ class cm_application_db {
 				'require-permit' => !!$require_permit,
 				'require-contract' => !!$require_contract,
 				'active' => !!$active,
-				'quantity' => $quantity,
-				'quantity-accepted' => $quantity_accepted,
-				'quantity-sold' => $quantity_sold,
-				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
+				'max-total-applications' => $max_total_applications,
+				'applications-accepted' => $applications_accepted,
+				'applications-sold' => $applications_sold,
+				'applications-remaining' => (is_null($max_total_applications) ? null : ($max_total_applications - $applications_sold)),
+				'max-total-applicants' => $max_total_applicants,
 				'applicants-accepted' => $applicants_accepted,
 				'applicants-sold' => $applicants_sold,
-				'applicants-remaining' => (is_null($quantity) ? null : ($quantity - $applicants_sold)),
+				'applicants-remaining' => (is_null($max_total_applicants) ? null : ($max_total_applicants - $applicants_sold)),
+				'max-total-assignments' => $max_total_assignments,
 				'assignments-accepted' => $assignments_accepted,
 				'assignments-sold' => $assignments_sold,
-				'assignments-remaining' => (is_null($quantity) ? null : ($quantity - $assignments_sold)),
+				'assignments-remaining' => (is_null($max_total_assignments) ? null : ($max_total_assignments - $assignments_sold)),
 				'start-date' => $start_date,
 				'end-date' => $end_date,
 				'min-age' => $min_age,
@@ -565,7 +571,8 @@ class cm_application_db {
 			' b.`base_applicant_count`, b.`base_assignment_count`,'.
 			' b.`price_per_applicant`, b.`price_per_assignment`,'.
 			' b.`max_prereg_discount`, b.`use_permit`, b.`require_permit`,'.
-			' b.`require_contract`, b.`active`, b.`quantity`,'.
+			' b.`require_contract`, b.`active`, b.`max_total_applications`,'.
+			' b.`max_total_applicants`, b.`max_total_assignments`,'.
 			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
 			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a1'.
 			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
@@ -598,16 +605,21 @@ class cm_application_db {
 			$base_applicant_count, $base_assignment_count,
 			$price_per_applicant, $price_per_assignment,
 			$max_prereg_discount, $use_permit, $require_permit,
-			$require_contract, $active, $quantity,
+			$require_contract, $active, $max_total_applications,
+			$max_total_applicants, $max_total_assignments,
 			$start_date, $end_date, $min_age, $max_age,
-			$quantity_accepted, $quantity_sold,
+			$applications_accepted, $applications_sold,
 			$applicants_accepted, $applicants_sold,
 			$assignments_accepted, $assignments_sold
 		);
 		$event_start_date = $this->event_info['start_date'];
 		$event_end_date   = $this->event_info['end_date'  ];
 		while ($stmt->fetch()) {
-			if ($unsold_only && !(is_null($quantity) || $quantity > $quantity_sold)) continue;
+			if ($unsold_only) {
+				if (!( is_null($max_total_applications) || $max_total_applications > $applications_sold )) continue;
+				if (!( is_null($max_total_applicants  ) || $max_total_applicants   > $applicants_sold   )) continue;
+				if (!( is_null($max_total_assignments ) || $max_total_assignments  > $assignments_sold  )) continue;
+			}
 			$min_birthdate = $max_age ? (((int)$event_start_date - $max_age - 1) . substr($event_start_date, 4)) : null;
 			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
 			$badge_types[] = array(
@@ -629,16 +641,18 @@ class cm_application_db {
 				'require-permit' => !!$require_permit,
 				'require-contract' => !!$require_contract,
 				'active' => !!$active,
-				'quantity' => $quantity,
-				'quantity-accepted' => $quantity_accepted,
-				'quantity-sold' => $quantity_sold,
-				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
+				'max-total-applications' => $max_total_applications,
+				'applications-accepted' => $applications_accepted,
+				'applications-sold' => $applications_sold,
+				'applications-remaining' => (is_null($max_total_applications) ? null : ($max_total_applications - $applications_sold)),
+				'max-total-applicants' => $max_total_applicants,
 				'applicants-accepted' => $applicants_accepted,
 				'applicants-sold' => $applicants_sold,
-				'applicants-remaining' => (is_null($quantity) ? null : ($quantity - $applicants_sold)),
+				'applicants-remaining' => (is_null($max_total_applicants) ? null : ($max_total_applicants - $applicants_sold)),
+				'max-total-assignments' => $max_total_assignments,
 				'assignments-accepted' => $assignments_accepted,
 				'assignments-sold' => $assignments_sold,
-				'assignments-remaining' => (is_null($quantity) ? null : ($quantity - $assignments_sold)),
+				'assignments-remaining' => (is_null($max_total_assignments) ? null : ($max_total_assignments - $assignments_sold)),
 				'start-date' => $start_date,
 				'end-date' => $end_date,
 				'min-age' => $min_age,
@@ -678,7 +692,9 @@ class cm_application_db {
 		$require_permit = (isset($badge_type['require-permit']) ? ($badge_type['require-permit'] ? 1 : 0) : 0);
 		$require_contract = (isset($badge_type['require-contract']) ? ($badge_type['require-contract'] ? 1 : 0) : 0);
 		$active = (isset($badge_type['active']) ? ($badge_type['active'] ? 1 : 0) : 1);
-		$quantity = (isset($badge_type['quantity']) ? $badge_type['quantity'] : null);
+		$max_total_applications = (isset($badge_type['max-total-applications']) ? $badge_type['max-total-applications'] : null);
+		$max_total_applicants = (isset($badge_type['max-total-applicants']) ? $badge_type['max-total-applicants'] : null);
+		$max_total_assignments = (isset($badge_type['max-total-assignments']) ? $badge_type['max-total-assignments'] : null);
 		$start_date = (isset($badge_type['start-date']) ? $badge_type['start-date'] : null);
 		$end_date = (isset($badge_type['end-date']) ? $badge_type['end-date'] : null);
 		$min_age = (isset($badge_type['min-age']) ? $badge_type['min-age'] : null);
@@ -690,17 +706,19 @@ class cm_application_db {
 			'`base_applicant_count` = ?, `base_assignment_count` = ?, '.
 			'`price_per_applicant` = ?, `price_per_assignment` = ?, '.
 			'`max_prereg_discount` = ?, `use_permit` = ?, `require_permit` = ?, '.
-			'`require_contract` = ?, `active` = ?, `quantity` = ?, '.
+			'`require_contract` = ?, `active` = ?, `max_total_applications` = ?, '.
+			'`max_total_applicants` = ?, `max_total_assignments` = ?, '.
 			'`start_date` = ?, `end_date` = ?, `min_age` = ?, `max_age` = ?'
 		);
 		$stmt->bind_param(
-			'isssiidiiddsiiiiissii',
+			'isssiidiiddsiiiiiiissii',
 			$order, $name, $description, $rewards,
 			$max_applicant_count, $max_assignment_count, $base_price,
 			$base_applicant_count, $base_assignment_count,
 			$price_per_applicant, $price_per_assignment,
 			$max_prereg_discount, $use_permit, $require_permit,
-			$require_contract, $active, $quantity,
+			$require_contract, $active, $max_total_applications,
+			$max_total_applicants, $max_total_assignments,
 			$start_date, $end_date, $min_age, $max_age
 		);
 		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
@@ -726,7 +744,9 @@ class cm_application_db {
 		$require_permit = (isset($badge_type['require-permit']) ? ($badge_type['require-permit'] ? 1 : 0) : 0);
 		$require_contract = (isset($badge_type['require-contract']) ? ($badge_type['require-contract'] ? 1 : 0) : 0);
 		$active = (isset($badge_type['active']) ? ($badge_type['active'] ? 1 : 0) : 1);
-		$quantity = (isset($badge_type['quantity']) ? $badge_type['quantity'] : null);
+		$max_total_applications = (isset($badge_type['max-total-applications']) ? $badge_type['max-total-applications'] : null);
+		$max_total_applicants = (isset($badge_type['max-total-applicants']) ? $badge_type['max-total-applicants'] : null);
+		$max_total_assignments = (isset($badge_type['max-total-assignments']) ? $badge_type['max-total-assignments'] : null);
 		$start_date = (isset($badge_type['start-date']) ? $badge_type['start-date'] : null);
 		$end_date = (isset($badge_type['end-date']) ? $badge_type['end-date'] : null);
 		$min_age = (isset($badge_type['min-age']) ? $badge_type['min-age'] : null);
@@ -738,18 +758,20 @@ class cm_application_db {
 			'`base_applicant_count` = ?, `base_assignment_count` = ?, '.
 			'`price_per_applicant` = ?, `price_per_assignment` = ?, '.
 			'`max_prereg_discount` = ?, `use_permit` = ?, `require_permit` = ?, '.
-			'`require_contract` = ?, `active` = ?, `quantity` = ?, '.
+			'`require_contract` = ?, `active` = ?, `max_total_applications` = ?, '.
+			'`max_total_applicants` = ?, `max_total_assignments` = ?, '.
 			'`start_date` = ?, `end_date` = ?, `min_age` = ?, `max_age` = ?'.
 			' WHERE `id` = ? LIMIT 1'
 		);
 		$stmt->bind_param(
-			'sssiidiiddsiiiiissiii',
+			'sssiidiiddsiiiiiiissiii',
 			$name, $description, $rewards,
 			$max_applicant_count, $max_assignment_count, $base_price,
 			$base_applicant_count, $base_assignment_count,
 			$price_per_applicant, $price_per_assignment,
 			$max_prereg_discount, $use_permit, $require_permit,
-			$require_contract, $active, $quantity,
+			$require_contract, $active, $max_total_applications,
+			$max_total_applicants, $max_total_assignments,
 			$start_date, $end_date, $min_age, $max_age,
 			$badge_type['id']
 		);

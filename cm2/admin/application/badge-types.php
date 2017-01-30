@@ -53,7 +53,7 @@ $list_def = array(
 		),
 		array(
 			'name' => '# Accepted',
-			'key1' => 'quantity-accepted',
+			'key1' => 'applications-accepted',
 			'key2' => 'applicants-accepted',
 			'key3' => 'assignments-accepted',
 			'term2' => 'Badges',
@@ -62,7 +62,7 @@ $list_def = array(
 		),
 		array(
 			'name' => '# Sold',
-			'key1' => 'quantity-sold',
+			'key1' => 'applications-sold',
 			'key2' => 'applicants-sold',
 			'key3' => 'assignments-sold',
 			'term2' => 'Badges',
@@ -71,7 +71,7 @@ $list_def = array(
 		),
 		array(
 			'name' => '# Remaining',
-			'key1' => 'quantity-remaining',
+			'key1' => 'applications-remaining',
 			'key2' => 'applicants-remaining',
 			'key3' => 'assignments-remaining',
 			'term2' => 'Badges',
@@ -80,8 +80,12 @@ $list_def = array(
 		),
 		array(
 			'name' => '# Total',
-			'key' => 'quantity',
-			'type' => 'quantity'
+			'key1' => 'max-total-applications',
+			'key2' => 'max-total-applicants',
+			'key3' => 'max-total-assignments',
+			'term2' => 'Badges',
+			'term3' => $ctx_info['assignment_term'][1],
+			'type' => 'quantity3'
 		),
 		array(
 			'name' => 'Base Price',
@@ -125,7 +129,9 @@ $list_def['edit-clear-function'] = <<<END
 		$('#ea-require-permit').prop('checked', false);
 		$('#ea-require-contract').prop('checked', false);
 		$('#ea-active').prop('checked', true);
-		$('#ea-quantity').val('');
+		$('#ea-max-total-applications').val('');
+		$('#ea-max-total-applicants').val('');
+		$('#ea-max-total-assignments').val('');
 		$('#ea-start-date').val('');
 		$('#ea-end-date').val('');
 		$('#ea-min-age').val('');
@@ -149,7 +155,9 @@ $list_def['edit-load-function'] = <<<END
 		$('#ea-require-permit').prop('checked', !!e['require-permit']);
 		$('#ea-require-contract').prop('checked', !!e['require-contract']);
 		$('#ea-active').prop('checked', !!e['active']);
-		$('#ea-quantity').val(e['quantity'] || '');
+		$('#ea-max-total-applications').val(e['max-total-applications'] || '');
+		$('#ea-max-total-applicants').val(e['max-total-applicants'] || '');
+		$('#ea-max-total-assignments').val(e['max-total-assignments'] || '');
 		$('#ea-start-date').val(e['start-date'] || '');
 		$('#ea-end-date').val(e['end-date'] || '');
 		$('#ea-min-age').val(e['min-age'] || '');
@@ -179,7 +187,9 @@ $list_def['edit-save-function'] = <<<END
 			'require-permit': $('#ea-require-permit').is(':checked'),
 			'require-contract': $('#ea-require-contract').is(':checked'),
 			'active': $('#ea-active').is(':checked'),
-			'quantity': $('#ea-quantity').val() || null,
+			'max-total-applications': $('#ea-max-total-applications').val() || null,
+			'max-total-applicants': $('#ea-max-total-applicants').val() || null,
+			'max-total-assignments': $('#ea-max-total-assignments').val() || null,
 			'start-date': $('#ea-start-date').val() || null,
 			'end-date': $('#ea-end-date').val() || null,
 			'min-age': $('#ea-min-age').val() || null,
@@ -346,9 +356,23 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 		echo '<td><label><input type="checkbox" name="ea-active" id="ea-active">Active</label></td>';
 	echo '</tr>';
 	echo '<tr>';
-		echo '<th><label for="ea-quantity">Quantity Available:</label></th>';
+		echo '<th><label for="ea-max-total-applications">Max Applications<br>Available:</label></th>';
 		echo '<td>';
-			echo '<input type="number" name="ea-quantity" id="ea-quantity" min="1">';
+			echo '<input type="number" name="ea-max-total-applications" id="ea-max-total-applications" min="1">';
+			echo '&nbsp;&nbsp;(Leave blank for unlimited.)';
+		echo '</td>';
+	echo '</tr>';
+	echo '<tr>';
+		echo '<th><label for="ea-max-total-applicants">Max Badges<br>Available:</label></th>';
+		echo '<td>';
+			echo '<input type="number" name="ea-max-total-applicants" id="ea-max-total-applicants" min="1">';
+			echo '&nbsp;&nbsp;(Leave blank for unlimited.)';
+		echo '</td>';
+	echo '</tr>';
+	echo '<tr>';
+		echo '<th><label for="ea-max-total-assignments">Max ' . $ctx_info['assignment_term'][1] . '<br>Available:</label></th>';
+		echo '<td>';
+			echo '<input type="number" name="ea-max-total-assignments" id="ea-max-total-assignments" min="1">';
 			echo '&nbsp;&nbsp;(Leave blank for unlimited.)';
 		echo '</td>';
 	echo '</tr>';
