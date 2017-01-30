@@ -362,6 +362,21 @@ echo '<article>';
 							return false;
 					}
 				}
+				function my_form_review_row($question, $answer) {
+					$out = '<tr><th><label>';
+					if ($question['title']) {
+						$out .= htmlspecialchars($question['title']);
+					} else if ($question['text']) {
+						$out .= htmlspecialchars($question['text']);
+					}
+					$out .= '</label></th><td>';
+					switch ($question['type']) {
+						case 'url'  : $out .= implode('<br>', array_map('url_link', $answer)); break;
+						case 'email': $out .= implode('<br>', array_map('email_link', $answer)); break;
+						default     : $out .= paragraph_string(implode("\n", $answer)); break;
+					}
+					return $out . '</td></tr>';
+				}
 				foreach ($questions as $question) {
 					if (my_question_is_visible($question)) {
 						if ($first) {
@@ -378,10 +393,7 @@ echo '<article>';
 							if ($question['title']) $question['text'] = null;
 							echo cm_form_row($question, $answer);
 						} else {
-							echo '<tr>';
-							echo '<th><label>' . htmlspecialchars($question['title'] ? $question['title'] : ($question['text'] ? $question['text'] : '')) . '</label></th>';
-							echo '<td>' . paragraph_string(implode("\n", $answer)) . '</td>';
-							echo '</tr>';
+							echo my_form_review_row($question, $answer);
 						}
 						$first = false;
 					}
