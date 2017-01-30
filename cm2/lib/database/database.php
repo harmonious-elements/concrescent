@@ -20,8 +20,7 @@ class cm_db {
 		);
 
 		/* Set text encoding */
-		$this->connection->query('set names utf8');
-		$this->connection->query('set character set utf8');
+		$this->connection->set_charset('utf8');
 
 		/* Set time zone */
 		$stmt = $this->connection->prepare('set time_zone = ?');
