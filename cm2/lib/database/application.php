@@ -448,13 +448,13 @@ class cm_application_db {
 			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
 			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a2'.
 			' WHERE a2.`badge_type_id` = b.`id` AND a2.`payment_status` = \'Completed\') c2,'.
-			' (SELECT SUM(a3.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a3'.
+			' (SELECT IFNULL(SUM(a3.`applicant_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a3'.
 			' WHERE a3.`badge_type_id` = b.`id` AND a3.`application_status` = \'Accepted\') c3,'.
-			' (SELECT SUM(a4.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a4'.
+			' (SELECT IFNULL(SUM(a4.`applicant_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a4'.
 			' WHERE a4.`badge_type_id` = b.`id` AND a4.`payment_status` = \'Completed\') c4,'.
-			' (SELECT SUM(a5.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a5'.
+			' (SELECT IFNULL(SUM(a5.`assignment_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a5'.
 			' WHERE a5.`badge_type_id` = b.`id` AND a5.`application_status` = \'Accepted\') c5,'.
-			' (SELECT SUM(a6.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a6'.
+			' (SELECT IFNULL(SUM(a6.`assignment_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a6'.
 			' WHERE a6.`badge_type_id` = b.`id` AND a6.`payment_status` = \'Completed\') c6'.
 			' FROM '.$this->cm_db->table_name('application_badge_types_'.$this->ctx_lc).' b'.
 			' WHERE `id` = ? LIMIT 1'
@@ -501,11 +501,11 @@ class cm_application_db {
 				'quantity-accepted' => $quantity_accepted,
 				'quantity-sold' => $quantity_sold,
 				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
-				'applicants-accepted' => ($applicants_accepted ? $applicants_accepted : 0),
-				'applicants-sold' => ($applicants_sold ? $applicants_sold : 0),
+				'applicants-accepted' => $applicants_accepted,
+				'applicants-sold' => $applicants_sold,
 				'applicants-remaining' => (is_null($quantity) ? null : ($quantity - $applicants_sold)),
-				'assignments-accepted' => ($assignments_accepted ? $assignments_accepted : 0),
-				'assignments-sold' => ($assignments_sold ? $assignments_sold : 0),
+				'assignments-accepted' => $assignments_accepted,
+				'assignments-sold' => $assignments_sold,
 				'assignments-remaining' => (is_null($quantity) ? null : ($quantity - $assignments_sold)),
 				'start-date' => $start_date,
 				'end-date' => $end_date,
@@ -571,13 +571,13 @@ class cm_application_db {
 			' WHERE a1.`badge_type_id` = b.`id` AND a1.`application_status` = \'Accepted\') c1,'.
 			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a2'.
 			' WHERE a2.`badge_type_id` = b.`id` AND a2.`payment_status` = \'Completed\') c2,'.
-			' (SELECT SUM(a3.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a3'.
+			' (SELECT IFNULL(SUM(a3.`applicant_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a3'.
 			' WHERE a3.`badge_type_id` = b.`id` AND a3.`application_status` = \'Accepted\') c3,'.
-			' (SELECT SUM(a4.`applicant_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a4'.
+			' (SELECT IFNULL(SUM(a4.`applicant_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a4'.
 			' WHERE a4.`badge_type_id` = b.`id` AND a4.`payment_status` = \'Completed\') c4,'.
-			' (SELECT SUM(a5.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a5'.
+			' (SELECT IFNULL(SUM(a5.`assignment_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a5'.
 			' WHERE a5.`badge_type_id` = b.`id` AND a5.`application_status` = \'Accepted\') c5,'.
-			' (SELECT SUM(a6.`assignment_count`) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a6'.
+			' (SELECT IFNULL(SUM(a6.`assignment_count`), 0) FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a6'.
 			' WHERE a6.`badge_type_id` = b.`id` AND a6.`payment_status` = \'Completed\') c6'.
 			' FROM '.$this->cm_db->table_name('application_badge_types_'.$this->ctx_lc).' b'
 		);
@@ -633,11 +633,11 @@ class cm_application_db {
 				'quantity-accepted' => $quantity_accepted,
 				'quantity-sold' => $quantity_sold,
 				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
-				'applicants-accepted' => ($applicants_accepted ? $applicants_accepted : 0),
-				'applicants-sold' => ($applicants_sold ? $applicants_sold : 0),
+				'applicants-accepted' => $applicants_accepted,
+				'applicants-sold' => $applicants_sold,
 				'applicants-remaining' => (is_null($quantity) ? null : ($quantity - $applicants_sold)),
-				'assignments-accepted' => ($assignments_accepted ? $assignments_accepted : 0),
-				'assignments-sold' => ($assignments_sold ? $assignments_sold : 0),
+				'assignments-accepted' => $assignments_accepted,
+				'assignments-sold' => $assignments_sold,
 				'assignments-remaining' => (is_null($quantity) ? null : ($quantity - $assignments_sold)),
 				'start-date' => $start_date,
 				'end-date' => $end_date,
