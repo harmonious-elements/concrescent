@@ -353,30 +353,6 @@ echo '<article>';
 							return $question['active'];
 					}
 				}
-				function my_question_is_title($question) {
-					switch ($question['type']) {
-						case 'h1': case 'h2': case 'h3':
-						case 'p': case 'q': case 'hr':
-							return true;
-						default:
-							return false;
-					}
-				}
-				function my_form_review_row($question, $answer) {
-					$out = '<tr><th><label>';
-					if ($question['title']) {
-						$out .= htmlspecialchars($question['title']);
-					} else if ($question['text']) {
-						$out .= htmlspecialchars($question['text']);
-					}
-					$out .= '</label></th><td>';
-					switch ($question['type']) {
-						case 'url'  : $out .= implode('<br>', array_map('url_link', $answer)); break;
-						case 'email': $out .= implode('<br>', array_map('email_link', $answer)); break;
-						default     : $out .= paragraph_string(implode("\n", $answer)); break;
-					}
-					return $out . '</td></tr>';
-				}
 				foreach ($questions as $question) {
 					if (my_question_is_visible($question)) {
 						if ($first) {
@@ -389,12 +365,7 @@ echo '<article>';
 							$item['form-answers'][$question['question-id']] :
 							array()
 						);
-						if ($can_edit || my_question_is_title($question)) {
-							if ($question['title']) $question['text'] = null;
-							echo cm_form_row($question, $answer);
-						} else {
-							echo my_form_review_row($question, $answer);
-						}
+						echo cm_form_review_row($question, $answer, $can_edit);
 						$first = false;
 					}
 				}

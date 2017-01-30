@@ -11,17 +11,27 @@ function cm_form_questions_to_list_columns($questions) {
 			$question['active'] && $question['listed'] &&
 			!in_array($question['type'], $ignored_question_types)
 		) {
-			$is_array_type = ($question['type'] == 'checkbox');
-			$key_prefix = 'form-answer-' . ($is_array_type ? 'array' : 'string');
-			$column_key = $key_prefix . '-' . $question['question-id'];
 			switch ($question['type']) {
-				case 'url': $column_type = 'url'; break;
-				case 'email': $column_type = 'email'; break;
-				default: $column_type = ($is_array_type ? 'array-short' : 'text'); break;
+				case 'checkbox':
+					$key_prefix = 'form-answer-array-';
+					$column_type = 'array-short';
+					break;
+				case 'url':
+					$key_prefix = 'form-answer-string-';
+					$column_type = 'url';
+					break;
+				case 'email':
+					$key_prefix = 'form-answer-string-';
+					$column_type = 'email';
+					break;
+				default:
+					$key_prefix = 'form-answer-string-';
+					$column_type = 'text';
+					break;
 			}
 			$columns[] = array(
 				'name' => $question['title'],
-				'key' => $column_key,
+				'key' => $key_prefix . $question['question-id'],
 				'type' => $column_type
 			);
 		}

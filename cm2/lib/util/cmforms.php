@@ -174,6 +174,29 @@ function cm_form_posted_answer($id, $type) {
 	}
 }
 
+function cm_form_review_row($question, $answer, $can_edit = true) {
+	$type = isset($question['type']) ? $question['type'] : '';
+	$is_title = ($type == 'h1' || $type == 'h2' || $type == 'h3');
+	$is_text = ($type == 'p' || $type == 'q' || $type == 'hr');
+	$title = isset($question['title']) ? $question['title'] : '';
+	$text = isset($question['text']) ? $question['text'] : '';
+	if ($can_edit || $is_title || $is_text) {
+		if ($title) $question['text'] = null;
+		return cm_form_row($question, $answer);
+	} else {
+		$out = '<tr><th><label>';
+		if ($title) $out .= htmlspecialchars($title);
+		else if ($text) $out .= htmlspecialchars($text);
+		$out .= '</label></th><td>';
+		switch ($type) {
+			case 'url'  : $out .= implode('<br>', array_map('url_link', $answer)); break;
+			case 'email': $out .= implode('<br>', array_map('email_link', $answer)); break;
+			default     : $out .= paragraph_string(implode("\n", $answer)); break;
+		}
+		return $out . '</td></tr>';
+	}
+}
+
 /* Form Editor */
 
 function cm_form_edit_head(&$form_def) {
