@@ -329,7 +329,10 @@ echo '<article>';
 					}
 				echo '</div>';
 			}
-			if (($can_submit && $submitted) || $attendee_blacklisted || $staff_blacklisted) {
+			if ($item['age'] && $item['age'] < 18) {
+				echo '<p class="cm-note-box">This person is under 18.</p>';
+			}
+			if (($can_submit && $submitted) || $attendee_blacklisted || $staff_blacklisted || ($item['age'] && $item['age'] < 18)) {
 				echo '<hr>';
 			}
 			echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';

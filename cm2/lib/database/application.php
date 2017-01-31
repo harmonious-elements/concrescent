@@ -1301,19 +1301,21 @@ class cm_application_db {
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
 		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'application-'.$this->ctx_lc);
 		$query = (
-			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
-			' `badge_type_id`, `notes`, `contact_first_name`,'.
-			' `contact_last_name`, `contact_subscribed`,'.
-			' `contact_email_address`, `contact_phone_number`,'.
-			' `contact_address_1`, `contact_address_2`, `contact_city`,'.
-			' `contact_state`, `contact_zip_code`, `contact_country`,'.
-			' `business_name`, `application_name`, `applicant_count`,'.
-			' `assignment_count`, `application_status`, `permit_number`,'.
-			' `payment_status`, `payment_badge_price`,'.
-			' `payment_group_uuid`, `payment_type`,'.
-			' `payment_txn_id`, `payment_txn_amt`,'.
-			' `payment_date`, `payment_details`'.
-			' FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc)
+			'SELECT a.`id`, a.`uuid`, a.`date_created`, a.`date_modified`,'.
+			' a.`badge_type_id`, a.`notes`, a.`contact_first_name`,'.
+			' a.`contact_last_name`, a.`contact_subscribed`,'.
+			' a.`contact_email_address`, a.`contact_phone_number`,'.
+			' a.`contact_address_1`, a.`contact_address_2`, a.`contact_city`,'.
+			' a.`contact_state`, a.`contact_zip_code`, a.`contact_country`,'.
+			' a.`business_name`, a.`application_name`, a.`applicant_count`,'.
+			' a.`assignment_count`, a.`application_status`, a.`permit_number`,'.
+			' (SELECT MIN(b1.`date_of_birth`) FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' b1 WHERE b1.`application_id` = a.`id`) c1,'.
+			' (SELECT MAX(b2.`date_of_birth`) FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' b2 WHERE b2.`application_id` = a.`id`) c2,'.
+			' a.`payment_status`, a.`payment_badge_price`,'.
+			' a.`payment_group_uuid`, a.`payment_type`,'.
+			' a.`payment_txn_id`, a.`payment_txn_amt`,'.
+			' a.`payment_date`, a.`payment_details`'.
+			' FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a'
 		);
 		if ($id) {
 			if ($uuid) $query .= ' WHERE `id` = ? AND `uuid` = ? LIMIT 1';
@@ -1338,6 +1340,7 @@ class cm_application_db {
 			$contact_state, $contact_zip_code, $contact_country,
 			$business_name, $application_name, $applicant_count,
 			$assignment_count, $application_status, $permit_number,
+			$min_birthdate, $max_birthdate,
 			$payment_status, $payment_badge_price,
 			$payment_group_uuid, $payment_type,
 			$payment_txn_id, $payment_txn_amt,
@@ -1356,6 +1359,8 @@ class cm_application_db {
 			$contact_address = trim(trim($contact_address_1) . "\n" . trim($contact_address_2));
 			$contact_csz = trim(trim(trim($contact_city) . ' ' . trim($contact_state)) . ' ' . trim($contact_zip_code));
 			$contact_address_full = trim(trim(trim($contact_address) . "\n" . trim($contact_csz)) . "\n" . trim($contact_country));
+			$min_age = $max_birthdate ? calculate_age($this->event_info['start_date'], $max_birthdate) : null;
+			$max_age = $min_birthdate ? calculate_age($this->event_info['start_date'], $min_birthdate) : null;
 			$review_link = (($payment_group_uuid && $payment_txn_id) ? (
 				$reg_url . '/review.php?c=' . $this->ctx_lc .
 				'&gid=' . $payment_group_uuid .
@@ -1410,6 +1415,10 @@ class cm_application_db {
 				'assignment-count' => $assignment_count,
 				'application-status' => $application_status,
 				'permit-number' => $permit_number,
+				'min-birthdate' => $min_birthdate,
+				'max-birthdate' => $max_birthdate,
+				'min-age' => $min_age,
+				'max-age' => $max_age,
 				'payment-status' => $payment_status,
 				'payment-badge-price' => $payment_badge_price,
 				'payment-group-uuid' => $payment_group_uuid,
@@ -1483,19 +1492,21 @@ class cm_application_db {
 		if (!$fdb) $fdb = new cm_forms_db($this->cm_db, 'application-'.$this->ctx_lc);
 		$applications = array();
 		$query = (
-			'SELECT `id`, `uuid`, `date_created`, `date_modified`,'.
-			' `badge_type_id`, `notes`, `contact_first_name`,'.
-			' `contact_last_name`, `contact_subscribed`,'.
-			' `contact_email_address`, `contact_phone_number`,'.
-			' `contact_address_1`, `contact_address_2`, `contact_city`,'.
-			' `contact_state`, `contact_zip_code`, `contact_country`,'.
-			' `business_name`, `application_name`, `applicant_count`,'.
-			' `assignment_count`, `application_status`, `permit_number`,'.
-			' `payment_status`, `payment_badge_price`,'.
-			' `payment_group_uuid`, `payment_type`,'.
-			' `payment_txn_id`, `payment_txn_amt`,'.
-			' `payment_date`, `payment_details`'.
-			' FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc)
+			'SELECT a.`id`, a.`uuid`, a.`date_created`, a.`date_modified`,'.
+			' a.`badge_type_id`, a.`notes`, a.`contact_first_name`,'.
+			' a.`contact_last_name`, a.`contact_subscribed`,'.
+			' a.`contact_email_address`, a.`contact_phone_number`,'.
+			' a.`contact_address_1`, a.`contact_address_2`, a.`contact_city`,'.
+			' a.`contact_state`, a.`contact_zip_code`, a.`contact_country`,'.
+			' a.`business_name`, a.`application_name`, a.`applicant_count`,'.
+			' a.`assignment_count`, a.`application_status`, a.`permit_number`,'.
+			' (SELECT MIN(b1.`date_of_birth`) FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' b1 WHERE b1.`application_id` = a.`id`) c1,'.
+			' (SELECT MAX(b2.`date_of_birth`) FROM '.$this->cm_db->table_name('applicants_'.$this->ctx_lc).' b2 WHERE b2.`application_id` = a.`id`) c2,'.
+			' a.`payment_status`, a.`payment_badge_price`,'.
+			' a.`payment_group_uuid`, a.`payment_type`,'.
+			' a.`payment_txn_id`, a.`payment_txn_amt`,'.
+			' a.`payment_date`, a.`payment_details`'.
+			' FROM '.$this->cm_db->table_name('applications_'.$this->ctx_lc).' a'
 		);
 		$first = true;
 		$bind = array('');
@@ -1523,6 +1534,7 @@ class cm_application_db {
 			$contact_state, $contact_zip_code, $contact_country,
 			$business_name, $application_name, $applicant_count,
 			$assignment_count, $application_status, $permit_number,
+			$min_birthdate, $max_birthdate,
 			$payment_status, $payment_badge_price,
 			$payment_group_uuid, $payment_type,
 			$payment_txn_id, $payment_txn_amt,
@@ -1542,6 +1554,8 @@ class cm_application_db {
 			$contact_address = trim(trim($contact_address_1) . "\n" . trim($contact_address_2));
 			$contact_csz = trim(trim(trim($contact_city) . ' ' . trim($contact_state)) . ' ' . trim($contact_zip_code));
 			$contact_address_full = trim(trim(trim($contact_address) . "\n" . trim($contact_csz)) . "\n" . trim($contact_country));
+			$min_age = $max_birthdate ? calculate_age($this->event_info['start_date'], $max_birthdate) : null;
+			$max_age = $min_birthdate ? calculate_age($this->event_info['start_date'], $min_birthdate) : null;
 			$review_link = (($payment_group_uuid && $payment_txn_id) ? (
 				$reg_url . '/review.php?c=' . $this->ctx_lc .
 				'&gid=' . $payment_group_uuid .
@@ -1596,6 +1610,10 @@ class cm_application_db {
 				'assignment-count' => $assignment_count,
 				'application-status' => $application_status,
 				'permit-number' => $permit_number,
+				'min-birthdate' => $min_birthdate,
+				'max-birthdate' => $max_birthdate,
+				'min-age' => $min_age,
+				'max-age' => $max_age,
 				'payment-status' => $payment_status,
 				'payment-badge-price' => $payment_badge_price,
 				'payment-group-uuid' => $payment_group_uuid,

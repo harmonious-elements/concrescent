@@ -61,6 +61,10 @@ if (isset($_POST['download-applications'])) {
 			array('key' => 'application-name',                 'name' => $ctx_info['application_name_term'],           'type' => 'text' ),
 			array('key' => 'assignment-count',                 'name' => $ctx_info['assignment_term'][1].' Requested', 'type' => 'int'  ),
 			array('key' => 'applicant-count',                  'name' => 'Badges Requested',                           'type' => 'int'  ),
+			array('key' => 'min-birthdate',                    'name' => 'Earliest Date of Birth',                     'type' => 'text' ),
+			array('key' => 'max-birthdate',                    'name' => 'Latest Date of Birth',                       'type' => 'text' ),
+			array('key' => 'min-age',                          'name' => 'Youngest Age (Start of Event)',              'type' => 'int'  ),
+			array('key' => 'max-age',                          'name' => 'Eldest Age (Start of Event)',                'type' => 'int'  ),
 		),
 		cm_form_questions_to_csv_columns($questions),
 		array(
