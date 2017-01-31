@@ -331,9 +331,21 @@ class cm_mail_db {
 					break;
 			}
 
+			if (isset($entity['qr-data']) && $entity['qr-data']) {
+				$mail_reference = strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $entity['qr-data']));
+			} else if (isset($entity['uuid']) && $entity['uuid']) {
+				$mail_reference = 'cm-uuid-' . strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $entity['uuid']));
+			} else if (isset($entity['id-string']) && $entity['id-string']) {
+				$mail_reference = 'cm-idstr-' . strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $entity['id-string']));
+			} else {
+				$mail_reference = 'cm-hash-' . strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', md5(serialize($entity))));
+			}
+			$mail_reference .= '@' . strtolower($_SERVER['SERVER_NAME']);
+
 			$mail_headers = array();
 			if ($template['from']) $mail_headers[] = 'From: ' . $template['from'];
 			if ($template['bcc']) $mail_headers[] = 'Bcc: ' . $template['bcc'];
+			$mail_headers[] = 'References: <' . $mail_reference . '>';
 			$mail_headers[] = 'X-Mailer: CONcrescent/2.0 PHP/' . phpversion();
 			$mail_headers[] = 'MIME-Version: 1.0';
 			$mail_headers[] = 'Content-Type: ' . $content_type;
