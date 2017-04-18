@@ -14,6 +14,7 @@ class cm_admin_db {
 			'`name` VARCHAR(255) NOT NULL,'.
 			'`username` VARCHAR(255) NOT NULL PRIMARY KEY,'.
 			'`password` VARCHAR(255) NOT NULL,'.
+			'`active` BOOLEAN NOT NULL,'.
 			'`permissions` TEXT NOT NULL'
 		));
 		$this->cm_db->table_def('admin_access_log', (
@@ -30,16 +31,18 @@ class cm_admin_db {
 			$config = $GLOBALS['cm_config']['default_admin'];
 			if ($config['name'] && $config['username'] && $config['password']) {
 				$password = password_hash($config['password'], PASSWORD_DEFAULT);
+				$active = 1;
 				$permissions = '*';
 				$stmt = $this->cm_db->connection->prepare(
 					'INSERT INTO '.$this->cm_db->table_name('admin_users').' SET '.
-					'`name` = ?, `username` = ?, `password` = ?, `permissions` = ?'
+					'`name` = ?, `username` = ?, `password` = ?, `active` = ?, `permissions` = ?'
 				);
 				$stmt->bind_param(
-					'ssss',
+					'sssis',
 					$config['name'],
 					$config['username'],
 					$password,
+					$active,
 					$permissions
 				);
 				$stmt->execute();
@@ -58,7 +61,7 @@ class cm_admin_db {
 		$stmt = $this->cm_db->connection->prepare(
 			'SELECT `name`, `username`, `password`, `permissions`'.
 			' FROM '.$this->cm_db->table_name('admin_users').
-			' WHERE `username` = ? LIMIT 1'
+			' WHERE `username` = ? AND `active` LIMIT 1'
 		);
 		$stmt->bind_param('s', $username);
 		$stmt->execute();
@@ -154,17 +157,18 @@ class cm_admin_db {
 	public function get_user($username) {
 		if (!$username) return false;
 		$stmt = $this->cm_db->connection->prepare(
-			'SELECT `name`, `username`, `permissions`'.
+			'SELECT `name`, `username`, `active`, `permissions`'.
 			' FROM '.$this->cm_db->table_name('admin_users').
 			' WHERE `username` = ? LIMIT 1'
 		);
 		$stmt->bind_param('s', $username);
 		$stmt->execute();
-		$stmt->bind_result($name, $username, $permissions);
+		$stmt->bind_result($name, $username, $active, $permissions);
 		if ($stmt->fetch()) {
 			$result = array(
 				'name' => $name,
 				'username' => $username,
+				'active' => !!$active,
 				'permissions' => ($permissions ? explode(',', $permissions) : array()),
 				'search-content' => array($name, $username)
 			);
@@ -178,16 +182,17 @@ class cm_admin_db {
 	public function list_users() {
 		$users = array();
 		$stmt = $this->cm_db->connection->prepare(
-			'SELECT `name`, `username`, `permissions`'.
+			'SELECT `name`, `username`, `active`, `permissions`'.
 			' FROM '.$this->cm_db->table_name('admin_users').
 			' ORDER BY `name`'
 		);
 		$stmt->execute();
-		$stmt->bind_result($name, $username, $permissions);
+		$stmt->bind_result($name, $username, $active, $permissions);
 		while ($stmt->fetch()) {
 			$users[] = array(
 				'name' => $name,
 				'username' => $username,
+				'active' => !!$active,
 				'permissions' => ($permissions ? explode(',', $permissions) : array()),
 				'search-content' => array($name, $username)
 			);
@@ -204,6 +209,7 @@ class cm_admin_db {
 		$name = isset($user['name']) ? $user['name'] : '';
 		$username = $user['username'];
 		$password = password_hash($user['password'], PASSWORD_DEFAULT);
+		$active = (isset($user['active']) ? ($user['active'] ? 1 : 0) : 1);
 		$permissions = (
 			(isset($user['permissions']) && $user['permissions']) ?
 			implode(',', $user['permissions']) : ''
@@ -211,13 +217,14 @@ class cm_admin_db {
 		/* Create and execute query */
 		$stmt = $this->cm_db->connection->prepare(
 			'INSERT INTO '.$this->cm_db->table_name('admin_users').' SET '.
-			'`name` = ?, `username` = ?, `password` = ?, `permissions` = ?'
+			'`name` = ?, `username` = ?, `password` = ?, `active` = ?, `permissions` = ?'
 		);
 		$stmt->bind_param(
-			'ssss',
+			'sssis',
 			$name,
 			$username,
 			$password,
+			$active,
 			$permissions
 		);
 		$success = $stmt->execute();
@@ -229,6 +236,7 @@ class cm_admin_db {
 		if (!$username || !$user) return false;
 		/* Get field values */
 		$new_password = '';
+		$new_active = 1;
 		$new_permissions = '';
 		$query_params = array();
 		$bind_params = array('');
@@ -247,6 +255,12 @@ class cm_admin_db {
 			$query_params[] = '`password` = ?';
 			$bind_params[0] .= 's';
 			$bind_params[] = &$new_password;
+		}
+		if (isset($user['active'])) {
+			$new_active = ($user['active'] ? 1 : 0);
+			$query_params[] = '`active` = ?';
+			$bind_params[0] .= 'i';
+			$bind_params[] = &$new_active;
 		}
 		if (isset($user['permissions']) && $user['permissions']) {
 			$new_permissions = implode(',', $user['permissions']);
@@ -274,6 +288,19 @@ class cm_admin_db {
 			' WHERE `username` = ? LIMIT 1'
 		);
 		$stmt->bind_param('s', $username);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function activate_user($username, $active) {
+		if (!$username) return false;
+		$active = $active ? 1 : 0;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('admin_users').
+			' SET `active` = ? WHERE `username` = ? LIMIT 1'
+		);
+		$stmt->bind_param('is', $active, $username);
 		$success = $stmt->execute();
 		$stmt->close();
 		return $success;

@@ -27,7 +27,8 @@ $list_def = array(
 	'sort-order' => array(0),
 	'row-key' => 'username',
 	'name-key' => 'name',
-	'row-actions' => array('edit', 'delete'),
+	'active-key' => 'active',
+	'row-actions' => array('switch', 'edit', 'delete'),
 	'table-actions' => array('add'),
 	'add-title' => 'Add User',
 	'edit-title' => 'Edit User',
@@ -38,6 +39,7 @@ $list_def['edit-clear-function'] = <<<END
 		$('#ea-name').val('');
 		$('#ea-username').val('');
 		$('#ea-password').val('');
+		$('#ea-active').prop('checked', true);
 		$('.ea-permissions').prop('checked', false);
 	}
 END;
@@ -46,6 +48,7 @@ $list_def['edit-load-function'] = <<<END
 		$('#ea-name').val(e['name']);
 		$('#ea-username').val(e['username']);
 		$('#ea-password').val('');
+		$('#ea-active').prop('checked', !!e['active']);
 		$('.ea-permissions').each(function() {
 			var name = $(this).attr('id').substring(15);
 			$(this).prop('checked', e['permissions'].indexOf(name) >= 0);
@@ -58,6 +61,7 @@ $list_def['edit-save-function'] = <<<END
 			'name': $('#ea-name').val(),
 			'username': $('#ea-username').val(),
 			'password': $('#ea-password').val(),
+			'active': $('#ea-active').is(':checked'),
 			'permissions': []
 		};
 		$('.ea-permissions').each(function() {
@@ -112,6 +116,19 @@ if (isset($_POST['cm-list-action'])) {
 			$response = array('ok' => $ok);
 			echo json_encode($response);
 			break;
+		case 'activate':
+		case 'deactivate':
+			$username = $_POST['cm-list-key'];
+			$ok = $adb->activate_user($username, $_POST['cm-list-action'] == 'activate');
+			$response = array('ok' => $ok);
+			if ($ok) {
+				$user = $adb->get_user($username);
+				if ($user) {
+					$response['row'] = cm_list_make_row($list_def, $user);
+				}
+			}
+			echo json_encode($response);
+			break;
 	}
 	exit(0);
 }
@@ -141,6 +158,10 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table cm-
 	echo '<tr>';
 		echo '<th><label for="ea-password">Password:</label></th>';
 		echo '<td><input type="password" name="ea-password" id="ea-password"></td>';
+	echo '</tr>';
+	echo '<tr>';
+		echo '<th><label for="ea-active">Active:</label></th>';
+		echo '<td><label><input type="checkbox" name="ea-active" id="ea-active">Active</label></td>';
 	echo '</tr>';
 	echo '<tr>';
 		echo '<th class="th-tall">Permissions:</th>';
