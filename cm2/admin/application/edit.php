@@ -99,6 +99,16 @@ $list_def = array(
 			'key' => 'attendee-id',
 			'type' => 'bool'
 		),
+		array(
+			'name' => 'P',
+			'key' => 'print-count',
+			'type' => 'numeric'
+		),
+		array(
+			'name' => 'C',
+			'key' => 'checkin-count',
+			'type' => 'numeric'
+		),
 	),
 	'sort-order' => array(0),
 	'row-key' => 'id',

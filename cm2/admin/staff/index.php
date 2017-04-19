@@ -78,6 +78,16 @@ $columns = array_merge(
 			'key' => 'payment-date',
 			'type' => 'text'
 		),
+		array(
+			'name' => 'P',
+			'key' => 'print-count',
+			'type' => 'numeric'
+		),
+		array(
+			'name' => 'C',
+			'key' => 'checkin-count',
+			'type' => 'numeric'
+		),
 	)
 );
 

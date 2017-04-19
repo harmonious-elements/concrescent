@@ -81,6 +81,16 @@ $columns = array(
 		'key' => 'attendee-id',
 		'type' => 'bool'
 	),
+	array(
+		'name' => 'P',
+		'key' => 'print-count',
+		'type' => 'numeric'
+	),
+	array(
+		'name' => 'C',
+		'key' => 'checkin-count',
+		'type' => 'numeric'
+	),
 );
 
 $list_def = array(
