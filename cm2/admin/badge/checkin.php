@@ -47,6 +47,16 @@ $columns = array(
 		'key' => 'payment-status',
 		'type' => 'status-label'
 	),
+	array(
+		'name' => 'P',
+		'key' => 'print-count',
+		'type' => 'numeric'
+	),
+	array(
+		'name' => 'C',
+		'key' => 'checkin-count',
+		'type' => 'numeric'
+	),
 );
 $list_def = array(
 	'loader' => 'server-side',
