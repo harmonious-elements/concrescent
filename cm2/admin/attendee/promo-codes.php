@@ -191,7 +191,7 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 		echo '<td><textarea name="ea-description" id="ea-description"></textarea></td>';
 	echo '</tr>';
 	echo '<tr>';
-		echo '<th><label for="ea-price">Price:</label></th>';
+		echo '<th><label for="ea-price">Discount:</label></th>';
 		echo '<td>';
 			echo '<input type="number" name="ea-price" id="ea-price" min="0" step="0.01">&nbsp;&nbsp;';
 			echo '<label><input type="checkbox" name="ea-percentage" id="ea-percentage">Percentage</label>';
