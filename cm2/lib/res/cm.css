@@ -838,3 +838,15 @@ table.cm-cart td:not(.td-actions) {
 	bottom: 0;
 	background: #444;
 }
+
+/* Printable */
+
+@media print {
+	header, nav {
+		display: none !important;
+	}
+	article {
+		display: block !important;
+		position: static !important;
+	}
+}
