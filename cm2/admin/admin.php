@@ -49,10 +49,6 @@ function cm_admin_body($title) {
 			echo '<div class="header-item">';
 				echo htmlspecialchars($GLOBALS['admin_user']['name']);
 			echo '</div>';
-			echo '<div class="header-item">';
-				$url = get_site_url(false) . '/admin/logout.php';
-				echo '<a href="' . htmlspecialchars($url) . '">Log Out</a>';
-			echo '</div>';
 		echo '</div>';
 	echo '</header>';
 }

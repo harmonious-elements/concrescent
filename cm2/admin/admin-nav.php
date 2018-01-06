@@ -318,6 +318,13 @@ $cm_admin_nav_payment = (
 $cm_admin_nav_admin = (
 	array(
 		array(
+			'id' => 'admin-users',
+			'href' => '/admin/users.php',
+			'name' => 'Admin Users',
+			'description' => 'Manage CONcrescent administrators and their permissions.',
+			'permission' => 'admin-users'
+		),
+		array(
 			'id' => 'admin-user',
 			'href' => '/admin/user.php',
 			'name' => 'Account Settings',
@@ -325,11 +332,11 @@ $cm_admin_nav_admin = (
 			'permission' => ''
 		),
 		array(
-			'id' => 'admin-users',
-			'href' => '/admin/users.php',
-			'name' => 'Admin Users',
-			'description' => 'Manage CONcrescent administrators and their permissions.',
-			'permission' => 'admin-users'
+			'id' => 'logout',
+			'href' => '/admin/logout.php',
+			'name' => 'Log Out',
+			'description' => 'Log out of CONcrescent.',
+			'permission' => ''
 		),
 	)
 );
