@@ -266,7 +266,7 @@ cm_list_head($list_def);
 cm_admin_body($ctx_name . ' Badge Types');
 cm_admin_nav('application-badge-types-' . $ctx_lc);
 
-echo '<article>';
+echo '<article class="cm-search-page">';
 cm_list_search_box($list_def);
 cm_list_table($list_def);
 echo '</article>';

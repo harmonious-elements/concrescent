@@ -91,7 +91,7 @@ cm_list_head($list_def);
 cm_admin_body('Badge Artwork');
 cm_admin_nav('badge-artwork');
 
-echo '<article>';
+echo '<article class="cm-search-page">';
 
 cm_list_search_box($list_def);
 

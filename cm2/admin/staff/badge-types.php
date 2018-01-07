@@ -185,7 +185,7 @@ cm_list_head($list_def);
 cm_admin_body('Staff Badge Types');
 cm_admin_nav('staff-badge-types');
 
-echo '<article>';
+echo '<article class="cm-search-page">';
 cm_list_search_box($list_def);
 cm_list_table($list_def);
 echo '</article>';

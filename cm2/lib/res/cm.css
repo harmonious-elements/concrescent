@@ -402,9 +402,15 @@ select {
 }
 /* Flexbox makes the cm-search-box look much nicer,
    so let's use it if the browser supports it. */
+.cm-search-page {
+	display: flex;
+	flex-direction: column;
+}
 .cm-search-box {
 	display: flex;
 	align-items: center;
+	flex-shrink: 0;
+	margin: 0;
 }
 .cm-search-box .cm-search-input {
 	display: flex;

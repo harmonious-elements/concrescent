@@ -293,7 +293,7 @@ echo '<script type="text/javascript" src="checkin.js"></script>';
 cm_admin_body('Registration Check-In');
 cm_admin_nav('badge-checkin');
 
-echo '<article>';
+echo '<article class="cm-search-page">';
 
 cm_list_search_box($list_def);
 cm_list_table($list_def);

@@ -507,6 +507,15 @@
 		};
 		var setListHTML = function(html) {
 			$('.cm-list-table-auto tbody').html(html);
+			/* Hack to update scrollbars when they appear unnecessarily. */
+			window.setTimeout(function() {
+				var table = $('.cm-list-table-auto');
+				table.height(table.height());
+				window.setTimeout(function() {
+					var table = $('.cm-list-table-auto');
+					table.css('height', '');
+				}, 1);
+			}, 1);
 			if (htmlInit) htmlInit();
 		};
 		var loader;
