@@ -124,7 +124,7 @@ function echo_root() {
 cm_admin_head('Org Chart');
 cm_admin_body('Org Chart');
 cm_admin_nav('staff-orgchart');
-echo '<article>';
+echo '<article class="cm-search-page">';
 
 echo '<div class="cm-list-table">';
 	echo '<table border="0" cellpadding="0" cellspacing="0">';
