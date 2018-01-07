@@ -103,7 +103,7 @@ echo '<article>';
 					echo '<td><input type="password" name="password" id="password"></td>';
 				echo '</tr>';
 				echo '<tr>';
-					echo '<td colspan="2"><hr></td>';
+					echo '<td colspan="2" class="hr"><hr></td>';
 				echo '</tr>';
 				echo '<tr>';
 					echo '<td colspan="2"><p>Enter your new account information below. To keep the same user name or password, leave the field blank.</p></td>';

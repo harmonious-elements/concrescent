@@ -310,7 +310,7 @@ echo '<article>';
 					$text = $fdb->get_custom_text('main');
 					if ($text) {
 						echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
-						echo '<tr><td colspan="2"><hr></td></tr>';
+						echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					}
 
 					echo '<tr><td colspan="2"><h2>Primary Contact Information</h2></td></tr>';
@@ -370,7 +370,7 @@ echo '<article>';
 						if ($error) echo '<span class="error">' . $error . '</span>'; echo '</td>';
 					echo '</tr>';
 
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					echo '<tr><td colspan="2"><h2>' . $ctx_name . ' Information</h2></td></tr>';
 					$text = $fdb->get_custom_text('application');
 					if ($text) echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
@@ -471,7 +471,7 @@ echo '<article>';
 						}
 					}
 
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					echo '<tr><td colspan="2"><h2>Badge Information</h2></td></tr>';
 					echo '<tr><td colspan="2"><p>';
 						$text = $fdb->get_custom_text('applicant');

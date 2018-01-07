@@ -437,7 +437,7 @@ echo '<article>';
 					echo '</tr>';
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -558,7 +558,7 @@ echo '<article>';
 				foreach ($questions as $question) {
 					if (my_question_is_visible($question)) {
 						if ($first) {
-							echo '<tr><td colspan="2"><hr></td></tr>';
+							echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 							echo '<tr><td colspan="2"><h2>Staff Information</h2></td></tr>';
 						}
 						$answer = (
@@ -574,7 +574,7 @@ echo '<article>';
 
 				if (!$review_mode || $cm_config['review_mode']['show_ice']) {
 
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					echo '<tr><td colspan="2"><h2>Emergency Contact Information</h2></td></tr>';
 
 					echo '<tr>';
@@ -619,7 +619,7 @@ echo '<article>';
 
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Application Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -718,7 +718,7 @@ echo '<article>';
 					if ($can_edit_status) {
 						echo '<td>';
 							echo '<input type="email" id="mail-alias-1" name="mail-alias-1" value="' . $value . '">';
-							echo '&nbsp;&nbsp;(This is for a <b>mail alias</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> an external address.)';
+							echo '<span class="cm-mail-alias-admonishment">(This is for a <b>mail alias</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> an external address.)</span>';
 						echo '</td>';
 					} else {
 						echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';
@@ -731,7 +731,7 @@ echo '<article>';
 					if ($can_edit_status) {
 						echo '<td>';
 							echo '<input type="email" id="mail-alias-2" name="mail-alias-2" value="' . $value . '">';
-							echo '&nbsp;&nbsp;(This is for a <b>mail alias</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> an external address.)';
+							echo '<span class="cm-mail-alias-admonishment">(This is for a <b>mail alias</b> at <b>' . htmlspecialchars($domain) . '</b>, <b>NOT</b> an external address.)</span>';
 						echo '</td>';
 					} else {
 						echo '<td><a href="mailto:' . $value . '">' . $value . '</a></td>';
@@ -780,7 +780,7 @@ echo '<article>';
 
 				if (!$review_mode) {
 
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					echo '<tr><td colspan="2"><h2>Payment Information</h2></td></tr>';
 
 					echo '<tr>';
@@ -888,7 +888,7 @@ echo '<article>';
 						echo '</tr>';
 					}
 
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					echo '<tr><td colspan="2"><h2>Record Information</h2></td></tr>';
 
 					$value = isset($item['id-string']) ? htmlspecialchars($item['id-string']) : '';

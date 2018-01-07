@@ -66,12 +66,11 @@ function cm_list_head(&$list_def) {
 function cm_list_search_box(&$list_def) {
 	echo '<div class="cm-search-box">';
 		echo '<div class="cm-search-input">';
-			echo '<label for="cm-search-input">Search';
+			echo '<input type="text" name="cm-search-input" id="cm-search-input" placeholder="Search';
 			if (isset($list_def['search-criteria']) && $list_def['search-criteria']) {
 				echo ' by ' . htmlspecialchars($list_def['search-criteria']);
 			}
-			echo ':</label>';
-			echo '<input type="text" name="cm-search-input" id="cm-search-input">';
+			echo '">';
 		echo '</div>';
 		echo '<div class="cm-search-options">';
 			echo '<button class="cm-search-first-page">&#xAB;</button>';

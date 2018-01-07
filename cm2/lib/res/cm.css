@@ -115,6 +115,7 @@ nav + article {
 .card .card-content {
 	/* break margin collapse */
 	overflow: auto;
+	padding: 0 16px;
 }
 .card .card-content > h1,
 .card .card-content > h2,
@@ -126,7 +127,11 @@ nav + article {
 .card .card-content > .cm-warning-box,
 .card .card-content > .cm-success-box,
 .card .card-content > .cm-note-box {
-	margin: 16px;
+	margin: 16px 0;
+}
+.card .card-content hr {
+	margin-left: -16px;
+	margin-right: -16px;
 }
 .card .card-buttons {
 	padding: 8px;
@@ -388,11 +393,9 @@ select {
 .cm-list-table table .deactivate-button {
 	width: 76px;
 }
-.cm-list-table-containing-table {
-	width: auto !important;
-}
 .cm-list-table-containing-cell {
 	padding: 4px;
+	max-width: 1px;
 }
 .cm-list-table-containing-cell .cm-list-table {
 	margin: 0;
@@ -406,18 +409,15 @@ select {
 .cm-search-box .cm-search-input {
 	display: flex;
 	align-items: center;
-	flex: 1 0 0;
-}
-.cm-search-box .cm-search-input label {
-	flex: 0 1 0;
+	flex: 1 1 0;
 }
 .cm-search-box .cm-search-input input {
-	flex: 1 0 0;
+	flex: 1 1 0;
 }
 .cm-search-box .cm-search-options {
 	display: flex;
 	align-items: center;
-	flex: 0 1 0;
+	flex: 0 0 0;
 }
 
 /* Special Columns */
@@ -461,7 +461,7 @@ select {
 	display: block;
 	margin: 16px;
 	padding: 16px;
-	overflow: hidden;
+	overflow: auto;
 }
 .cm-form-editor table {
 	width: 100%;
@@ -650,7 +650,6 @@ select {
 
 .cm-reg-edit .card-content {
 	position: relative;
-	overflow: hidden;
 }
 .cm-reg-edit .cm-reg-badge-types {
 	position: absolute;
@@ -659,6 +658,10 @@ select {
 	right: 16px;
 	bottom: 16px;
 	overflow: auto;
+	margin-left: 16px;
+}
+.cm-reg-edit .cm-reg-badge-types hr {
+	margin: 0;
 }
 .cm-reg-edit .cm-reg-badge-types h1,
 .cm-reg-edit .cm-reg-badge-types h2,
@@ -689,14 +692,16 @@ select {
 	width: 100%;
 }
 .cm-reg-edit-no-errors table {
-	width: 48%;
-	width: calc(50% - 24px);
+	width: 50%;
 }
 .cm-reg-edit table th {
 	width: 220px;
 }
-.cm-reg-edit table hr {
-	margin: 12px -40px 12px -20px;
+.cm-reg-edit table td.hr {
+	padding: 0;
+}
+.cm-reg-edit table td.hr hr {
+	margin: 16px -16px;
 }
 .cm-reg-edit table span.error {
 	padding-left: 1em;
@@ -721,6 +726,10 @@ table.cm-cart td:not(.td-actions) {
 .cm-add-to-blacklist {
 	font-weight: bold;
 	color: red;
+}
+.cm-mail-alias-admonishment {
+	display: block;
+	padding-top: 4px;
 }
 
 /* Statistics Page */

@@ -161,7 +161,7 @@ echo '<article>';
 				$text = $fdb->get_custom_text('main');
 				if ($text) {
 					echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				}
 
 				echo '<tr><td colspan="2"><h2>Personal Information</h2></td></tr>';
@@ -259,7 +259,7 @@ echo '<article>';
 					echo '</tr>';
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';
 				$text = $fdb->get_custom_text('contact');
 				if ($text) echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
@@ -341,7 +341,7 @@ echo '<article>';
 				foreach ($questions as $question) {
 					if ($question['active']) {
 						if ($first) {
-							echo '<tr><td colspan="2"><hr></td></tr>';
+							echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 							echo '<tr><td colspan="2"><h2>Staff Information</h2></td></tr>';
 						}
 						$answer = (
@@ -359,7 +359,7 @@ echo '<article>';
 					}
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Emergency Contact Information</h2></td></tr>';
 				$text = $fdb->get_custom_text('ice');
 				if ($text) echo '<tr><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';

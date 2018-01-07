@@ -448,7 +448,7 @@ echo '<article>';
 					}
 				echo '</tr>';
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>' . htmlspecialchars($ctx_name) . ' Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -547,14 +547,14 @@ echo '<article>';
 				}
 
 				if (!$new) {
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					echo '<tr><td colspan="2"><h2>Badge Information</h2></td></tr>';
 					echo '<tr><td colspan="2" class="cm-list-table-containing-cell">';
 					cm_list_table($list_def);
 					echo '</td></tr>';
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Application Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -664,7 +664,7 @@ echo '<article>';
 
 				if (!$review_mode) {
 
-					echo '<tr><td colspan="2"><hr></td></tr>';
+					echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 					echo '<tr><td colspan="2"><h2>Payment Information</h2></td></tr>';
 
 					echo '<tr>';
@@ -841,7 +841,7 @@ echo '<article>';
 
 					if (!$new) {
 
-						echo '<tr><td colspan="2"><hr></td></tr>';
+						echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 						echo '<tr><td colspan="2"><h2>Record Information</h2></td></tr>';
 
 						$value = isset($item['id-string']) ? htmlspecialchars($item['id-string']) : '';

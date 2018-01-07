@@ -348,7 +348,7 @@ echo '<article>';
 					echo '</tr>';
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -452,7 +452,7 @@ echo '<article>';
 					}
 				echo '</tr>';
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Emergency Contact Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -495,7 +495,7 @@ echo '<article>';
 					}
 				echo '</tr>';
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Record Information</h2></td></tr>';
 
 				$value = isset($item['id-string']) ? htmlspecialchars($item['id-string']) : '';

@@ -114,7 +114,7 @@ function cm_form_row($question, $answer, $error = null, $for_editor = false) {
 			$out .= '</td>';
 			break;
 		case 'hr':
-			$out .= '<td colspan="2"><hr></td>';
+			$out .= '<td colspan="2" class="hr"><hr></td>';
 			break;
 		default:
 			if ($title && $text) {

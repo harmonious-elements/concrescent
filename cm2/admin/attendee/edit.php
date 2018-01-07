@@ -242,7 +242,7 @@ echo '<article>';
 					echo '</tr>';
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -359,7 +359,7 @@ echo '<article>';
 				foreach ($questions as $question) {
 					if (my_question_is_visible($question)) {
 						if ($first) {
-							echo '<tr><td colspan="2"><hr></td></tr>';
+							echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 							echo '<tr><td colspan="2"><h2>Additional Information</h2></td></tr>';
 						}
 						$answer = (
@@ -373,7 +373,7 @@ echo '<article>';
 					}
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Emergency Contact Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -416,7 +416,7 @@ echo '<article>';
 					}
 				echo '</tr>';
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Payment Information</h2></td></tr>';
 
 				echo '<tr>';
@@ -545,7 +545,7 @@ echo '<article>';
 					echo '</tr>';
 				}
 
-				echo '<tr><td colspan="2"><hr></td></tr>';
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Record Information</h2></td></tr>';
 
 				$value = isset($item['id-string']) ? htmlspecialchars($item['id-string']) : '';
