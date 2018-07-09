@@ -74,6 +74,7 @@ $list_def['edit-clear-function'] = <<<END
 		$('#ea-business-name').val('');
 		$('#ea-application-name').val('');
 		$('#ea-added-by').val('');
+		$('#ea-notes').val('');
 	}
 END;
 $list_def['edit-load-function'] = <<<END
@@ -81,6 +82,7 @@ $list_def['edit-load-function'] = <<<END
 		$('#ea-business-name').val(e['business-name']);
 		$('#ea-application-name').val(e['application-name']);
 		$('#ea-added-by').val(e['added-by']);
+		$('#ea-notes').val(e['notes']);
 	}
 END;
 $list_def['edit-save-function'] = <<<END
@@ -88,7 +90,8 @@ $list_def['edit-save-function'] = <<<END
 		return {
 			'business-name': $('#ea-business-name').val(),
 			'application-name': $('#ea-application-name').val(),
-			'added-by': $('#ea-added-by').val()
+			'added-by': $('#ea-added-by').val(),
+			'notes': $('#ea-notes').val()
 		};
 	}
 END;
@@ -162,6 +165,10 @@ echo '<table border="0" cellpadding="0" cellspacing="0" class="cm-form-table">';
 	echo '<tr>';
 		echo '<th><label for="ea-added-by">Added/Approved By:</label></th>';
 		echo '<td><input type="text" name="ea-added-by" id="ea-added-by"></td>';
+	echo '</tr>';
+	echo '<tr>';
+		echo '<th><label for="ea-notes">Notes:</label></th>';
+		echo '<td><textarea name="ea-notes" id="ea-notes"></textarea></td>';
 	echo '</tr>';
 echo '</table>';
 

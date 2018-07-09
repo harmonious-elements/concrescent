@@ -11,7 +11,7 @@
 			event.preventDefault();
 		});
 
-		var addToBlacklistAddedBy = $('.cm-add-to-blacklist-added-by');
+		var addToBlacklistFields = $('.cm-add-to-blacklist-fields');
 		var addToAttendeeBlacklist = $('input[type=checkbox][name=add-to-attendee-blacklist]');
 		var addToApplicantBlacklist = $('input[type=checkbox][name=add-to-applicant-blacklist]');
 		var addToBlacklistChanged = function() {
@@ -19,8 +19,8 @@
 				addToAttendeeBlacklist.is(':checked') ||
 				addToApplicantBlacklist.is(':checked')
 			);
-			if (checked) addToBlacklistAddedBy.removeClass('hidden');
-			else addToBlacklistAddedBy.addClass('hidden');
+			if (checked) addToBlacklistFields.removeClass('hidden');
+			else addToBlacklistFields.addClass('hidden');
 		};
 		addToAttendeeBlacklist.bind('click', addToBlacklistChanged);
 		addToApplicantBlacklist.bind('click', addToBlacklistChanged);

@@ -132,7 +132,7 @@
 	};
 
 	$(document).ready(function() {
-		var addToBlacklistAddedBy = $('.cm-add-to-blacklist-added-by');
+		var addToBlacklistFields = $('.cm-add-to-blacklist-fields');
 		var addToAttendeeBlacklist = $('input[type=checkbox][name=add-to-attendee-blacklist]');
 		var addToStaffBlacklist = $('input[type=checkbox][name=add-to-staff-blacklist]');
 		var addToBlacklistChanged = function() {
@@ -140,8 +140,8 @@
 				addToAttendeeBlacklist.is(':checked') ||
 				addToStaffBlacklist.is(':checked')
 			);
-			if (checked) addToBlacklistAddedBy.removeClass('hidden');
-			else addToBlacklistAddedBy.addClass('hidden');
+			if (checked) addToBlacklistFields.removeClass('hidden');
+			else addToBlacklistFields.addClass('hidden');
 		};
 		addToAttendeeBlacklist.bind('click', addToBlacklistChanged);
 		addToStaffBlacklist.bind('click', addToBlacklistChanged);

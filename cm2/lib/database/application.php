@@ -103,6 +103,7 @@ class cm_application_db {
 				'`business_name` VARCHAR(255) NULL,'.
 				'`application_name` VARCHAR(255) NULL,'.
 				'`added_by` VARCHAR(255) NULL,'.
+				'`notes` TEXT NULL,'.
 				'`normalized_business_name` VARCHAR(255) NULL,'.
 				'`normalized_application_name` VARCHAR(255) NULL'
 			));
@@ -114,6 +115,7 @@ class cm_application_db {
 				'`email_address` VARCHAR(255) NULL,'.
 				'`phone_number` VARCHAR(255) NULL,'.
 				'`added_by` VARCHAR(255) NULL,'.
+				'`notes` TEXT NULL,'.
 				'`normalized_real_name` VARCHAR(255) NULL,'.
 				'`normalized_reversed_name` VARCHAR(255) NULL,'.
 				'`normalized_fandom_name` VARCHAR(255) NULL,'.
@@ -854,7 +856,7 @@ class cm_application_db {
 	public function get_application_blacklist_entry($id) {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(
-			'SELECT `id`, `business_name`, `application_name`, `added_by`,'.
+			'SELECT `id`, `business_name`, `application_name`, `added_by`, `notes`,'.
 			' `normalized_business_name`, `normalized_application_name`'.
 			' FROM '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).
 			' WHERE `id` = ? LIMIT 1'
@@ -862,7 +864,7 @@ class cm_application_db {
 		$stmt->bind_param('i', $id);
 		$stmt->execute();
 		$stmt->bind_result(
-			$id, $business_name, $application_name, $added_by,
+			$id, $business_name, $application_name, $added_by, $notes,
 			$normalized_business_name, $normalized_application_name
 		);
 		if ($stmt->fetch()) {
@@ -871,9 +873,10 @@ class cm_application_db {
 				'business-name' => $business_name,
 				'application-name' => $application_name,
 				'added-by' => $added_by,
+				'notes' => $notes,
 				'normalized-business-name' => $normalized_business_name,
 				'normalized-application-name' => $normalized_application_name,
-				'search-content' => array($business_name, $application_name, $added_by)
+				'search-content' => array($business_name, $application_name, $added_by, $notes)
 			);
 			$stmt->close();
 			return $result;
@@ -885,14 +888,14 @@ class cm_application_db {
 	public function list_application_blacklist_entries() {
 		$blacklist = array();
 		$stmt = $this->cm_db->connection->prepare(
-			'SELECT `id`, `business_name`, `application_name`, `added_by`,'.
+			'SELECT `id`, `business_name`, `application_name`, `added_by`, `notes`,'.
 			' `normalized_business_name`, `normalized_application_name`'.
 			' FROM '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).
 			' ORDER BY `business_name`, `application_name`'
 		);
 		$stmt->execute();
 		$stmt->bind_result(
-			$id, $business_name, $application_name, $added_by,
+			$id, $business_name, $application_name, $added_by, $notes,
 			$normalized_business_name, $normalized_application_name
 		);
 		while ($stmt->fetch()) {
@@ -901,9 +904,10 @@ class cm_application_db {
 				'business-name' => $business_name,
 				'application-name' => $application_name,
 				'added-by' => $added_by,
+				'notes' => $notes,
 				'normalized-business-name' => $normalized_business_name,
 				'normalized-application-name' => $normalized_application_name,
-				'search-content' => array($business_name, $application_name, $added_by)
+				'search-content' => array($business_name, $application_name, $added_by, $notes)
 			);
 		}
 		$stmt->close();
@@ -915,21 +919,23 @@ class cm_application_db {
 		$business_name = (isset($entry['business-name']) ? $entry['business-name'] : '');
 		$application_name = (isset($entry['application-name']) ? $entry['application-name'] : '');
 		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$notes = (isset($entry['notes']) ? $entry['notes'] : '');
 		$normalized_business_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $business_name));
 		$normalized_application_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $application_name));
 		if (!$business_name) $business_name = null;
 		if (!$application_name) $application_name = null;
 		if (!$added_by) $added_by = null;
+		if (!$notes) $notes = null;
 		if (!$normalized_business_name) $normalized_business_name = null;
 		if (!$normalized_application_name) $normalized_application_name = null;
 		$stmt = $this->cm_db->connection->prepare(
 			'INSERT INTO '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).' SET '.
-			'`business_name` = ?, `application_name` = ?, `added_by` = ?, '.
+			'`business_name` = ?, `application_name` = ?, `added_by` = ?, `notes` = ?, '.
 			'`normalized_business_name` = ?, `normalized_application_name` = ?'
 		);
 		$stmt->bind_param(
-			'sssss',
-			$business_name, $application_name, $added_by,
+			'ssssss',
+			$business_name, $application_name, $added_by, $notes,
 			$normalized_business_name, $normalized_application_name
 		);
 		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
@@ -942,22 +948,24 @@ class cm_application_db {
 		$business_name = (isset($entry['business-name']) ? $entry['business-name'] : '');
 		$application_name = (isset($entry['application-name']) ? $entry['application-name'] : '');
 		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$notes = (isset($entry['notes']) ? $entry['notes'] : '');
 		$normalized_business_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $business_name));
 		$normalized_application_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $application_name));
 		if (!$business_name) $business_name = null;
 		if (!$application_name) $application_name = null;
 		if (!$added_by) $added_by = null;
+		if (!$notes) $notes = null;
 		if (!$normalized_business_name) $normalized_business_name = null;
 		if (!$normalized_application_name) $normalized_application_name = null;
 		$stmt = $this->cm_db->connection->prepare(
 			'UPDATE '.$this->cm_db->table_name('application_blacklist_'.$this->ctx_lc).' SET '.
-			'`business_name` = ?, `application_name` = ?, `added_by` = ?, '.
+			'`business_name` = ?, `application_name` = ?, `added_by` = ?, `notes` = ?, '.
 			'`normalized_business_name` = ?, `normalized_application_name` = ?'.
 			' WHERE `id` = ? LIMIT 1'
 		);
 		$stmt->bind_param(
-			'sssssi',
-			$business_name, $application_name, $added_by,
+			'ssssssi',
+			$business_name, $application_name, $added_by, $notes,
 			$normalized_business_name, $normalized_application_name,
 			$entry['id']
 		);
@@ -1018,7 +1026,7 @@ class cm_application_db {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(
 			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
-			' `email_address`, `phone_number`, `added_by`,'.
+			' `email_address`, `phone_number`, `added_by`, `notes`,'.
 			' `normalized_real_name`,'.
 			' `normalized_reversed_name`,'.
 			' `normalized_fandom_name`,'.
@@ -1031,7 +1039,7 @@ class cm_application_db {
 		$stmt->execute();
 		$stmt->bind_result(
 			$id, $first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,
@@ -1051,6 +1059,7 @@ class cm_application_db {
 				'email-address' => $email_address,
 				'phone-number' => $phone_number,
 				'added-by' => $added_by,
+				'notes' => $notes,
 				'normalized-real-name' => $normalized_real_name,
 				'normalized-reversed-name' => $normalized_reversed_name,
 				'normalized-fandom-name' => $normalized_fandom_name,
@@ -1058,7 +1067,8 @@ class cm_application_db {
 				'normalized-phone-number' => $normalized_phone_number,
 				'search-content' => array(
 					$first_name, $last_name, $real_name, $reversed_name,
-					$fandom_name, $email_address, $phone_number, $added_by
+					$fandom_name, $email_address, $phone_number,
+					$added_by, $notes
 				)
 			);
 			$stmt->close();
@@ -1072,7 +1082,7 @@ class cm_application_db {
 		$blacklist = array();
 		$stmt = $this->cm_db->connection->prepare(
 			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
-			' `email_address`, `phone_number`, `added_by`,'.
+			' `email_address`, `phone_number`, `added_by`, `notes`,'.
 			' `normalized_real_name`,'.
 			' `normalized_reversed_name`,'.
 			' `normalized_fandom_name`,'.
@@ -1084,7 +1094,7 @@ class cm_application_db {
 		$stmt->execute();
 		$stmt->bind_result(
 			$id, $first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,
@@ -1104,6 +1114,7 @@ class cm_application_db {
 				'email-address' => $email_address,
 				'phone-number' => $phone_number,
 				'added-by' => $added_by,
+				'notes' => $notes,
 				'normalized-real-name' => $normalized_real_name,
 				'normalized-reversed-name' => $normalized_reversed_name,
 				'normalized-fandom-name' => $normalized_fandom_name,
@@ -1111,7 +1122,8 @@ class cm_application_db {
 				'normalized-phone-number' => $normalized_phone_number,
 				'search-content' => array(
 					$first_name, $last_name, $real_name, $reversed_name,
-					$fandom_name, $email_address, $phone_number, $added_by
+					$fandom_name, $email_address, $phone_number,
+					$added_by, $notes
 				)
 			);
 		}
@@ -1127,6 +1139,7 @@ class cm_application_db {
 		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
 		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
 		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$notes = (isset($entry['notes']) ? $entry['notes'] : '');
 		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
 		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
 		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
@@ -1138,6 +1151,7 @@ class cm_application_db {
 		if (!$email_address) $email_address = null;
 		if (!$phone_number) $phone_number = null;
 		if (!$added_by) $added_by = null;
+		if (!$notes) $notes = null;
 		if (!$normalized_real_name) $normalized_real_name = null;
 		if (!$normalized_reversed_name) $normalized_reversed_name = null;
 		if (!$normalized_fandom_name) $normalized_fandom_name = null;
@@ -1146,7 +1160,7 @@ class cm_application_db {
 		$stmt = $this->cm_db->connection->prepare(
 			'INSERT INTO '.$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).' SET '.
 			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
-			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, `notes` = ?, '.
 			'`normalized_real_name` = ?, '.
 			'`normalized_reversed_name` = ?, '.
 			'`normalized_fandom_name` = ?, '.
@@ -1154,9 +1168,9 @@ class cm_application_db {
 			'`normalized_phone_number` = ?'
 		);
 		$stmt->bind_param(
-			'sssssssssss',
+			'ssssssssssss',
 			$first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,
@@ -1176,6 +1190,7 @@ class cm_application_db {
 		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
 		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
 		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$notes = (isset($entry['notes']) ? $entry['notes'] : '');
 		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
 		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
 		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
@@ -1187,6 +1202,7 @@ class cm_application_db {
 		if (!$email_address) $email_address = null;
 		if (!$phone_number) $phone_number = null;
 		if (!$added_by) $added_by = null;
+		if (!$notes) $notes = null;
 		if (!$normalized_real_name) $normalized_real_name = null;
 		if (!$normalized_reversed_name) $normalized_reversed_name = null;
 		if (!$normalized_fandom_name) $normalized_fandom_name = null;
@@ -1195,7 +1211,7 @@ class cm_application_db {
 		$stmt = $this->cm_db->connection->prepare(
 			'UPDATE '.$this->cm_db->table_name('applicant_blacklist_'.$this->ctx_lc).' SET '.
 			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
-			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, `notes` = ?, '.
 			'`normalized_real_name` = ?, '.
 			'`normalized_reversed_name` = ?, '.
 			'`normalized_fandom_name` = ?, '.
@@ -1204,9 +1220,9 @@ class cm_application_db {
 			' WHERE `id` = ? LIMIT 1'
 		);
 		$stmt->bind_param(
-			'sssssssssssi',
+			'ssssssssssssi',
 			$first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,

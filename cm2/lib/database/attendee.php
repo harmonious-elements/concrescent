@@ -65,6 +65,7 @@ class cm_attendee_db {
 			'`email_address` VARCHAR(255) NULL,'.
 			'`phone_number` VARCHAR(255) NULL,'.
 			'`added_by` VARCHAR(255) NULL,'.
+			'`notes` TEXT NULL,'.
 			'`normalized_real_name` VARCHAR(255) NULL,'.
 			'`normalized_reversed_name` VARCHAR(255) NULL,'.
 			'`normalized_fandom_name` VARCHAR(255) NULL,'.
@@ -670,7 +671,7 @@ class cm_attendee_db {
 		if (!$id) return false;
 		$stmt = $this->cm_db->connection->prepare(
 			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
-			' `email_address`, `phone_number`, `added_by`,'.
+			' `email_address`, `phone_number`, `added_by`, `notes`,'.
 			' `normalized_real_name`,'.
 			' `normalized_reversed_name`,'.
 			' `normalized_fandom_name`,'.
@@ -683,7 +684,7 @@ class cm_attendee_db {
 		$stmt->execute();
 		$stmt->bind_result(
 			$id, $first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,
@@ -703,6 +704,7 @@ class cm_attendee_db {
 				'email-address' => $email_address,
 				'phone-number' => $phone_number,
 				'added-by' => $added_by,
+				'notes' => $notes,
 				'normalized-real-name' => $normalized_real_name,
 				'normalized-reversed-name' => $normalized_reversed_name,
 				'normalized-fandom-name' => $normalized_fandom_name,
@@ -710,7 +712,8 @@ class cm_attendee_db {
 				'normalized-phone-number' => $normalized_phone_number,
 				'search-content' => array(
 					$first_name, $last_name, $real_name, $reversed_name,
-					$fandom_name, $email_address, $phone_number, $added_by
+					$fandom_name, $email_address, $phone_number,
+					$added_by, $notes
 				)
 			);
 			$stmt->close();
@@ -724,7 +727,7 @@ class cm_attendee_db {
 		$blacklist = array();
 		$stmt = $this->cm_db->connection->prepare(
 			'SELECT `id`, `first_name`, `last_name`, `fandom_name`,'.
-			' `email_address`, `phone_number`, `added_by`,'.
+			' `email_address`, `phone_number`, `added_by`, `notes`,'.
 			' `normalized_real_name`,'.
 			' `normalized_reversed_name`,'.
 			' `normalized_fandom_name`,'.
@@ -736,7 +739,7 @@ class cm_attendee_db {
 		$stmt->execute();
 		$stmt->bind_result(
 			$id, $first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,
@@ -756,6 +759,7 @@ class cm_attendee_db {
 				'email-address' => $email_address,
 				'phone-number' => $phone_number,
 				'added-by' => $added_by,
+				'notes' => $notes,
 				'normalized-real-name' => $normalized_real_name,
 				'normalized-reversed-name' => $normalized_reversed_name,
 				'normalized-fandom-name' => $normalized_fandom_name,
@@ -763,7 +767,8 @@ class cm_attendee_db {
 				'normalized-phone-number' => $normalized_phone_number,
 				'search-content' => array(
 					$first_name, $last_name, $real_name, $reversed_name,
-					$fandom_name, $email_address, $phone_number, $added_by
+					$fandom_name, $email_address, $phone_number,
+					$added_by, $notes
 				)
 			);
 		}
@@ -779,6 +784,7 @@ class cm_attendee_db {
 		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
 		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
 		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$notes = (isset($entry['notes']) ? $entry['notes'] : '');
 		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
 		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
 		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
@@ -790,6 +796,7 @@ class cm_attendee_db {
 		if (!$email_address) $email_address = null;
 		if (!$phone_number) $phone_number = null;
 		if (!$added_by) $added_by = null;
+		if (!$notes) $notes = null;
 		if (!$normalized_real_name) $normalized_real_name = null;
 		if (!$normalized_reversed_name) $normalized_reversed_name = null;
 		if (!$normalized_fandom_name) $normalized_fandom_name = null;
@@ -798,7 +805,7 @@ class cm_attendee_db {
 		$stmt = $this->cm_db->connection->prepare(
 			'INSERT INTO '.$this->cm_db->table_name('attendee_blacklist').' SET '.
 			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
-			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, `notes` = ?, '.
 			'`normalized_real_name` = ?, '.
 			'`normalized_reversed_name` = ?, '.
 			'`normalized_fandom_name` = ?, '.
@@ -806,9 +813,9 @@ class cm_attendee_db {
 			'`normalized_phone_number` = ?'
 		);
 		$stmt->bind_param(
-			'sssssssssss',
+			'ssssssssssss',
 			$first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,
@@ -828,6 +835,7 @@ class cm_attendee_db {
 		$email_address = (isset($entry['email-address']) ? $entry['email-address'] : '');
 		$phone_number = (isset($entry['phone-number']) ? $entry['phone-number'] : '');
 		$added_by = (isset($entry['added-by']) ? $entry['added-by'] : '');
+		$notes = (isset($entry['notes']) ? $entry['notes'] : '');
 		$normalized_real_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $first_name . $last_name));
 		$normalized_reversed_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $last_name . $first_name));
 		$normalized_fandom_name = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $fandom_name));
@@ -839,6 +847,7 @@ class cm_attendee_db {
 		if (!$email_address) $email_address = null;
 		if (!$phone_number) $phone_number = null;
 		if (!$added_by) $added_by = null;
+		if (!$notes) $notes = null;
 		if (!$normalized_real_name) $normalized_real_name = null;
 		if (!$normalized_reversed_name) $normalized_reversed_name = null;
 		if (!$normalized_fandom_name) $normalized_fandom_name = null;
@@ -847,7 +856,7 @@ class cm_attendee_db {
 		$stmt = $this->cm_db->connection->prepare(
 			'UPDATE '.$this->cm_db->table_name('attendee_blacklist').' SET '.
 			'`first_name` = ?, `last_name` = ?, `fandom_name` = ?, '.
-			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, '.
+			'`email_address` = ?, `phone_number` = ?, `added_by` = ?, `notes` = ?, '.
 			'`normalized_real_name` = ?, '.
 			'`normalized_reversed_name` = ?, '.
 			'`normalized_fandom_name` = ?, '.
@@ -856,9 +865,9 @@ class cm_attendee_db {
 			' WHERE `id` = ? LIMIT 1'
 		);
 		$stmt->bind_param(
-			'sssssssssssi',
+			'ssssssssssssi',
 			$first_name, $last_name, $fandom_name,
-			$email_address, $phone_number, $added_by,
+			$email_address, $phone_number, $added_by, $notes,
 			$normalized_real_name,
 			$normalized_reversed_name,
 			$normalized_fandom_name,

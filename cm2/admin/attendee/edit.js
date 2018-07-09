@@ -1,11 +1,11 @@
 (function($,window,document){
 	$(document).ready(function() {
-		var addToBlacklistAddedBy = $('.cm-add-to-blacklist-added-by');
+		var addToBlacklistFields = $('.cm-add-to-blacklist-fields');
 		var addToBlacklist = $('input[type=checkbox][name=add-to-blacklist]');
 		addToBlacklist.bind('click', function() {
 			var checked = addToBlacklist.is(':checked');
-			if (checked) addToBlacklistAddedBy.removeClass('hidden');
-			else addToBlacklistAddedBy.addClass('hidden');
+			if (checked) addToBlacklistFields.removeClass('hidden');
+			else addToBlacklistFields.addClass('hidden');
 		});
 
 		var resendEmail = $('input[type=checkbox][name=resend-email]');

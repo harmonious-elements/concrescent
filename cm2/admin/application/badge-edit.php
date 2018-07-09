@@ -174,11 +174,13 @@ if ($submitted) {
 		if (isset($_POST['add-to-applicant-blacklist']) && $_POST['add-to-applicant-blacklist']) {
 			$blacklist_entry = $item;
 			$blacklist_entry['added-by'] = trim($_POST['add-to-blacklist-added-by']);
+			$blacklist_entry['notes'] = trim($_POST['add-to-blacklist-notes']);
 			$apdb->create_applicant_blacklist_entry($blacklist_entry);
 		}
 		if (isset($_POST['add-to-attendee-blacklist']) && $_POST['add-to-attendee-blacklist']) {
 			$blacklist_entry = $item;
 			$blacklist_entry['added-by'] = trim($_POST['add-to-blacklist-added-by']);
+			$blacklist_entry['notes'] = trim($_POST['add-to-blacklist-notes']);
 			$atdb->create_blacklist_entry($blacklist_entry);
 		}
 	}
@@ -342,9 +344,13 @@ echo '<article>';
 							if (!$attendee_blacklisted) echo '<label><input type="checkbox" name="add-to-attendee-blacklist" value="1">Add to Attendee Blacklist</label>';
 						echo '</td>';
 					echo '</tr>';
-					echo '<tr class="cm-add-to-blacklist-added-by hidden">';
+					echo '<tr class="cm-add-to-blacklist-fields hidden">';
 						echo '<th>Added/Approved By</th>';
 						echo '<td><input type="text" id="add-to-blacklist-added-by" name="add-to-blacklist-added-by"></td>';
+					echo '</tr>';
+					echo '<tr class="cm-add-to-blacklist-fields hidden">';
+						echo '<th>Notes</th>';
+						echo '<td><textarea id="add-to-blacklist-notes" name="add-to-blacklist-notes"></textarea></td>';
 					echo '</tr>';
 				}
 
