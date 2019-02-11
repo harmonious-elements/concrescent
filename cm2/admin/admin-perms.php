@@ -45,6 +45,11 @@ $cm_admin_perms_attendee_config = (
 			'description' => 'Create or modify the types of badges available to attendees.'
 		),
 		array(
+			'id' => 'attendee-addons',
+			'name' => 'Attendee Addons',
+			'description' => 'Create or modify additional, optional items or packages for attendees.'
+		),
+		array(
 			'id' => 'attendee-questions',
 			'name' => 'Attendee Questions',
 			'description' => 'Add explanatory text and questions to the attendee registration form.'

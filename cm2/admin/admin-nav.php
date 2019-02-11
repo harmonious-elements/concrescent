@@ -38,6 +38,13 @@ $cm_admin_nav_attendee = (
 			'permission' => 'attendee-badge-types'
 		),
 		array(
+			'id' => 'attendee-addons',
+			'href' => '/admin/attendee/addons.php',
+			'name' => 'Attendee Addons',
+			'description' => 'Create or modify additional, optional items or packages for attendees.',
+			'permission' => 'attendee-addons'
+		),
+		array(
 			'id' => 'attendee-questions',
 			'href' => '/admin/attendee/questions.php',
 			'name' => 'Attendee Questions',

@@ -45,6 +45,21 @@ class cm_attendee_db {
 			'`min_age` INTEGER NULL,'.
 			'`max_age` INTEGER NULL'
 		));
+		$this->cm_db->table_def('attendee_addons', (
+			'`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,'.
+			'`order` INTEGER NOT NULL,'.
+			'`name` VARCHAR(255) NOT NULL,'.
+			'`description` TEXT NULL,'.
+			'`price` DECIMAL(7,2) NOT NULL,'.
+			'`payable_onsite` BOOLEAN NOT NULL,'.
+			'`active` BOOLEAN NOT NULL,'.
+			'`badge_type_ids` TEXT NULL,'.
+			'`quantity` INTEGER NULL,'.
+			'`start_date` DATE NULL,'.
+			'`end_date` DATE NULL,'.
+			'`min_age` INTEGER NULL,'.
+			'`max_age` INTEGER NULL'
+		));
 		$this->cm_db->table_def('attendee_promo_codes', (
 			'`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,'.
 			'`code` VARCHAR(255) NOT NULL UNIQUE KEY,'.
@@ -124,6 +139,24 @@ class cm_attendee_db {
 			'`payment_promo_code` VARCHAR(255) NULL,'.
 			'`payment_promo_price` DECIMAL(7,2) NULL,'.
 			'`payment_group_uuid` VARCHAR(255) NOT NULL,'.
+			'`payment_type` VARCHAR(255) NULL,'.
+			'`payment_txn_id` VARCHAR(255) NULL,'.
+			'`payment_txn_amt` DECIMAL(7,2) NULL,'.
+			'`payment_date` DATETIME NULL,'.
+			'`payment_details` TEXT NULL'
+		));
+		$this->cm_db->table_def('attendee_addon_purchases', (
+			'`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,'.
+			'`attendee_id` INTEGER NOT NULL,'.
+			'`addon_id` INTEGER NOT NULL,'.
+			'`payment_price` DECIMAL(7,2) NOT NULL,'.
+			'`payment_status` ENUM('.
+				'\'Incomplete\','.
+				'\'Cancelled\','.
+				'\'Rejected\','.
+				'\'Completed\','.
+				'\'Refunded\''.
+			') NOT NULL,'.
 			'`payment_type` VARCHAR(255) NULL,'.
 			'`payment_txn_id` VARCHAR(255) NULL,'.
 			'`payment_txn_amt` DECIMAL(7,2) NULL,'.
@@ -414,6 +447,275 @@ class cm_attendee_db {
 			foreach ($ids as $cindex => $cid) {
 				$stmt = $this->cm_db->connection->prepare(
 					'UPDATE '.$this->cm_db->table_name('attendee_badge_types').
+					' SET `order` = ? WHERE `id` = ? LIMIT 1'
+				);
+				$ni = $cindex + 1;
+				$stmt->bind_param('ii', $ni, $cid);
+				$stmt->execute();
+				$stmt->close();
+			}
+		}
+		$this->cm_db->connection->autocommit(true);
+		return ($index >= 0);
+	}
+
+	public function get_addon($id, $name_map = null) {
+		if (!$id) return false;
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT b.`id`, b.`order`, b.`name`, b.`description`, b.`price`,'.
+			' b.`payable_onsite`, b.`active`, b.`badge_type_ids`, b.`quantity`,'.
+			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('attendee_addon_purchases').' a'.
+			' WHERE a.`addon_id` = b.`id` AND a.`payment_status` = \'Completed\') c'.
+			' FROM '.$this->cm_db->table_name('attendee_addons').' b'.
+			' WHERE b.`id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $order, $name, $description, $price,
+			$payable_onsite, $active, $badge_type_ids, $quantity,
+			$start_date, $end_date, $min_age, $max_age,
+			$quantity_sold
+		);
+		if ($stmt->fetch()) {
+			$event_start_date = $this->event_info['start_date'];
+			$event_end_date   = $this->event_info['end_date'  ];
+			$min_birthdate = $max_age ? (((int)$event_start_date - $max_age - 1) . substr($event_start_date, 4)) : null;
+			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
+			$result = array(
+				'id' => $id,
+				'order' => $order,
+				'name' => $name,
+				'description' => $description,
+				'price' => $price,
+				'payable-onsite' => !!$payable_onsite,
+				'active' => !!$active,
+				'badge-type-ids' => ($badge_type_ids ? explode(',', $badge_type_ids) : array()),
+				'badge-type-names' => array(),
+				'quantity' => $quantity,
+				'quantity-sold' => $quantity_sold,
+				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
+				'start-date' => $start_date,
+				'end-date' => $end_date,
+				'min-age' => $min_age,
+				'max-age' => $max_age,
+				'min-birthdate' => $min_birthdate,
+				'max-birthdate' => $max_birthdate,
+				'search-content' => array($name, $description)
+			);
+			foreach ($result['badge-type-ids'] as $btid) {
+				$result['badge-type-names'][] = isset($name_map[$btid]) ? $name_map[$btid] : $btid;
+			}
+			$stmt->close();
+			return $result;
+		}
+		$stmt->close();
+		return false;
+	}
+
+	public function list_addons($active_only = false, $unsold_only = false, $onsite_only = false, $name_map = null) {
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		$addons = array();
+		$query = (
+			'SELECT b.`id`, b.`order`, b.`name`, b.`description`, b.`price`,'.
+			' b.`payable_onsite`, b.`active`, b.`badge_type_ids`, b.`quantity`,'.
+			' b.`start_date`, b.`end_date`, b.`min_age`, b.`max_age`,'.
+			' (SELECT COUNT(*) FROM '.$this->cm_db->table_name('attendee_addon_purchases').' a'.
+			' WHERE a.`addon_id` = b.`id` AND a.`payment_status` = \'Completed\') c'.
+			' FROM '.$this->cm_db->table_name('attendee_addons').' b'
+		);
+		$first = true;
+		if ($active_only) {
+			$query .= (
+				($first ? ' WHERE' : ' AND').' b.`active`'.
+				' AND (b.`start_date` IS NULL OR b.`start_date` <= CURDATE())'.
+				' AND (b.`end_date` IS NULL OR b.`end_date` >= CURDATE())'
+			);
+			$first = false;
+		}
+		if ($onsite_only) {
+			$query .= ($first ? ' WHERE' : ' AND').' b.`payable_onsite`';
+			$first = false;
+		}
+		$stmt = $this->cm_db->connection->prepare($query . ' ORDER BY b.`order`');
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $order, $name, $description, $price,
+			$payable_onsite, $active, $badge_type_ids, $quantity,
+			$start_date, $end_date, $min_age, $max_age,
+			$quantity_sold
+		);
+		$event_start_date = $this->event_info['start_date'];
+		$event_end_date   = $this->event_info['end_date'  ];
+		while ($stmt->fetch()) {
+			if ($unsold_only && !(is_null($quantity) || $quantity > $quantity_sold)) continue;
+			$min_birthdate = $max_age ? (((int)$event_start_date - $max_age - 1) . substr($event_start_date, 4)) : null;
+			$max_birthdate = $min_age ? (((int)$event_end_date   - $min_age    ) . substr($event_end_date  , 4)) : null;
+			$result = array(
+				'id' => $id,
+				'order' => $order,
+				'name' => $name,
+				'description' => $description,
+				'price' => $price,
+				'payable-onsite' => !!$payable_onsite,
+				'active' => !!$active,
+				'badge-type-ids' => ($badge_type_ids ? explode(',', $badge_type_ids) : array()),
+				'badge-type-names' => array(),
+				'quantity' => $quantity,
+				'quantity-sold' => $quantity_sold,
+				'quantity-remaining' => (is_null($quantity) ? null : ($quantity - $quantity_sold)),
+				'start-date' => $start_date,
+				'end-date' => $end_date,
+				'min-age' => $min_age,
+				'max-age' => $max_age,
+				'min-birthdate' => $min_birthdate,
+				'max-birthdate' => $max_birthdate,
+				'search-content' => array($name, $description)
+			);
+			foreach ($result['badge-type-ids'] as $btid) {
+				$result['badge-type-names'][] = isset($name_map[$btid]) ? $name_map[$btid] : $btid;
+			}
+			$addons[] = $result;
+		}
+		$stmt->close();
+		return $addons;
+	}
+
+	public function create_addon($addon) {
+		if (!$addon) return false;
+		$this->cm_db->connection->autocommit(false);
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT IFNULL(MAX(`order`),0)+1 FROM '.
+			$this->cm_db->table_name('attendee_addons')
+		);
+		$stmt->execute();
+		$stmt->bind_result($order);
+		$stmt->fetch();
+		$stmt->close();
+		$name = (isset($addon['name']) ? $addon['name'] : '');
+		$description = (isset($addon['description']) ? $addon['description'] : '');
+		$price = (isset($addon['price']) ? (float)$addon['price'] : 0);
+		$payable_onsite = (isset($addon['payable-onsite']) ? ($addon['payable-onsite'] ? 1 : 0) : 0);
+		$active = (isset($addon['active']) ? ($addon['active'] ? 1 : 0) : 1);
+		$badge_type_ids = (isset($addon['badge-type-ids']) ? implode(',', $addon['badge-type-ids']) : '*');
+		$quantity = (isset($addon['quantity']) ? $addon['quantity'] : null);
+		$start_date = (isset($addon['start-date']) ? $addon['start-date'] : null);
+		$end_date = (isset($addon['end-date']) ? $addon['end-date'] : null);
+		$min_age = (isset($addon['min-age']) ? $addon['min-age'] : null);
+		$max_age = (isset($addon['max-age']) ? $addon['max-age'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'INSERT INTO '.$this->cm_db->table_name('attendee_addons').' SET '.
+			'`order` = ?, `name` = ?, `description` = ?, `price` = ?, '.
+			'`payable_onsite` = ?, `active` = ?, `badge_type_ids` = ?, '.
+			'`quantity` = ?, `start_date` = ?, `end_date` = ?, '.
+			'`min_age` = ?, `max_age` = ?'
+		);
+		$stmt->bind_param(
+			'issdiisissii',
+			$order, $name, $description, $price,
+			$payable_onsite, $active, $badge_type_ids,
+			$quantity, $start_date, $end_date,
+			$min_age, $max_age
+		);
+		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+		$stmt->close();
+		$this->cm_db->connection->autocommit(true);
+		return $id;
+	}
+
+	public function update_addon($addon) {
+		if (!$addon || !isset($addon['id']) || !$addon['id']) return false;
+		$name = (isset($addon['name']) ? $addon['name'] : '');
+		$description = (isset($addon['description']) ? $addon['description'] : '');
+		$price = (isset($addon['price']) ? (float)$addon['price'] : 0);
+		$payable_onsite = (isset($addon['payable-onsite']) ? ($addon['payable-onsite'] ? 1 : 0) : 0);
+		$active = (isset($addon['active']) ? ($addon['active'] ? 1 : 0) : 1);
+		$badge_type_ids = (isset($addon['badge-type-ids']) ? implode(',', $addon['badge-type-ids']) : '*');
+		$quantity = (isset($addon['quantity']) ? $addon['quantity'] : null);
+		$start_date = (isset($addon['start-date']) ? $addon['start-date'] : null);
+		$end_date = (isset($addon['end-date']) ? $addon['end-date'] : null);
+		$min_age = (isset($addon['min-age']) ? $addon['min-age'] : null);
+		$max_age = (isset($addon['max-age']) ? $addon['max-age'] : null);
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendee_addons').' SET '.
+			'`name` = ?, `description` = ?, `price` = ?, '.
+			'`payable_onsite` = ?, `active` = ?, `badge_type_ids` = ?, '.
+			'`quantity` = ?, `start_date` = ?, `end_date` = ?, '.
+			'`min_age` = ?, `max_age` = ? WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param(
+			'ssdiisissiii',
+			$name, $description, $price,
+			$payable_onsite, $active, $badge_type_ids,
+			$quantity, $start_date, $end_date,
+			$min_age, $max_age, $addon['id']
+		);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function delete_addon($id) {
+		if (!$id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('attendee_addons').
+			' WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('i', $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function activate_addon($id, $active) {
+		if (!$id) return false;
+		$active = $active ? 1 : 0;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendee_addons').
+			' SET `active` = ? WHERE `id` = ? LIMIT 1'
+		);
+		$stmt->bind_param('ii', $active, $id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function reorder_addon($id, $direction) {
+		if (!$id || !$direction) return false;
+		$this->cm_db->connection->autocommit(false);
+		$ids = array();
+		$index = -1;
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT `id` FROM '.
+			$this->cm_db->table_name('attendee_addons').
+			' ORDER BY `order`'
+		);
+		$stmt->execute();
+		$stmt->bind_result($cid);
+		while ($stmt->fetch()) {
+			$cindex = count($ids);
+			$ids[] = $cid;
+			if ($id == $cid) $index = $cindex;
+		}
+		$stmt->close();
+		if ($index >= 0) {
+			while ($direction < 0 && $index > 0) {
+				$ids[$index] = $ids[$index - 1];
+				$ids[$index - 1] = $id;
+				$direction++;
+				$index--;
+			}
+			while ($direction > 0 && $index < (count($ids) - 1)) {
+				$ids[$index] = $ids[$index + 1];
+				$ids[$index + 1] = $id;
+				$direction--;
+				$index++;
+			}
+			foreach ($ids as $cindex => $cid) {
+				$stmt = $this->cm_db->connection->prepare(
+					'UPDATE '.$this->cm_db->table_name('attendee_addons').
 					' SET `order` = ? WHERE `id` = ? LIMIT 1'
 				);
 				$ni = $cindex + 1;
