@@ -24,6 +24,14 @@ if (!$_GET) {
 		$item['payment-txn-id'] = $group_uuid;
 		$item['payment-txn-amt'] = $total_price;
 		$item['payment-date'] = $payment_date;
+		if (isset($item['addons']) && $item['addons']) {
+			for ($j = 0, $m = count($item['addons']); $j < $m; $j++) {
+				$item['addons'][$j]['payment-status'] = 'Incomplete';
+				$item['addons'][$j]['payment-txn-id'] = $group_uuid;
+				$item['addons'][$j]['payment-txn-amt'] = $total_price;
+				$item['addons'][$j]['payment-date'] = $payment_date;
+			}
+		}
 		$attendee_ids[] = $atdb->create_attendee($item, $fdb);
 		if ($atdb->is_blacklisted($item)) $blacklisted = true;
 	}
@@ -115,6 +123,11 @@ if (!$_GET) {
 			$badge_type_id = (int)$item['badge-type-id'];
 			$badge_type_name = isset($name_map[$badge_type_id]) ? $name_map[$badge_type_id] : $badge_type_id;
 			$items[] = $paypal->create_item($badge_type_name, $item['payment-promo-price']);
+			if (isset($item['addons']) && $item['addons']) {
+				foreach ($item['addons'] as $addon) {
+					$items[] = $paypal->create_item($addon['name'], $addon['price']);
+				}
+			}
 		}
 		$total = $paypal->create_total($total_price);
 		$txn = $paypal->create_transaction($items, $total);

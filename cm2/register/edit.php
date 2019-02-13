@@ -9,6 +9,10 @@ $active_badge_types = $atdb->list_badge_types(true, false, $onsite_only);
 $sellable_badge_types = $atdb->list_badge_types(true, true, $onsite_only);
 if (!$sellable_badge_types) cm_reg_closed();
 
+$badge_type_name_map = $atdb->get_badge_type_name_map();
+$active_addons = $atdb->list_addons(true, false, $onsite_only, $badge_type_name_map);
+$sellable_addons = $atdb->list_addons(true, true, $onsite_only, $badge_type_name_map);
+
 $new = !isset($_GET['index']);
 $index = $new ? -1 : (int)$_GET['index'];
 $item = $new ? array() : cm_reg_cart_get($index);
@@ -41,6 +45,24 @@ if (isset($_POST['submit'])) {
 	}
 	if (!$found_badge_type) {
 		$errors['badge-type-id'] = 'The badge you selected is not available.';
+	}
+
+	$item['addons'] = array();
+	$item['addon-ids'] = array();
+	foreach ($sellable_addons as $addon) {
+		if (isset($_POST['addon-'.$addon['id']]) && $_POST['addon-'.$addon['id']]) {
+			if ($item['date-of-birth'] && (
+				($addon['min-birthdate'] && $item['date-of-birth'] < $addon['min-birthdate']) ||
+				($addon['max-birthdate'] && $item['date-of-birth'] > $addon['max-birthdate'])
+			)) {
+				$errors['addon-'.$addon['id']] = 'The addon you selected is not applicable.';
+			}
+			if ($found_badge_type && !$atdb->addon_applies($addon, $found_badge_type['id'])) {
+				$errors['addon-'.$addon['id']] = 'The addon you selected is not applicable.';
+			}
+			$item['addons'][] = $addon;
+			$item['addon-ids'][] = $addon['id'];
+		}
 	}
 
 	$item['email-address'] = trim($_POST['email-address']);
@@ -91,6 +113,7 @@ if (isset($_POST['submit'])) {
 
 cm_reg_head($new ? 'Add Badge' : 'Edit Badge');
 echo '<script type="text/javascript">cm_badge_type_info = ('.json_encode($sellable_badge_types).');</script>';
+echo '<script type="text/javascript">cm_addon_info = ('.json_encode($sellable_addons).');</script>';
 echo '<script type="text/javascript" src="edit.js"></script>';
 cm_reg_body(($new ? 'Add Badge' : 'Edit Badge'), true);
 
@@ -268,6 +291,29 @@ echo '<article>';
 						echo '</td>';
 					echo '</tr>';
 				}
+
+				echo '<tr class="cm-reg-addons hidden"><td colspan="2" class="hr"><hr></td></tr>';
+				echo '<tr class="cm-reg-addons hidden"><td colspan="2"><h2>Choose Your Addons</h2></td></tr>';
+				$text = $fdb->get_custom_text('choose-addons');
+				if ($text) echo '<tr class="cm-reg-addons hidden"><td colspan="2"><p>' . safe_html_string($text) . '</p></td></tr>';
+				echo '<tr class="cm-reg-addons hidden"><td colspan="2">';
+				foreach ($sellable_addons as $addon) {
+					$value = isset($item['addon-ids']) && in_array($addon['id'], $item['addon-ids']);
+					$error = isset($errors['addon-'.$addon['id']]) ? htmlspecialchars($errors['addon-'.$addon['id']]) : '';
+					$aid = htmlspecialchars($addon['id']);
+					$aname = htmlspecialchars($addon['name']);
+					$aprice = htmlspecialchars(price_string($addon['price']));
+					$adesc = safe_html_string($addon['description']);
+					echo '<div class="cm-reg-addon hidden" id="cm-reg-addon-' . $aid . '">';
+					echo '<p><label>';
+					echo '<input type="checkbox" id="addon-' . $aid . '" name="addon-' . $aid . '" value="1"' . ($value ? ' checked>' : '>');
+					echo $aname . ' &mdash; ' . $aprice;
+					echo '</label></p>';
+					if ($adesc) echo '<p class="cm-reg-addon-desc">' . $adesc . '</p>';
+					if ($error) echo '<p class="error">' . $error . '</p>';
+					echo '</div>';
+				}
+				echo '</td></tr>';
 
 				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
 				echo '<tr><td colspan="2"><h2>Contact Information</h2></td></tr>';

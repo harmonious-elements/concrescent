@@ -8,6 +8,10 @@ $all_badge_types = $atdb->list_badge_types();
 $sellable_badge_types = $atdb->list_badge_types(true, true, $onsite_only);
 if (!$sellable_badge_types) cm_reg_closed();
 
+$badge_type_name_map = $atdb->get_badge_type_name_map();
+$all_addons = $atdb->list_addons(false, false, false, $badge_type_name_map);
+$sellable_addons = $atdb->list_addons(true, true, $onsite_only, $badge_type_name_map);
+
 function apply_promo_code($code, $atdb, &$name_map, &$errors) {
 	if (!$code) return;
 	$promo_code = $atdb->get_promo_code($code, true, true, $name_map);
@@ -39,10 +43,14 @@ function apply_promo_code($code, $atdb, &$name_map, &$errors) {
 	}
 }
 
-function checkout_registration($payment_method, &$sellable_badge_types, &$errors) {
+function checkout_registration($payment_method, &$atdb, &$sellable_badge_types, &$sellable_addons, &$errors) {
 	$badge_map = array();
+	$addon_map = array();
 	foreach ($sellable_badge_types as $bt) {
 		$badge_map[$bt['id']] = $bt;
+	}
+	foreach ($sellable_addons as $addon) {
+		$addon_map[$addon['id']] = $addon;
 	}
 	for ($i = 0, $n = cm_reg_cart_count(); $i < $n; $i++) {
 		$item = cm_reg_cart_get($i);
@@ -58,6 +66,26 @@ function checkout_registration($payment_method, &$sellable_badge_types, &$errors
 				$errors[$i] = 'This badge type is no longer applicable.';
 			} else if ($payment_method == 'cash' && !$badge_type['payable-onsite']) {
 				$errors[$i] = 'This badge type cannot be paid for with cash.';
+			}
+		}
+		if (isset($item['addons']) && $item['addons']) {
+			foreach ($item['addons'] as $addon) {
+				$addon_id = $addon['id'];
+				if (!isset($addon_map[$addon_id])) {
+					$errors[$i.'a'.$addon_id] = 'This addon is no longer available.';
+				} else {
+					$addon = $addon_map[$addon_id];
+					if ($item['date-of-birth'] && (
+						($addon['min-birthdate'] && $item['date-of-birth'] < $addon['min-birthdate']) ||
+						($addon['max-birthdate'] && $item['date-of-birth'] > $addon['max-birthdate'])
+					)) {
+						$errors[$i.'a'.$addon_id] = 'This addon is no longer applicable.';
+					} else if (!$atdb->addon_applies($addon, $badge_type_id)) {
+						$errors[$i.'a'.$addon_id] = 'This addon is no longer applicable.';
+					} else if ($payment_method == 'cash' && !$addon['payable-onsite']) {
+						$errors[$i.'a'.$addon_id] = 'This addon cannot be paid for with cash.';
+					}
+				}
 			}
 		}
 	}
@@ -88,7 +116,7 @@ if (isset($_POST['action'])) {
 			apply_promo_code(trim($_POST['code']), $atdb, $name_map, $errors);
 			break;
 		case 'checkout':
-			checkout_registration(trim($_POST['payment-method']), $sellable_badge_types, $errors);
+			checkout_registration(trim($_POST['payment-method']), $atdb, $sellable_badge_types, $sellable_addons, $errors);
 			break;
 	}
 }
@@ -204,6 +232,23 @@ echo '<div class="card">';
 								echo '</form>';
 							echo '</td>';
 						echo '</tr>';
+						if (isset($item['addons']) && $item['addons']) {
+							foreach ($item['addons'] as $addon) {
+								echo '<tr>';
+									echo '<td>';
+										echo '<div class="cm-cart-addon-name">' . htmlspecialchars($addon['name']) . '</div>';
+										if (isset($errors[$i.'a'.$addon['id']])) {
+											echo '<div class="cm-cart-addon-error error">' . htmlspecialchars($errors[$i.'a'.$addon['id']]) . '</div>';
+										}
+									echo '</td>';
+									echo '<td><div>Addon</div></td>';
+									echo '<td class="td-numeric"><div>' . htmlspecialchars(price_string($addon['price'])) . '</div></td>';
+									echo '<td class="td-actions"></td>';
+								echo '</tr>';
+								$badge_price_total += (float)$addon['price'];
+								$promo_price_total += (float)$addon['price'];
+							}
+						}
 					}
 				echo '</tbody>';
 				echo '<tfoot>';
@@ -275,8 +320,12 @@ echo '<form action="cart.php" method="post" class="card">';
 				echo '<div><label><input type="radio" name="payment-method" value="paypal" checked>';
 				echo 'Pay with PayPal</label></div>';
 				$badge_type_payable_onsite = array();
+				$addon_payable_onsite = array();
 				foreach ($all_badge_types as $bt) {
 					$badge_type_payable_onsite[$bt['id']] = $bt['payable-onsite'];
+				}
+				foreach ($all_addons as $addon) {
+					$addon_payable_onsite[$addon['id']] = $addon['payable-onsite'];
 				}
 				$all_payable_onsite = true;
 				for ($i = 0, $n = cm_reg_cart_count(); $i < $n; $i++) {
@@ -284,6 +333,13 @@ echo '<form action="cart.php" method="post" class="card">';
 					$badge_type_id = (int)$item['badge-type-id'];
 					if (!$badge_type_payable_onsite[$badge_type_id]) {
 						$all_payable_onsite = false;
+					}
+					if (isset($item['addons']) && $item['addons']) {
+						foreach ($item['addons'] as $addon) {
+							if (!$addon_payable_onsite[$addon['id']]) {
+								$all_payable_onsite = false;
+							}
+						}
 					}
 				}
 				if ($all_payable_onsite) {

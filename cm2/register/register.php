@@ -64,6 +64,11 @@ function cm_reg_cart_total() {
 	$total = 0;
 	foreach ($_SESSION['cart'] as $item) {
 		$total += (float)$item['payment-promo-price'];
+		if (isset($item['addons']) && $item['addons']) {
+			foreach ($item['addons'] as $addon) {
+				$total += (float)$addon['price'];
+			}
+		}
 	}
 	return $total;
 }

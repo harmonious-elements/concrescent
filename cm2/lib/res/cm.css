@@ -715,6 +715,15 @@ select {
 .cm-reg-edit table div.error {
 	padding-top: 8px;
 }
+.cm-reg-edit .cm-reg-addon p {
+	margin: 8px 0;
+}
+.cm-reg-edit .cm-reg-addon label {
+	font-weight: bold;
+}
+.cm-reg-edit .cm-reg-addon .cm-reg-addon-desc {
+	margin: 8px 40px;
+}
 
 /* Shopping Cart Page */
 
@@ -725,6 +734,17 @@ table.cm-cart td {
 table.cm-cart td:not(.td-actions) {
 	padding-top: 8px;
 	padding-bottom: 8px;
+}
+.cm-cart-addon-name {
+	padding-left: 16px;
+}
+.cm-cart-addon-name:before {
+	content: '+';
+	display: inline-block;
+	width: 24px;
+}
+.cm-cart-addon-error {
+	padding-left: 40px;
 }
 
 /* Entity Edit Page */

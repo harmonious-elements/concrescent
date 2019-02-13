@@ -1,6 +1,9 @@
-(function($,window,document,cmui,badgeTypes){
+(function($,window,document,cmui,badgeTypes,addons){
 	$(document).ready(function() {
 		var fandomName = $('#fandom-name');
+		var dateOfBirth = $('#date-of-birth');
+		var badgeType = $('#badge-type-id');
+
 		var fandomNameChanged = function() {
 			if (fandomName.val()) {
 				if ($('#name-on-badge-row').hasClass('hidden')) {
@@ -17,13 +20,39 @@
 		fandomName.bind('keyup', fandomNameChanged);
 		fandomNameChanged();
 
-		var badgeType = $('#badge-type-id');
 		var badgeTypeChanged = function() {
 			var badgeId = 1 * badgeType.val();
 			$('.cm-reg-badge-type').removeClass('cm-reg-badge-type-selected');
 			$('#cm-reg-badge-type-' + badgeId).addClass('cm-reg-badge-type-selected');
 			$('.cm-reg-inline-badge-type').addClass('hidden');
 			$('#cm-reg-inline-badge-type-' + badgeId).removeClass('hidden');
+
+			var dob = cmui.formatDate(cmui.parseDate(dateOfBirth.val()));
+			$('.cm-reg-addons').addClass('hidden');
+			$('.cm-reg-addon').addClass('hidden');
+			for (var i = 0, n = addons.length; i < n; i++) {
+				var addon = addons[i];
+				var badgeSat = (
+					addon['badge-type-ids'].indexOf('*') >= 0 ||
+					addon['badge-type-ids'].indexOf(badgeId) >= 0 ||
+					addon['badge-type-ids'].indexOf(badgeId.toString()) >= 0
+				);
+				var minSat = (
+					(dob && addon['min-birthdate']) ?
+					(dob >= addon['min-birthdate']) : true
+				);
+				var maxSat = (
+					(dob && addon['max-birthdate']) ?
+					(dob <= addon['max-birthdate']) : true
+				);
+				if (badgeSat && minSat && maxSat) {
+					$('.cm-reg-addons').removeClass('hidden');
+					$('#cm-reg-addon-' + addon['id']).removeClass('hidden');
+				} else {
+					$('#addon-' + addon['id']).prop('checked', false);
+				}
+			}
+
 			$('.cm-question-row').addClass('hidden');
 			$('.cm-question-row-' + badgeId).removeClass('hidden');
 			$('.cm-question-row-all').removeClass('hidden');
@@ -46,7 +75,6 @@
 			});
 		});
 
-		var dateOfBirth = $('#date-of-birth');
 		var dateOfBirthOldVal = null;
 		var dateOfBirthChanged = function() {
 			var dateOfBirthNewVal = dateOfBirth.val();
@@ -97,4 +125,4 @@
 			event.preventDefault();
 		});
 	});
-})(jQuery,window,document,cmui,cm_badge_type_info);
+})(jQuery,window,document,cmui,cm_badge_type_info,cm_addon_info);

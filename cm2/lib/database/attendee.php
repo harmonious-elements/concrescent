@@ -459,6 +459,13 @@ class cm_attendee_db {
 		return ($index >= 0);
 	}
 
+	public function addon_applies($addon, $badge_type_id) {
+		return ($addon && $addon['badge-type-ids'] && (
+			in_array('*', $addon['badge-type-ids']) ||
+			in_array($badge_type_id, $addon['badge-type-ids'])
+		));
+	}
+
 	public function get_addon($id, $name_map = null) {
 		if (!$id) return false;
 		if (!$name_map) $name_map = $this->get_badge_type_name_map();
@@ -726,6 +733,111 @@ class cm_attendee_db {
 		}
 		$this->cm_db->connection->autocommit(true);
 		return ($index >= 0);
+	}
+
+	public function list_addon_purchases($attendee_id, $name_map = null) {
+		if (!$attendee_id) return false;
+		if (!$name_map) $name_map = $this->get_badge_type_name_map();
+		$purchases = array();
+		$stmt = $this->cm_db->connection->prepare(
+			'SELECT b.`id`, b.`attendee_id`, b.`addon_id`,'.
+			' b.`payment_price`, b.`payment_status`, b.`payment_type`,'.
+			' b.`payment_txn_id`, b.`payment_txn_amt`,'.
+			' b.`payment_date`, b.`payment_details`,'.
+			' (SELECT a.`order` FROM '.$this->cm_db->table_name('attendee_addons').' a'.
+			' WHERE a.`id` = b.`addon_id`) c'.
+			' FROM '.$this->cm_db->table_name('attendee_addon_purchases').' b'.
+			' WHERE b.`attendee_id` = ? ORDER BY c'
+		);
+		$stmt->bind_param('i', $attendee_id);
+		$stmt->execute();
+		$stmt->bind_result(
+			$id, $attendee_id, $addon_id,
+			$payment_price, $payment_status, $payment_type,
+			$payment_txn_id, $payment_txn_amt,
+			$payment_date, $payment_details,
+			$order
+		);
+		while ($stmt->fetch()) {
+			$purchases[] = array(
+				'id' => $id,
+				'attendee-id' => $attendee_id,
+				'addon-id' => $addon_id,
+				'payment-price' => $payment_price,
+				'payment-status' => $payment_status,
+				'payment-type' => $payment_type,
+				'payment-txn-id' => $payment_txn_id,
+				'payment-txn-amt' => $payment_txn_amt,
+				'payment-date' => $payment_date,
+				'payment-details' => $payment_details,
+				'order' => $order
+			);
+		}
+		$stmt->close();
+		foreach ($purchases as $i => $purchase) {
+			$addon = $this->get_addon($purchase['addon-id'], $name_map);
+			if ($addon) $purchases[$i] += $addon;
+		}
+		return $purchases;
+	}
+
+	public function create_addon_purchases($attendee_id, $addons) {
+		if (!$attendee_id) return false;
+		$ids = array();
+		foreach ($addons as $addon) {
+			$addon_id = (isset($addon['addon-id']) ? $addon['addon-id'] : (isset($addon['id']) ? $addon['id'] : null));
+			$payment_price = (isset($addon['payment-price']) ? $addon['payment-price'] : (isset($addon['price']) ? $addon['price'] : null));
+			$payment_status = (isset($addon['payment-status']) ? $addon['payment-status'] : null);
+			$payment_type = (isset($addon['payment-type']) ? $addon['payment-type'] : null);
+			$payment_txn_id = (isset($addon['payment-txn-id']) ? $addon['payment-txn-id'] : null);
+			$payment_txn_amt = (isset($addon['payment-txn-amt']) ? $addon['payment-txn-amt'] : null);
+			$payment_date = (isset($addon['payment-date']) ? $addon['payment-date'] : null);
+			$payment_details = (isset($addon['payment-details']) ? $addon['payment-details'] : null);
+			$stmt = $this->cm_db->connection->prepare(
+				'INSERT INTO '.$this->cm_db->table_name('attendee_addon_purchases').' SET '.
+				'`attendee_id` = ?, `addon_id` = ?, `payment_price` = ?, '.
+				'`payment_status` = ?, `payment_type` = ?, '.
+				'`payment_txn_id` = ?, `payment_txn_amt` = ?, '.
+				'`payment_date` = ?, `payment_details` = ?'
+			);
+			$stmt->bind_param(
+				'iidsssdss',
+				$attendee_id, $addon_id, $payment_price,
+				$payment_status, $payment_type,
+				$payment_txn_id, $payment_txn_amt,
+				$payment_date, $payment_details
+			);
+			$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
+			$stmt->close();
+			$ids[] = $id;
+		}
+		return $ids;
+	}
+
+	public function delete_addon_purchases($attendee_id) {
+		if (!$attendee_id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'DELETE FROM '.$this->cm_db->table_name('attendee_addon_purchases').
+			' WHERE `attendee_id` = ?'
+		);
+		$stmt->bind_param('i', $attendee_id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
+	}
+
+	public function update_addon_purchase_payment_status($attendee_id, $status, $type, $txn, $details) {
+		if (!$attendee_id) return false;
+		$stmt = $this->cm_db->connection->prepare(
+			'UPDATE '.$this->cm_db->table_name('attendee_addon_purchases').' SET '.
+			'`payment_status` = ?, `payment_type` = ?, '.
+			'`payment_txn_id` = ?, `payment_details` = ?'.
+			' WHERE `attendee_id` = ?'
+		);
+		$stmt->bind_param('ssssi', $status, $type, $txn, $details, $attendee_id);
+		$success = $stmt->execute();
+		$stmt->close();
+		return $success;
 	}
 
 	public function promo_code_normalize($code) {
@@ -1453,6 +1565,20 @@ class cm_attendee_db {
 				'search-content' => $search_content
 			);
 			$stmt->close();
+			$addons = $this->list_addon_purchases($id, $name_map);
+			if ($addons) {
+				$result['addons'] = $addons;
+				$result['addon-ids'] = array();
+				$result['addon-names'] = array();
+				foreach ($addons as $addon) {
+					$result['addon-ids'][] = $addon['addon-id'];
+					if (isset($addon['name'])) {
+						$result['addon-names'][] = $addon['name'];
+						$result['search-content'][] = $addon['name'];
+						$result['search-content'][] = $addon['description'];
+					}
+				}
+			}
 			$answers = $fdb->list_answers($id);
 			if ($answers) {
 				$result['form-answers'] = $answers;
@@ -1641,6 +1767,20 @@ class cm_attendee_db {
 		}
 		$stmt->close();
 		foreach ($attendees as $i => $attendee) {
+			$addons = $this->list_addon_purchases($attendee['id'], $name_map);
+			if ($addons) {
+				$attendees[$i]['addons'] = $addons;
+				$attendees[$i]['addon-ids'] = array();
+				$attendees[$i]['addon-names'] = array();
+				foreach ($addons as $addon) {
+					$attendees[$i]['addon-ids'][] = $addon['addon-id'];
+					if (isset($addon['name'])) {
+						$attendees[$i]['addon-names'][] = $addon['name'];
+						$attendees[$i]['search-content'][] = $addon['name'];
+						$attendees[$i]['search-content'][] = $addon['description'];
+					}
+				}
+			}
 			$answers = $fdb->list_answers($attendee['id']);
 			if ($answers) {
 				$attendees[$i]['form-answers'] = $answers;
@@ -1719,6 +1859,9 @@ class cm_attendee_db {
 		$id = $stmt->execute() ? $this->cm_db->connection->insert_id : false;
 		$stmt->close();
 		if ($id !== false) {
+			if (isset($attendee['addons'])) {
+				$this->create_addon_purchases($id, $attendee['addons']);
+			}
 			if ($fdb && isset($attendee['form-answers'])) {
 				$fdb->set_answers($id, $attendee['form-answers']);
 			}
@@ -1794,6 +1937,10 @@ class cm_attendee_db {
 		$success = $stmt->execute();
 		$stmt->close();
 		if ($success) {
+			if (isset($attendee['addons'])) {
+				$this->delete_addon_purchases($attendee['id']);
+				$this->create_addon_purchases($attendee['id'], $attendee['addons']);
+			}
 			if ($fdb && isset($attendee['form-answers'])) {
 				$fdb->clear_answers($attendee['id']);
 				$fdb->set_answers($attendee['id'], $attendee['form-answers']);
@@ -1815,6 +1962,7 @@ class cm_attendee_db {
 		$success = $stmt->execute();
 		$stmt->close();
 		if ($success) {
+			$this->delete_addon_purchases($id);
 			$this->cm_ldb->remove_entity($id);
 		}
 		return $success;
@@ -1832,6 +1980,7 @@ class cm_attendee_db {
 		$success = $stmt->execute();
 		$stmt->close();
 		if ($success) {
+			$this->update_addon_purchase_payment_status($id, $status, $type, $txn, $details);
 			$attendee = $this->get_attendee($id);
 			$this->cm_ldb->remove_entity($id);
 			$this->cm_ldb->add_entity($attendee);
