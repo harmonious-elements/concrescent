@@ -724,6 +724,9 @@ select {
 .cm-reg-edit .cm-reg-addon .cm-reg-addon-desc {
 	margin: 8px 40px;
 }
+.cm-reg-edit .cm-reg-addon .disabled {
+	opacity: 0.5;
+}
 
 /* Shopping Cart Page */
 

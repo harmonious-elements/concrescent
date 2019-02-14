@@ -13,6 +13,7 @@ $can_edit = $adb->user_has_permission($admin_user, 'attendees-edit') && !isset($
 
 $atdb = new cm_attendee_db($db);
 $name_map = $atdb->get_badge_type_name_map();
+$all_addons = $atdb->list_addons(false, false, false, $name_map);
 
 $fdb = new cm_forms_db($db, 'attendee');
 $questions = $fdb->list_questions();
@@ -69,6 +70,43 @@ if ($submitted) {
 		$item['payment-group-uuid'] = $db->uuid();
 		$item['payment-date'] = $db->now();
 	}
+
+	/* Addons */
+	$new_addons = array();
+	foreach ($all_addons as $addon) {
+		$k = 'addon-' . $addon['id'];
+		if (isset($_POST[$k]) && $_POST[$k]) {
+			$payment_info = array();
+			if (isset($item['addons']) && $item['addons']) {
+				foreach ($item['addons'] as $pi) {
+					if ($pi['addon-id'] == $addon['id']) {
+						$payment_info = $pi;
+					}
+				}
+			}
+			if (
+				!$payment_info
+				|| (        $payment_info['payment-status' ] !=        $_POST[$k.'-payment-status' ] )
+				|| ( (float)$payment_info['payment-price'  ] != (float)$_POST[$k.'-payment-price'  ] )
+				|| (        $payment_info['payment-type'   ] !=        $_POST[$k.'-payment-type'   ] )
+				|| (        $payment_info['payment-txn-id' ] !=        $_POST[$k.'-payment-txn-id' ] )
+				|| ( (float)$payment_info['payment-txn-amt'] != (float)$_POST[$k.'-payment-txn-amt'] )
+				|| (        $payment_info['payment-details'] !=        $_POST[$k.'-payment-details'] )
+			) {
+				$payment_info['payment-status'] = trim($_POST[$k.'-payment-status']);
+				$payment_info['payment-price'] = (float)$_POST[$k.'-payment-price'];
+				$payment_info['payment-type'] = trim($_POST[$k.'-payment-type']);
+				$payment_info['payment-txn-id'] = trim($_POST[$k.'-payment-txn-id']);
+				$payment_info['payment-txn-amt'] = (float)$_POST[$k.'-payment-txn-amt'];
+				$payment_info['payment-details'] = $_POST[$k.'-payment-details'];
+				$payment_info['payment-date'] = $db->now();
+			}
+			$payment_info['attendee-id'] = $id;
+			$payment_info['addon-id'] = $addon['id'];
+			$new_addons[] = $payment_info;
+		}
+	}
+	$item['addons'] = $new_addons;
 
 	/* Custom Questions */
 	$item['form-answers'] = array();
@@ -244,6 +282,109 @@ echo '<article>';
 					echo '<tr class="cm-add-to-blacklist-fields hidden">';
 						echo '<th>Notes</th>';
 						echo '<td><textarea id="add-to-blacklist-notes" name="add-to-blacklist-notes"></textarea></td>';
+					echo '</tr>';
+				}
+
+				echo '<tr><td colspan="2" class="hr"><hr></td></tr>';
+				echo '<tr><td colspan="2"><h2>Choose Your Addons</h2></td></tr>';
+				foreach ($all_addons as $addon) {
+					$checked = in_array($addon['id'], $item['addon-ids']);
+					echo '<tr><td colspan="2"><div class="cm-reg-addon" id="cm-reg-addon-' . $addon['id'] . '">';
+					echo (($can_edit || $checked) ? '<div>' : '<div class="disabled">') . '<label>';
+					echo '<input type="checkbox" id="addon-' . $addon['id'] . '" name="addon-' . $addon['id'] . '" value="1"';
+					if ($checked) echo ' checked'; if (!$can_edit) echo ' disabled'; echo '>';
+					echo htmlspecialchars($addon['name']) . ' &mdash; ' . htmlspecialchars(price_string($addon['price']));
+					echo '</label></div>';
+					echo '</div></td></tr>';
+
+					$trtag = '<tr class="addon-' . $addon['id'] . '-details' . ($checked ? '">' : ' hidden">');
+					$payment_info = array();
+					if ($checked) {
+						foreach ($item['addons'] as $pi) {
+							if ($pi['addon-id'] == $addon['id']) {
+								$payment_info = $pi;
+							}
+						}
+					}
+
+					echo $trtag;
+						echo '<th><label for="addon-' . $addon['id'] . '-payment-status">Payment Status</label></th>';
+						$value = isset($payment_info['payment-status']) ? htmlspecialchars($payment_info['payment-status']) : '';
+						if ($can_edit) {
+							echo '<td>';
+								echo '<select id="addon-' . $addon['id'] . '-payment-status" name="addon-' . $addon['id'] . '-payment-status">';
+									foreach ($atdb->payment_statuses as $ps) {
+										$hps = htmlspecialchars($ps);
+										echo '<option value="' . $hps;
+										echo ($value == $hps) ? '" selected>' : '">';
+										echo $hps . '</option>';
+									}
+								echo '</select>';
+							echo '</td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+					echo $trtag;
+						echo '<th><label for="addon-' . $addon['id'] . '-payment-price">Payment Price</label></th>';
+						if ($can_edit) {
+							$value = isset($payment_info['payment-price']) ? htmlspecialchars($payment_info['payment-price']) : '';
+							echo '<td><input type="number" id="addon-' . $addon['id'] . '-payment-price" name="addon-' . $addon['id'] . '-payment-price" value="' . $value . '" min="0" step="0.01"></td>';
+						} else {
+							$value = isset($payment_info['payment-price']) ? htmlspecialchars(price_string($payment_info['payment-price'])) : '';
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+					echo $trtag;
+						echo '<th><label for="addon-' . $addon['id'] . '-payment-type">Payment Type</label></th>';
+						$value = isset($payment_info['payment-type']) ? htmlspecialchars($payment_info['payment-type']) : '';
+						if ($can_edit) {
+							echo '<td><input type="text" id="addon-' . $addon['id'] . '-payment-type" name="addon-' . $addon['id'] . '-payment-type" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+					echo $trtag;
+						echo '<th><label for="addon-' . $addon['id'] . '-payment-txn-id">Payment Transaction ID</label></th>';
+						$value = isset($payment_info['payment-txn-id']) ? htmlspecialchars($payment_info['payment-txn-id']) : '';
+						if ($can_edit) {
+							echo '<td><input type="text" id="addon-' . $addon['id'] . '-payment-txn-id" name="addon-' . $addon['id'] . '-payment-txn-id" value="' . $value . '"></td>';
+						} else {
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+					echo $trtag;
+						echo '<th><label for="addon-' . $addon['id'] . '-payment-txn-amt">Payment Transaction Amount</label></th>';
+						if ($can_edit) {
+							$value = isset($payment_info['payment-txn-amt']) ? htmlspecialchars($payment_info['payment-txn-amt']) : '';
+							echo '<td><input type="number" id="addon-' . $addon['id'] . '-payment-txn-amt" name="addon-' . $addon['id'] . '-payment-txn-amt" value="' . $value . '" min="0" step="0.01"></td>';
+						} else {
+							$value = isset($payment_info['payment-txn-amt']) ? htmlspecialchars(price_string($payment_info['payment-txn-amt'])) : '';
+							echo '<td>' . $value . '</td>';
+						}
+					echo '</tr>';
+
+					$value = isset($payment_info['payment-date']) ? htmlspecialchars($payment_info['payment-date']) : '';
+					if ($value) {
+						echo $trtag;
+							echo '<th><label>Payment Date</label></th>';
+							echo '<td>' . $value . '</td>';
+						echo '</tr>';
+					}
+
+					echo $trtag;
+						echo '<th><label for="addon-' . $addon['id'] . '-payment-details">Payment Details</label></th>';
+						if ($can_edit) {
+							$value = isset($payment_info['payment-details']) ? htmlspecialchars($payment_info['payment-details']) : '';
+							echo '<td><textarea id="addon-' . $addon['id'] . '-payment-details" name="addon-' . $addon['id'] . '-payment-details">' . $value . '</textarea></td>';
+						} else {
+							$value = isset($payment_info['payment-details']) ? paragraph_string($payment_info['payment-details']) : '';
+							echo '<td>' . $value . '</td>';
+						}
 					echo '</tr>';
 				}
 

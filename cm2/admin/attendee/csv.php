@@ -32,6 +32,8 @@ if (isset($_POST['download-attendees'])) {
 			array('key' => 'badge-type-id',            'name' => 'Badge Type ID',                   'type' => 'int'  ),
 			array('key' => 'badge-type-id-string',     'name' => 'Badge Type ID String',            'type' => 'text' ),
 			array('key' => 'badge-type-name',          'name' => 'Badge Type Name',                 'type' => 'text' ),
+			array('key' => 'addon-ids',                'name' => 'Addon IDs',                       'type' => 'array'),
+			array('key' => 'addon-names',              'name' => 'Addon Names',                     'type' => 'array'),
 			array('key' => 'email-address',            'name' => 'Email Address',                   'type' => 'text' ),
 			array('key' => 'email-address-subscribed', 'name' => 'Email Address (Subscribed)',      'type' => 'text' ),
 			array('key' => 'subscribed',               'name' => 'Subscribed',                      'type' => 'bool' ),

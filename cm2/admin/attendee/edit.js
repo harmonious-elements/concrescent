@@ -24,6 +24,16 @@
 		paymentStatus.bind('mousedown', paymentStatusChanged);
 		paymentStatus.bind('mouseup', paymentStatusChanged);
 
+		$('.cm-reg-addon input[type=checkbox]').each(function() {
+			var checkbox = $(this);
+			var details = $('.' + checkbox.attr('id') + '-details');
+			checkbox.bind('click', function(event) {
+				var checked = checkbox.is(':checked');
+				if (checked) details.removeClass('hidden');
+				else details.addClass('hidden');
+			});
+		});
+
 		$('body').bind('keydown', function(event) {
 			switch (event.which) {
 				case 27:
