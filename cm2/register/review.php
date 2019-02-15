@@ -9,11 +9,16 @@ if (!$gid || !$tid) {
 	header('Location: index.php');
 	exit(0);
 }
+
 $items = $atdb->list_attendees($gid, $tid, $name_map, $fdb);
 if (!$items) {
 	header('Location: index.php');
 	exit(0);
 }
+
+$onsite_only = isset($_COOKIE['onsite_only']) && $_COOKIE['onsite_only'];
+$sellable_badge_types = $atdb->list_badge_types(true, true, $onsite_only);
+$can_post_purchase_edit = $sellable_badge_types && !$onsite_only;
 
 cm_reg_head('Review Order');
 cm_reg_body('Review Order', false);
@@ -24,6 +29,11 @@ echo '<div class="card">';
 	echo '<div class="card-content">';
 		echo '<p>';
 			$count = count($items);
+			foreach ($items as $item) {
+				if (isset($item['addons'])) {
+					$count += count($item['addons']);
+				}
+			}
 			$count .= ($count == 1) ? ' item' : ' items';
 			echo 'Here are the details of the <b>' . $count . '</b> you ordered ';
 			echo 'on <b>' . htmlspecialchars($items[0]['payment-date']) . '</b>.';
@@ -42,7 +52,9 @@ echo '<div class="card">';
 						echo '<th>Badge Type</th>';
 						echo '<th class="td-numeric">Price</th>';
 						echo '<th>Payment Status</th>';
-						echo '<th class="td-actions">Actions</th>';
+						if ($can_post_purchase_edit) {
+							echo '<th class="td-actions">Actions</th>';
+						}
 					echo '</tr>';
 				echo '</thead>';
 				echo '<tbody>';
@@ -78,15 +90,17 @@ echo '<div class="card">';
 								$payment_status = $item['payment-status'];
 								if ($payment_status) echo '<div>' . cm_status_label($payment_status) . '</div>';
 							echo '</td>';
-							echo '<td class="td-actions">';
-								if ($item['payment-status'] == 'Completed') {
-									echo '<form action="post-purchase-edit.php" method="post">';
-										echo '<input type="hidden" name="id" value="' . $item['id'] . '">';
-										echo '<input type="hidden" name="uuid" value="' . $item['uuid'] . '">';
-										echo '<input type="submit" name="submit" value="Edit Order">';
-									echo '</form>';
-								}
-							echo '</td>';
+							if ($can_post_purchase_edit) {
+								echo '<td class="td-actions">';
+									if ($item['payment-status'] == 'Completed') {
+										echo '<form action="post-purchase-edit.php" method="post">';
+											echo '<input type="hidden" name="id" value="' . $item['id'] . '">';
+											echo '<input type="hidden" name="uuid" value="' . $item['uuid'] . '">';
+											echo '<input type="submit" name="submit" value="Edit Order">';
+										echo '</form>';
+									}
+								echo '</td>';
+							}
 						echo '</tr>';
 						if (isset($item['addons']) && $item['addons']) {
 							foreach ($item['addons'] as $addon) {
@@ -98,7 +112,9 @@ echo '<div class="card">';
 									echo '<td><div>Addon</div></td>';
 									echo '<td class="td-numeric"><div>' . $addon_price . '</div></td>';
 									echo '<td><div>' . $addon_status . '</div></td>';
-									echo '<td class="td-actions"></td>';
+									if ($can_post_purchase_edit) {
+										echo '<td class="td-actions"></td>';
+									}
 								echo '</tr>';
 								$badge_price_total += (float)$addon['payment-price'];
 								$promo_price_total += (float)$addon['payment-price'];
@@ -119,7 +135,9 @@ echo '<div class="card">';
 							}
 						echo '</th>';
 						echo '<th></th>';
-						echo '<th class="td-actions"></th>';
+						if ($can_post_purchase_edit) {
+							echo '<th class="td-actions"></th>';
+						}
 					echo '</tr>';
 				echo '</tfoot>';
 			echo '</table>';

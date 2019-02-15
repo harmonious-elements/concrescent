@@ -24,9 +24,17 @@ $questions = $fdb->list_questions();
 $mdb = new cm_mail_db($db);
 $contact_address = $mdb->get_contact_address('attendee-paid');
 
-function cm_reg_cart_count() {
+function cm_reg_cart_count($include_addons = false) {
 	if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
-	return count($_SESSION['cart']);
+	$count = count($_SESSION['cart']);
+	if ($include_addons) {
+		foreach ($_SESSION['cart'] as $item) {
+			if (isset($item['addons'])) {
+				$count += count($item['addons']);
+			}
+		}
+	}
+	return $count;
 }
 
 function cm_reg_cart_add($item) {
@@ -172,7 +180,7 @@ function cm_reg_body($title, $show_cart = true) {
 			echo '<div class="header-items">';
 				echo '<div class="header-item">';
 					$url = get_site_url(false) . '/register/cart.php';
-					$count = cm_reg_cart_count();
+					$count = cm_reg_cart_count(true);
 					$count .= ($count == 1) ? ' item' : ' items';
 					echo '<a href="' . htmlspecialchars($url) . '">Shopping Cart: ' . $count . '</a>';
 				echo '</div>';

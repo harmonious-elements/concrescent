@@ -157,7 +157,7 @@ echo '<div class="card">';
 			echo '</p>';
 		}
 		echo '<p>';
-			$count = cm_reg_cart_count();
+			$count = cm_reg_cart_count(true);
 			$count .= ($count == 1) ? ' item' : ' items';
 			echo 'Your shopping cart has <b>' . $count . '</b>. ';
 			echo 'Your registration is not complete until your click <b>Place Order</b>.';
