@@ -16,7 +16,7 @@ if (!$items) {
 }
 
 cm_reg_head('Review Order');
-cm_reg_body('Review Order');
+cm_reg_body('Review Order', false);
 echo '<article>';
 
 echo '<div class="card">';
@@ -42,6 +42,7 @@ echo '<div class="card">';
 						echo '<th>Badge Type</th>';
 						echo '<th class="td-numeric">Price</th>';
 						echo '<th>Payment Status</th>';
+						echo '<th class="td-actions">Actions</th>';
 					echo '</tr>';
 				echo '</thead>';
 				echo '<tbody>';
@@ -77,6 +78,15 @@ echo '<div class="card">';
 								$payment_status = $item['payment-status'];
 								if ($payment_status) echo '<div>' . cm_status_label($payment_status) . '</div>';
 							echo '</td>';
+							echo '<td class="td-actions">';
+								if ($item['payment-status'] == 'Completed') {
+									echo '<form action="post-purchase-edit.php" method="post">';
+										echo '<input type="hidden" name="id" value="' . $item['id'] . '">';
+										echo '<input type="hidden" name="uuid" value="' . $item['uuid'] . '">';
+										echo '<input type="submit" name="submit" value="Edit Order">';
+									echo '</form>';
+								}
+							echo '</td>';
 						echo '</tr>';
 						if (isset($item['addons']) && $item['addons']) {
 							foreach ($item['addons'] as $addon) {
@@ -88,6 +98,7 @@ echo '<div class="card">';
 									echo '<td><div>Addon</div></td>';
 									echo '<td class="td-numeric"><div>' . $addon_price . '</div></td>';
 									echo '<td><div>' . $addon_status . '</div></td>';
+									echo '<td class="td-actions"></td>';
 								echo '</tr>';
 								$badge_price_total += (float)$addon['payment-price'];
 								$promo_price_total += (float)$addon['payment-price'];
@@ -108,6 +119,7 @@ echo '<div class="card">';
 							}
 						echo '</th>';
 						echo '<th></th>';
+						echo '<th class="td-actions"></th>';
 					echo '</tr>';
 				echo '</tfoot>';
 			echo '</table>';

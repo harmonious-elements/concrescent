@@ -715,13 +715,15 @@ select {
 .cm-reg-edit table div.error {
 	padding-top: 8px;
 }
-.cm-reg-edit .cm-reg-addon p {
+.cm-reg-edit .cm-reg-addon p,
+.cm-reg-edit .cm-reg-upgrade p {
 	margin: 8px 0;
 }
 .cm-reg-edit .cm-reg-addon label {
 	font-weight: bold;
 }
-.cm-reg-edit .cm-reg-addon .cm-reg-addon-desc {
+.cm-reg-edit .cm-reg-addon .cm-reg-addon-desc,
+.cm-reg-edit .cm-reg-upgrade .cm-reg-upgrade-desc {
 	margin: 8px 40px;
 }
 .cm-reg-edit .cm-reg-addon .disabled {

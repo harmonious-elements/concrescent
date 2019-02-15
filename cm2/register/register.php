@@ -96,6 +96,60 @@ function cm_reg_cart_destroy() {
 	session_destroy();
 }
 
+function cm_reg_post_edit_get() {
+	if (isset($_SESSION['post_edit'])) {
+		return $_SESSION['post_edit'];
+	} else {
+		return null;
+	}
+}
+
+function cm_reg_post_edit_set($item) {
+	$_SESSION['post_edit'] = $item;
+}
+
+function cm_reg_post_edit_total() {
+	$total = 0;
+	if (isset($_SESSION['post_edit'])) {
+		$item = $_SESSION['post_edit'];
+		if (isset($item['new-badge-type'])) {
+			$bt = $item['new-badge-type'];
+			if (isset($bt['price-diff'])) {
+				$total += (float)$bt['price-diff'];
+			}
+		}
+		if (isset($item['new-addons'])) {
+			foreach ($item['new-addons'] as $addon) {
+				$total += (float)$addon['price'];
+			}
+		}
+	}
+	return $total;
+}
+
+function cm_reg_post_edit_set_state($state) {
+	if (!isset($_SESSION['post_edit'])) $_SESSION['post_edit'] = array();
+	$_SESSION['post_edit_hash'] = md5(serialize($_SESSION['post_edit']));
+	$_SESSION['post_edit_state'] = $state;
+}
+
+function cm_reg_post_edit_check_state($expected_state) {
+	if (!isset($_SESSION['post_edit'])) return false;
+	if (!isset($_SESSION['post_edit_hash'])) return false;
+	if (!isset($_SESSION['post_edit_state'])) return false;
+	$expected_hash = md5(serialize($_SESSION['post_edit']));
+	if ($_SESSION['post_edit_hash'] != $expected_hash) return false;
+	if ($_SESSION['post_edit_state'] != $expected_state) return false;
+	return true;
+}
+
+function cm_reg_post_edit_destroy() {
+	unset($_SESSION['post_edit']);
+	unset($_SESSION['post_edit_hash']);
+	unset($_SESSION['post_edit_state']);
+	session_destroy();
+}
+
 function cm_reg_head($title) {
 	echo '<!DOCTYPE HTML>';
 	echo '<html>';
