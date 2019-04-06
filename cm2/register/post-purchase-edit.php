@@ -67,7 +67,7 @@ if (isset($_POST['submit']) && isset($_POST['action']) && $_POST['action'] == 'c
 		$errors['name-on-badge'] = 'Name on badge is required.';
 	}
 
-	$item['badge-type-id'] = (int)$_POST['badge-type-id'];
+	$item['badge-type-id'] = isset($_POST['badge-type-id']) ? (int)$_POST['badge-type-id'] : $item['badge-type-id'];
 	$item['new-badge-type'] = false;
 	foreach ($applicable_badge_types as $badge_type) {
 		if ($badge_type['id'] == $item['badge-type-id']) {
